@@ -1,0 +1,84 @@
+# Ignore sensitive configuration
+config/settings.yaml.personal
+config/settings.yaml
+config/rsu_schedule.yaml
+.env
+
+# Ignore data files
+data/*
+!data/.gitkeep
+!data/demo_source/
+
+# Ignore any real financial outputs
+output/*
+!output/.gitkeep
+output_report_from_real_analysis/*
+notebooks/output/
+
+# Ignore uploaded data files (contain personal financial data)
+src/web_app/static/uploads/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter notebooks (contain PII in outputs)
+notebooks/
+*.ipynb
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# OS specific
+.DS_Store
+.history/
+
+# IDE
+.idea/
+.vscode/
+
+# Debug files
+debug_*.html
+debug_*.py
+
+# Test files in root (use test/ directory for permanent tests)
+test_*.py
+verify_*.py
+
+# Temporary session documentation (may contain personal data)
+*VALIDATION_REPORT*.md
+*FIX_SUMMARY*.md
+*PHASE_STATUS*.md
+*SESSION_SUMMARY*.md
+
+# Backup directories (contain personal financial data)
+backups/
+
+# Logs
+logs/
+*.log
+
+# Verification docs with personal data
+docs/_active_projects/wealth_insights/
+docs/_active_projects/phase6_discrepancy_resolution_summary.md
+
+
+# Personal data backup (not for open source)
+data/personal_backup/

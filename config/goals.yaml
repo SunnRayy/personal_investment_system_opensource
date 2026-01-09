@@ -1,0 +1,61 @@
+goals:
+  emergency_fund:
+    name: Emergency Fund
+    target_amount: 50000.0
+    target_date: '2026-12-31'
+    priority: low
+    category: emergency
+    description: Maintain emergency fund covering 6 months of expenses
+    current_progress: 0
+  fire:
+    name: FIRE
+    target_amount: 2000000.0
+    target_date: '2045-12-31'
+    priority: high
+    category: retirement
+    description: Financial Independence, Retire Early
+    current_progress: 0.0
+  house_down_payment:
+    name: House Down Payment
+    target_amount: 100000.0
+    target_date: '2030-12-31'
+    priority: medium
+    category: property
+    description: Saving for a house
+    current_progress: 0.0
+planning_config:
+  assumptions:
+    annual_inflation_rate: 0.03
+    default_investment_return: 0.07
+    risk_free_rate: 0.02
+  simulation:
+    num_simulations: 10000
+    confidence_levels:
+    - 0.1
+    - 0.25
+    - 0.5
+    - 0.75
+    - 0.9
+    market_volatility: 0.15
+  tracking:
+    update_frequency: monthly
+    rebalancing_threshold: 0.05
+    alert_thresholds:
+      behind_schedule: 0.1
+      ahead_schedule: 0.2
+  categories:
+    retirement:
+      default_return_assumption: 0.08
+      risk_tolerance: moderate_aggressive
+    property:
+      default_return_assumption: 0.06
+      risk_tolerance: moderate
+    emergency:
+      default_return_assumption: 0.02
+      risk_tolerance: conservative
+    education:
+      default_return_assumption: 0.07
+      risk_tolerance: moderate
+    lifestyle:
+      default_return_assumption: 0.05
+      risk_tolerance: moderate

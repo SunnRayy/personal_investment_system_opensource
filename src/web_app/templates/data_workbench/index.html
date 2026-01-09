@@ -1,0 +1,783 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Data Workbench') }} - WealthOS{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">{{ _('Data Workbench') }}</h1>
+        <p class="text-gray-600 mt-2">{{ _('Import, clean, and promote data to the production system.') }}</p>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="border-b border-gray-200 mb-6">
+        <nav class="-mb-px flex space-x-8">
+            <button id="stagingTab" onclick="switchMainTab('staging')"
+                class="border-b-2 border-blue-500 py-4 px-1 text-sm font-medium text-blue-600">
+                {{ _('Staging Area') }}
+            </button>
+            <button id="historyTab" onclick="switchMainTab('history')"
+                class="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                {{ _('Import History') }}
+            </button>
+        </nav>
+    </div>
+
+    <!-- Staging Area Content -->
+    <div id="stagingContent">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Left Panel: Upload & Actions -->
+            <div class="md:col-span-1 space-y-6">
+                <!-- Upload Card -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                        <h5 class="font-semibold text-gray-700">{{ _('Import Data') }}</h5>
+                    </div>
+                    <div class="p-6">
+                        <form id="uploadForm" enctype="multipart/form-data" onsubmit="uploadFile(event)">
+                            <div class="mb-4">
+                                <label for="fileInput" class="block text-sm font-medium text-gray-700 mb-2">{{ _('Select
+                                    Excel/CSV File') }}</label>
+                                <input class="block w-full text-sm text-gray-500
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-blue-50 file:text-blue-700
+                                hover:file:bg-blue-100" type="file" id="fileInput" name="file"
+                                    accept=".xlsx,.xls,.csv">
+                            </div>
+                            <button type="submit"
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex justify-center items-center"
+                                id="uploadBtn">
+                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
+                                </svg>
+                                <span>{{ _('Upload & Process') }}</span>
+                            </button>
+                        </form>
+                        <!-- Upload Result Info (Hidden by default) -->
+                        <div id="uploadResultInfo" class="mt-4 hidden">
+                            <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd"
+                                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3 text-sm">
+                                        <p class="font-medium text-blue-800">{{ _('Import Details') }}</p>
+                                        <div class="mt-2 text-blue-700 space-y-1">
+                                            <p><strong>{{ _('Source') }}:</strong> <span id="detectedSource">-</span> |
+                                                <strong>{{ _('Currency') }}:</strong> <span
+                                                    id="detectedCurrency">-</span></p>
+                                            <p><strong>{{ _('Imported') }}:</strong> <span id="detailTotalRows">-</span>
+                                                {{ _('rows') }}</p>
+                                            <p><strong>{{ _('Valid') }}:</strong> <span id="detailValidRows"
+                                                    class="text-green-600">-</span> |
+                                                <strong>{{ _('Errors') }}:</strong> <span id="detailErrorRows"
+                                                    class="text-red-600">-</span> |
+                                                <strong>{{ _('Skipped') }}:</strong> <span id="detailSkippedRows"
+                                                    class="text-gray-600">-</span>
+                                            </p>
+                                            <details class="mt-2">
+                                                <summary class="cursor-pointer text-blue-600 hover:text-blue-800">{{
+                                                    _('Column Mapping') }}</summary>
+                                                <div id="columnMappingDetail"
+                                                    class="mt-2 text-xs bg-white p-2 rounded border border-blue-200">
+                                                </div>
+                                            </details>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions Card -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                        <h5 class="font-semibold text-gray-700">{{ _('Actions') }}</h5>
+                    </div>
+                    <div class="p-6 space-y-3">
+                        <button
+                            class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out"
+                            id="promoteBtn" onclick="promoteData()">
+                            {{ _('Promote Valid Records') }}
+                        </button>
+                        <button
+                            class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out"
+                            id="clearBtn" onclick="clearData()">
+                            {{ _('Clear Staging Area') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Data Grid -->
+            <div class="md:col-span-2">
+                <div class="bg-white rounded-lg shadow-md h-full flex flex-col">
+                    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                        <h5 class="font-semibold text-gray-700">{{ _('Staging Data') }}</h5>
+                        <div class="flex space-x-2">
+                            <span class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-semibold"
+                                id="totalCount">0 {{ _('Total') }}</span>
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold"
+                                id="validCount">0 {{ _('Valid') }}</span>
+                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-semibold"
+                                id="errorCount">0
+                                {{ _('Errors') }}</span>
+                        </div>
+                    </div>
+                    <div class="flex-grow overflow-auto" style="max-height: 70vh;">
+                        <!-- Batch Actions Bar (hidden by default) -->
+                        <div id="batchActionsBar"
+                            class="hidden bg-blue-50 border-b border-blue-200 px-6 py-3 flex justify-between items-center">
+                            <span id="selectedCountText" class="text-sm font-medium text-blue-900"
+                                data-selected-text="{{ _('rows selected') }}">0 {{ _('rows selected') }}</span>
+                            <div class="space-x-2">
+                                <button onclick="openBatchResolveModal()"
+                                    class="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                                    {{ _('Batch Resolve') }}
+                                </button>
+                                <button onclick="clearSelection()"
+                                    class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300">
+                                    {{ _('Clear Selection') }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <table class="min-w-full divide-y divide-gray-200" id="stagingTable">
+                            <thead class="bg-gray-50 sticky top-0">
+                                <tr>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <input type="checkbox" id="selectAllCheckbox" onclick="toggleSelectAll()"
+                                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    </th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {{ _('Status') }}</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {{ _('Date') }}</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {{ _('Asset ID') }}</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {{ _('Type') }}</th>
+                                    <th
+                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {{ _('Amount') }}</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {{ _('Errors') }}</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {{ _('Actions') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="stagingTableBody">
+                                <!-- Data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resolve Error Modal -->
+        <div id="resolveModal"
+            class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+            <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+                <!-- Modal Header -->
+                <div class="flex justify-between items-center pb-3 border-b">
+                    <h3 class="text-xl font-semibold text-gray-900">{{ _('Resolve Unknown Asset') }}</h3>
+                    <button onclick="closeResolveModal()" class="text-gray-400 hover:text-gray-500">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Tabs -->
+                <div class="border-b border-gray-200 mt-4">
+                    <nav class="-mb-px flex space-x-8">
+                        <button id="mapTab" onclick="switchTab('map')"
+                            class="border-b-2 border-blue-500 py-4 px-1 text-sm font-medium text-blue-600">
+                            {{ _('Map to Existing Asset') }}
+                        </button>
+                        <button id="createTab" onclick="switchTab('create')"
+                            class="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                            {{ _('Create New Asset') }}
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Tab Content: Map to Existing -->
+                <div id="mapContent" class="mt-4">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ _('Search for Asset') }}</label>
+                        <input type="text" id="assetSearchInput"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="{{ _('Type asset name or ID...') }}" oninput="searchAssets(this.value)">
+                    </div>
+                    <div id="searchResults" class="border border-gray-200 rounded-md max-h-64 overflow-y-auto">
+                        <p class="text-gray-500 text-sm p-4">{{ _('Start typing to search...') }}</p>
+                    </div>
+                    <div class="mt-4 flex justify-end">
+                        <button onclick="closeResolveModal()"
+                            class="mr-2 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                            {{ _('Cancel') }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Create New -->
+                <div id="createContent" class="mt-4 hidden">
+                    <form id="createAssetForm" onsubmit="submitNewAsset(event)">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ _('Asset Name') }}
+                                    *</label>
+                                <input type="text" id="newAssetName" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ _('Asset Type') }}
+                                    *</label>
+                                <select id="newAssetType" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="Stock">Stock</option>
+                                    <option value="Bond">Bond</option>
+                                    <option value="Fund">Fund</option>
+                                    <option value="ETF">ETF</option>
+                                    <option value="Crypto">Crypto</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ _('Asset Class') }}
+                                    ({{ _('Optional') }})</label>
+                                <input type="text" id="newAssetClass"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="e.g., Equity, Fixed_Income, Alternative">
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button type="button" onclick="closeResolveModal()"
+                                class="mr-2 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                                {{ _('Cancel') }}
+                            </button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                {{ _('Create & Resolve') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> <!-- Close stagingContent -->
+
+<!-- Import History Content (hidden by default) -->
+<div id="historyContent" class="hidden">
+    <div class="bg-white rounded-lg shadow-md">
+        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+            <h5 class="font-semibold text-gray-700">{{ _('Import History') }}</h5>
+        </div>
+        <div class="overflow-auto" style="max-height: 80vh;">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50 sticky top-0">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{
+                            _('Batch ID') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {{ _('Filename') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {{ _('Uploaded') }}</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {{ _('Total') }}</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {{ _('Valid') }}</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {{ _('Errors') }}</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {{ _('Promoted') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {{ _('Status') }}</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200" id="historyTableBody">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Inline JavaScript to ensure it loads and executes
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('Workbench initialized');
+        loadStagingData();
+    });
+
+    function switchMainTab(tab) {
+        if (tab === 'staging') {
+            document.getElementById('stagingTab').className = 'border-b-2 border-blue-500 py-4 px-1 text-sm font-medium text-blue-600';
+            document.getElementById('historyTab').className = 'border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300';
+            document.getElementById('stagingContent').classList.remove('hidden');
+            document.getElementById('historyContent').classList.add('hidden');
+        } else {
+            document.getElementById('historyTab').className = 'border-b-2 border-blue-500 py-4 px-1 text-sm font-medium text-blue-600';
+            document.getElementById('stagingTab').className = 'border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300';
+            document.getElementById('historyContent').classList.remove('hidden');
+            document.getElementById('stagingContent').classList.add('hidden');
+            loadImportHistory();
+        }
+    }
+
+    function loadImportHistory() {
+        fetch('/workbench/api/import-history')
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('historyTableBody');
+                if (!tbody) return;
+
+                tbody.innerHTML = '';
+
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-gray-500">No import history</td></tr>';
+                    return;
+                }
+
+                data.forEach(record => {
+                    const tr = document.createElement('tr');
+
+                    const uploadDate = record.uploaded_at ? new Date(record.uploaded_at).toLocaleString() : '-';
+
+                    let statusClass = 'bg-gray-100 text-gray-800';
+                    if (record.status === 'promoted') {
+                        statusClass = 'bg-green-100 text-green-800';
+                    } else if (record.status === 'cleared') {
+                        statusClass = 'bg-red-100 text-red-800';
+                    } else if (record.status === 'uploaded') {
+                        statusClass = 'bg-blue-100 text-blue-800';
+                    }
+
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 text-sm text-gray-900 font-mono">${record.batch_id}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">${record.filename || '-'}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">${uploadDate}</td>
+                        <td class="px-6 py-4 text-sm text-center text-gray-900">${record.total_rows}</td>
+                        <td class="px-6 py-4 text-sm text-center text-green-600">${record.valid_rows}</td>
+                        <td class="px-6 py-4 text-sm text-center text-red-600">${record.error_rows}</td>
+                        <td class="px-6 py-4 text-sm text-center text-blue-600">${record.promoted_rows}</td>
+                        <td class="px-6 py-4"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${record.status}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(error => console.error('Error loading import history:', error));
+    }
+
+
+    function uploadFile(event) {
+        event.preventDefault();
+        console.log('Upload started');
+
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const spinner = uploadBtn.querySelector('svg');
+
+        if (!fileInput.files[0]) {
+            alert('Please select a file');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        uploadBtn.disabled = true;
+        if (spinner) spinner.classList.remove('hidden');
+
+        fetch('/workbench/upload', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Upload response:', data);
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    // Display success message
+                    alert(data.message);
+
+                    // Show upload result details
+                    displayUploadResults(data);
+
+                    // Reload staging data
+                    loadStagingData();
+                    fileInput.value = ''; // Clear input
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Upload failed: ' + error);
+            })
+            .finally(() => {
+                uploadBtn.disabled = false;
+                if (spinner) spinner.classList.add('hidden');
+            });
+    }
+
+    function displayUploadResults(data) {
+        const resultDiv = document.getElementById('uploadResultInfo');
+
+        // Populate fields
+        document.getElementById('detectedSource').textContent = data.file_source || 'unknown';
+        document.getElementById('detectedCurrency').textContent = data.detected_currency || 'N/A';
+        document.getElementById('detailTotalRows').textContent = data.total_rows || 0;
+        document.getElementById('detailValidRows').textContent = data.valid_rows || 0;
+        document.getElementById('detailErrorRows').textContent = data.error_rows || 0;
+        document.getElementById('detailSkippedRows').textContent = data.skipped_rows || 0;
+
+        // Display column mapping
+        const mappingDiv = document.getElementById('columnMappingDetail');
+        if (data.column_mapping && Object.keys(data.column_mapping).length > 0) {
+            let mappingHtml = '<ul class="list-disc list-inside">';
+            for (const [standardField, actualColumn] of Object.entries(data.column_mapping)) {
+                mappingHtml += `<li><strong>${standardField}</strong> → ${actualColumn}</li>`;
+            }
+            mappingHtml += '</ul>';
+            mappingDiv.innerHTML = mappingHtml;
+        } else {
+            mappingDiv.innerHTML = '<p class="text-gray-500">No column mapping detected</p>';
+        }
+
+        // Show the results
+        resultDiv.classList.remove('hidden');
+    }
+
+    function promoteData() {
+        if (!confirm('Are you sure you want to promote all VALID records to production?')) return;
+
+        fetch('/workbench/api/promote', {
+            method: 'POST'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    alert(data.message);
+                    loadStagingData();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function clearData() {
+        if (!confirm('Are you sure you want to clear ALL staging data? This cannot be undone.')) return;
+
+        fetch('/workbench/api/clear', {
+            method: 'POST'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    loadStagingData();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function loadStagingData() {
+        fetch('/workbench/api/staging-data?t=' + new Date().getTime())
+            .then(response => response.json())
+            .then(data => {
+                console.log('Loaded data:', data);
+                const tbody = document.getElementById('stagingTableBody');
+                if (!tbody) return;
+
+                tbody.innerHTML = '';
+
+                let validCount = 0;
+                let errorCount = 0;
+
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500">No data in staging</td></tr>';
+                }
+
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+
+                    let statusClass = 'bg-gray-100 text-gray-800';
+                    if (row.status === 'VALID') {
+                        statusClass = 'bg-green-100 text-green-800';
+                        validCount++;
+                    } else if (row.status === 'ERROR') {
+                        statusClass = 'bg-red-100 text-red-800';
+                        errorCount++;
+                    } else if (row.status === 'PROMOTED') {
+                        statusClass = 'bg-blue-100 text-blue-800';
+                    }
+
+
+                    // Add Resolve button for ERROR rows
+                    const actionButton = row.status === 'ERROR'
+                        ? `<button onclick="openResolveModal(${row.id}, '${row.asset_id || ''}')" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Resolve</button>`
+                        : '-';
+
+                    // Add checkbox for ERROR rows only
+                    const checkboxCell = row.status === 'ERROR'
+                        ? `<input type="checkbox" class="row-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" 
+                               data-id="${row.id}" onchange="toggleRowSelection(${row.id})">`
+                        : '';
+
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">${checkboxCell}</td>
+                        <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${row.status}</span></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${row.date || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">${row.asset_id || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${row.transaction_type || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">${row.amount ? row.amount.toFixed(2) : '-'}</td>
+                        <td class="px-6 py-4 text-sm text-red-600">${row.validation_errors ? row.validation_errors.join(', ') : ''}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">${actionButton}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById('totalCount').textContent = `${data.length} Total`;
+                document.getElementById('validCount').textContent = `${validCount} Valid`;
+                document.getElementById('errorCount').textContent = `${errorCount} Errors`;
+
+                // Reset selection after reload
+                selectedStagingIds.clear();
+                updateBatchActionsBar();
+            })
+            .catch(error => console.error('Error loading data:', error));
+    }
+
+    // Batch selection state
+    const selectedStagingIds = new Set();
+
+    function toggleRowSelection(id) {
+        if (selectedStagingIds.has(id)) {
+            selectedStagingIds.delete(id);
+        } else {
+            selectedStagingIds.add(id);
+        }
+        updateBatchActionsBar();
+        updateSelectAllCheckbox();
+    }
+
+    function toggleSelectAll() {
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+
+        rowCheckboxes.forEach(checkbox => {
+            const id = parseInt(checkbox.dataset.id);
+            if (selectAllCheckbox.checked) {
+                selectedStagingIds.add(id);
+                checkbox.checked = true;
+            } else {
+                selectedStagingIds.delete(id);
+                checkbox.checked = false;
+            }
+        });
+
+        updateBatchActionsBar();
+    }
+
+    function updateSelectAllCheckbox() {
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+        const allChecked = rowCheckboxes.length > 0 &&
+            Array.from(rowCheckboxes).every(cb => cb.checked);
+        selectAllCheckbox.checked = allChecked;
+    }
+
+    function updateBatchActionsBar() {
+        const bar = document.getElementById('batchActionsBar');
+        const countText = document.getElementById('selectedCountText');
+
+        if (selectedStagingIds.size > 0) {
+            bar.classList.remove('hidden');
+            countText.textContent = `${selectedStagingIds.size} row${selectedStagingIds.size > 1 ? 's' : ''} selected`;
+        } else {
+            bar.classList.add('hidden');
+        }
+    }
+
+    function clearSelection() {
+        selectedStagingIds.clear();
+        document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+        document.getElementById('selectAllCheckbox').checked = false;
+        updateBatchActionsBar();
+    }
+
+    function openBatchResolveModal() {
+        if (selectedStagingIds.size === 0) {
+            alert('Please select at least one row');
+            return;
+        }
+
+        // Use existing modal but flag it as batch mode
+        currentStagingId = Array.from(selectedStagingIds); // Store array instead of single ID
+        document.getElementById('resolveModal').classList.remove('hidden');
+        document.getElementById('assetSearchInput').focus();
+    }
+
+    // Modal state
+    let currentStagingId = null;
+
+    function openResolveModal(stagingId, currentAssetId) {
+        currentStagingId = stagingId;
+        document.getElementById('resolveModal').classList.remove('hidden');
+        document.getElementById('assetSearchInput').value = currentAssetId || '';
+        document.getElementById('assetSearchInput').focus();
+    }
+
+    function closeResolveModal() {
+        document.getElementById('resolveModal').classList.add('hidden');
+        currentStagingId = null;
+        document.getElementById('assetSearchInput').value = '';
+        document.getElementById('searchResults').innerHTML = '<p class="text-gray-500 text-sm p-4">Start typing to search...</p>';
+        document.getElementById('createAssetForm').reset();
+    }
+
+    function switchTab(tab) {
+        if (tab === 'map') {
+            document.getElementById('mapTab').className = 'border-b-2 border-blue-500 py-4 px-1 text-sm font-medium text-blue-600';
+            document.getElementById('createTab').className = 'border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300';
+            document.getElementById('mapContent').classList.remove('hidden');
+            document.getElementById('createContent').classList.add('hidden');
+        } else {
+            document.getElementById('createTab').className = 'border-b-2 border-blue-500 py-4 px-1 text-sm font-medium text-blue-600';
+            document.getElementById('mapTab').className = 'border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300';
+            document.getElementById('createContent').classList.remove('hidden');
+            document.getElementById('mapContent').classList.add('hidden');
+        }
+    }
+
+    let searchTimeout;
+    function searchAssets(query) {
+        clearTimeout(searchTimeout);
+
+        if (!query || query.length < 2) {
+            document.getElementById('searchResults').innerHTML = '<p class="text-gray-500 text-sm p-4">Start typing to search...</p>';
+            return;
+        }
+
+        searchTimeout = setTimeout(() => {
+            fetch(`/workbench/api/search-assets?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(assets => {
+                    const resultsDiv = document.getElementById('searchResults');
+                    if (assets.length === 0) {
+                        resultsDiv.innerHTML = '<p class="text-gray-500 text-sm p-4">No assets found</p>';
+                    } else {
+                        resultsDiv.innerHTML = assets.map(asset => `
+                            <div class="p-3 hover:bg-gray-50 border-b cursor-pointer" onclick="selectAsset('${asset.asset_id}')">
+                                <div class="font-medium text-gray-900">${asset.asset_name}</div>
+                                <div class="text-sm text-gray-500">ID: ${asset.asset_id} | Type: ${asset.asset_type || 'N/A'}</div>
+                            </div>
+                        `).join('');
+                    }
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    document.getElementById('searchResults').innerHTML = '<p class="text-red-500 text-sm p-4">Error searching assets</p>';
+                });
+        }, 300);
+    }
+
+    function selectAsset(assetId) {
+        if (!currentStagingId) return;
+
+        // Check if batch mode (currentStagingId is an array)
+        const isBatchMode = Array.isArray(currentStagingId);
+        const endpoint = isBatchMode ? '/workbench/api/batch-resolve-error' : '/workbench/api/resolve-error';
+        const payload = isBatchMode
+            ? { staging_ids: currentStagingId, asset_id: assetId }
+            : { staging_id: currentStagingId, asset_id: assetId };
+
+        fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    const message = isBatchMode
+                        ? `Successfully resolved ${data.updated_count} records!`
+                        : 'Error resolved successfully!';
+                    alert(message);
+                    closeResolveModal();
+                    loadStagingData();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to resolve error');
+            });
+    }
+
+    function submitNewAsset(event) {
+        event.preventDefault();
+
+        if (!currentStagingId) return;
+
+        const name = document.getElementById('newAssetName').value.trim();
+        const type = document.getElementById('newAssetType').value;
+        const assetClass = document.getElementById('newAssetClass').value.trim();
+
+        fetch('/workbench/api/create-asset', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                staging_id: currentStagingId,
+                asset_name: name,
+                asset_type: type,
+                asset_class: assetClass
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    alert('Asset created and error resolved successfully!');
+                    closeResolveModal();
+                    loadStagingData();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to create asset');
+            });
+    }
+</script>
+{% endblock %}

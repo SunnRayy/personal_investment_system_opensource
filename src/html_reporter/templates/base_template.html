@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="{{ locale|default('en') }}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ _('Personal Investment Report') }}{% endblock %}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js Datalabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: 70px;
+            /* Account for fixed navbar */
+            font-size: 0.875rem;
+            /* Base font size reduced */
+        }
+
+        /* Navigation Bar Styles */
+        .navbar-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar-custom .navbar-brand {
+            font-weight: 600;
+            font-size: 1.1rem;
+            /* Reduced from 1.3rem */
+            color: white !important;
+        }
+
+        .navbar-custom .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            font-size: 0.85rem;
+            /* Added explicit size */
+            padding: 0.4rem 0.85rem !important;
+            /* Slightly reduced padding */
+            margin: 0 0.25rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-custom .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white !important;
+        }
+
+        .navbar-custom .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: white !important;
+            font-weight: 600;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 0;
+            /* Reduced from 2rem */
+            margin-bottom: 1.5rem;
+            /* Reduced from 2rem */
+            border-radius: 0 0 1rem 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.75rem;
+            /* Added explicit size */
+        }
+
+        .page-header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.95;
+            font-size: 0.9rem;
+            /* Added explicit size */
+        }
+
+        /* KPI Cards */
+        .kpi-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.25rem;
+            /* Reduced from 1.5rem */
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            border: none;
+            height: 120px;
+            /* Reduced from 140px */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .kpi-card-secondary {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+        }
+
+        .kpi-value {
+            font-size: 1.5rem;
+            /* Reduced from 1.8rem */
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.4rem;
+        }
+
+        .kpi-label {
+            color: #6c757d;
+            font-size: 0.75rem;
+            /* Reduced from 0.9rem */
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Section Titles */
+        .section-title {
+            color: #2c3e50;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            /* Reduced from 2rem */
+            font-weight: 600;
+            font-size: 1.4rem;
+            /* Added explicit size */
+        }
+
+        .section-subtitle {
+            color: #495057;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Charts */
+        .chart-container {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            /* Reduced from 2rem */
+            margin-bottom: 1.5rem;
+            /* Reduced from 2rem */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            /* Reduced from 1.5rem */
+            font-weight: 600;
+            font-size: 1.1rem;
+            /* Added explicit size */
+        }
+
+        /* Tables */
+        .table-container {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            /* Reduced from 2rem */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .table {
+            font-size: 0.85rem;
+            /* Added to make table text smaller */
+        }
+
+        .status-unmapped {
+            background-color: #fff3cd !important;
+            color: #856404;
+        }
+
+        .status-non-rebalanceable {
+            background-color: #f8d7da !important;
+            color: #721c24;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.8rem;
+            /* Added explicit size */
+        }
+
+        .positive {
+            color: #28a745;
+        }
+
+        .negative {
+            color: #dc3545;
+        }
+
+        /* Recommendation Cards */
+        .recommendation-card {
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .recommendation-card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .recommendation-card .card-header {
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.95rem;
+            /* Added explicit size */
+        }
+
+        .recommendation-card .card-body {
+            font-size: 0.875rem;
+            /* Added explicit size */
+        }
+
+        .recommendation-card .card-header.bg-danger {
+            background-color: #dc3545 !important;
+        }
+
+        .recommendation-card .card-header.bg-warning {
+            background-color: #ffc107 !important;
+        }
+
+        .recommendation-card .card-header.bg-info {
+            background-color: #0dcaf0 !important;
+        }
+
+        /* Thermometer Cards */
+        .thermometer-card {
+            height: 260px;
+            /* Reduced from 280px */
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .thermometer-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .thermometer-card .card-header {
+            border-radius: 1rem 1rem 0 0 !important;
+            padding: 1.25rem;
+            /* Reduced from 1.5rem */
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            /* Reduced from 1.1rem */
+            border-bottom: none !important;
+        }
+
+        .indicator-value {
+            font-size: 2rem;
+            /* Reduced from 2.5rem */
+            font-weight: bold;
+            margin-bottom: 0.4rem;
+        }
+
+        .indicator-zone {
+            font-size: 1rem;
+            /* Reduced from 1.2rem */
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .indicator-explanation {
+            font-size: 0.8rem;
+            /* Reduced from 0.9rem */
+            color: #6c757d;
+            text-align: center;
+        }
+
+        /* Level-based colors for thermometer */
+        .level-0-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .level-1-header {
+            background: linear-gradient(135deg, #17a2b8 0%, #3498db 100%);
+        }
+
+        .level-2-header {
+            background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%);
+        }
+
+        .level-3-header {
+            background: linear-gradient(135deg, #fd7e14 0%, #ff922b 100%);
+        }
+
+        .level-4-header {
+            background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%);
+        }
+
+        .level-0-text {
+            color: #28a745;
+        }
+
+        .level-1-text {
+            color: #17a2b8;
+        }
+
+        .level-2-text {
+            color: #ffc107;
+        }
+
+        .level-3-text {
+            color: #fd7e14;
+        }
+
+        .level-4-text {
+            color: #dc3545;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            margin-top: 3rem;
+            /* Reduced from 4rem */
+            padding: 1.5rem 0;
+            /* Reduced from 2rem */
+            font-size: 0.85rem;
+            /* Added explicit size */
+        }
+
+        /* Report Navigation Cards (for index page) */
+        .report-nav-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.75rem;
+            /* Reduced from 2rem */
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            height: 100%;
+        }
+
+        .report-nav-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .report-nav-card i {
+            font-size: 2.5rem;
+            /* Reduced from 3rem */
+            margin-bottom: 1rem;
+        }
+
+        .report-nav-card h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            /* Added explicit size */
+        }
+
+        .report-nav-card p {
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            /* Added explicit size */
+        }
+
+        .report-nav-card .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.65rem 1.75rem;
+            /* Slightly reduced */
+            font-size: 0.9rem;
+            /* Added explicit size */
+        }
+
+        /* Breadcrumb */
+        .breadcrumb-custom {
+            background-color: transparent;
+            padding: 1rem 0;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            /* Added explicit size */
+        }
+
+        .breadcrumb-custom .breadcrumb-item a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .breadcrumb-custom .breadcrumb-item.active {
+            color: #6c757d;
+        }
+
+        /* Holdings Table Specific */
+        .subtotal-row {
+            font-weight: bold;
+            border-top: 2px solid #dee2e6 !important;
+        }
+
+        .top-class-subtotal {
+            background-color: #e9ecef !important;
+            color: #495057;
+            font-size: 0.95rem;
+            /* Reduced from 1.1rem */
+        }
+
+        .sub-class-subtotal {
+            background-color: #f8f9fa !important;
+            color: #6c757d;
+            font-size: 0.9rem;
+            /* Reduced from 1.05rem */
+        }
+
+        .asset-row {
+            background-color: white;
+        }
+
+        .asset-row:hover {
+            background-color: #f5f5f5 !important;
+        }
+
+        /* Badge sizes */
+        .badge {
+            font-size: 0.75rem;
+            /* Added explicit size */
+        }
+
+        /* Card titles */
+        .card-title {
+            font-size: 1rem;
+            /* Added explicit size */
+        }
+
+        /* Alerts */
+        .alert {
+            font-size: 0.875rem;
+            /* Added explicit size */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 60px;
+                font-size: 0.8rem;
+                /* Even smaller on mobile */
+            }
+
+            .navbar-custom .navbar-brand {
+                font-size: 1rem;
+            }
+
+            .kpi-card {
+                height: auto;
+                min-height: 100px;
+                /* Reduced from 120px */
+            }
+
+            .page-header h1 {
+                font-size: 1.5rem;
+                /* Reduced from 1.75rem */
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">
+                <i class="bi bi-wallet2"></i> {{ _('Investment Hub') }}
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'index' %}active{% endif %}" href="index.html">
+                            <i class="bi bi-house-door"></i> {{ _('Home') }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'portfolio' %}active{% endif %}"
+                            href="portfolio_report.html">
+                            <i class="bi bi-graph-up-arrow"></i> {{ _('Portfolio') }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'thermometer' %}active{% endif %}"
+                            href="market_thermometer.html">
+                            <i class="bi bi-thermometer-half"></i> {{ _('Market') }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'compass' %}active{% endif %}"
+                            href="action_compass.html">
+                            <i class="bi bi-compass"></i> {{ _('Actions') }}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid" style="max-width: 1400px;">
+        <!-- Breadcrumb -->
+        {% if show_breadcrumb %}
+        <nav aria-label="breadcrumb" class="breadcrumb-custom">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html"><i class="bi bi-house-door"></i> {{ _('Home') }}</a>
+                </li>
+                {% block breadcrumb %}{% endblock %}
+            </ol>
+        </nav>
+        {% endif %}
+
+        <!-- Page Content -->
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="text-muted mb-2">
+                        <strong>{{ _('Personal Investment System') }}</strong>
+                    </p>
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-clock"></i> {{ _('Generated:') }} {{ generation_time }}
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
+                    <div class="btn-group" role="group" aria-label="Quick navigation">
+                        <a href="index.html" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-house-door"></i> {{ _('Home') }}
+                        </a>
+                        <a href="portfolio_report.html" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-graph-up-arrow"></i> {{ _('Portfolio') }}
+                        </a>
+                        <a href="market_thermometer.html" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-thermometer-half"></i> {{ _('Market') }}
+                        </a>
+                        <a href="action_compass.html" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-compass"></i> {{ _('Actions') }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Page-specific scripts -->
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

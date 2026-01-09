@@ -1,0 +1,3286 @@
+# Translations template for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-08 08:20+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: src/html_reporter/reporter.py:34
+#: src/web_app/templates/reports/portfolio.html:356
+msgid "Active"
+msgstr ""
+
+#: src/html_reporter/reporter.py:34
+#: src/web_app/templates/reports/portfolio.html:359
+msgid "Closed"
+msgstr ""
+
+#: src/html_reporter/reporter.py:48
+#: src/html_reporter/templates/portfolio_report.html:681
+#: src/html_reporter/templates/portfolio_report.html:749
+msgid "Excellent"
+msgstr ""
+
+#: src/html_reporter/reporter.py:50
+#: src/html_reporter/templates/portfolio_report.html:683
+#: src/html_reporter/templates/portfolio_report.html:750
+msgid "Good"
+msgstr ""
+
+#: src/html_reporter/reporter.py:52
+#: src/html_reporter/templates/portfolio_report.html:685
+#: src/html_reporter/templates/portfolio_report.html:750
+msgid "Average"
+msgstr ""
+
+#: src/html_reporter/reporter.py:54
+msgid "Poor"
+msgstr ""
+
+#: src/html_reporter/reporter.py:296
+msgid "Increase"
+msgstr ""
+
+#: src/html_reporter/reporter.py:296
+msgid "Increase Moderately"
+msgstr ""
+
+#: src/html_reporter/reporter.py:299
+msgid "Decrease"
+msgstr ""
+
+#: src/html_reporter/reporter.py:299
+msgid "Decrease Moderately"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:3
+msgid "Action Compass - Investment System"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:8
+#: src/html_reporter/templates/base_template.html:511
+#: src/html_reporter/templates/base_template.html:543
+#: src/html_reporter/templates/base_template.html:569
+msgid "Home"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:9
+#: src/html_reporter/templates/index.html:107
+#: src/html_reporter/templates/market_thermometer.html:654
+#: src/html_reporter/templates/market_thermometer.html:1092
+msgid "Action Compass"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:18
+msgid "Action Compass - Actionable Insights"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:20
+msgid ""
+"Intelligent recommendations and alerts to help you optimize your "
+"investment\n"
+"            strategy."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:37
+msgid "Strategic Command:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:53
+msgid "Risk Level:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:58
+msgid "Confidence:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:63
+msgid "Market Indicators"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:76
+msgid "Core Strategic Objective"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:90
+msgid "Portfolio Alignment Analysis"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:104
+msgid "Aligned"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:155
+msgid "See"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:155
+#: src/html_reporter/templates/action_compass.html:177
+msgid "Priority Actions"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:155
+msgid ""
+"below for detailed\n"
+"                                    action plan"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:178
+#, python-format
+msgid "Top %(count)s"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:182
+msgid ""
+"Consolidated recommendations from strategic directive, rebalancing "
+"analysis, and alternative\n"
+"                    assets"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:247
+#, python-format
+msgid "P%(priority)s"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:266
+msgid "Alternative Assets - Gold & Crypto Recommendations"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:270
+msgid ""
+"Phase 3 weighted scoring recommendations for gold, Bitcoin, and Ethereum "
+"based on multi-indicator\n"
+"            contrarian signals and relative value analysis."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:289
+msgid "Hold"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:345
+msgid "Phase 3 Weighted Score"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:355
+msgid "Scale: -10 (Strong Buy) to +10 (Strong Sell)"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:358
+msgid "Strong Buy ≤ -6"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:359
+msgid "Buy: -6 to -3"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:360
+msgid "Hold: -3 to +3"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:361
+msgid "Sell: +3 to +6"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:362
+msgid "Strong Sell ≥ +6"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:375
+msgid "Weighted Score Breakdown:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:381
+msgid "Indicator"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:382
+msgid "Value"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:383
+msgid "Base"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:384
+#: src/html_reporter/templates/portfolio_report.html:472
+msgid "Weight"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:385
+msgid "Score"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:427
+msgid "Total Score:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:446
+msgid "Incomplete Data:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:457
+msgid "Status:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:468
+msgid "View Raw Indicators"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:484
+msgid "Intelligent Recommendations"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:489
+msgid "Expand All Details"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:493
+msgid "Top priority items are shown above in Priority Actions section."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:493
+#, python-format
+msgid ""
+"Expand\n"
+"            below to see all %(count)s detailed recommendations with full"
+" analysis, alternative options, and\n"
+"            implementation steps."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:509
+msgid "Recommendation Summary"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:514
+msgid "Total Recommendations"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:520
+msgid "High Priority"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:526
+msgid "Total Potential Impact"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:533
+msgid "Average Priority"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:563
+msgid "Strategic recommendation from market regime"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:563
+msgid "STRATEGIC"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:572
+#, python-format
+msgid "Priority: %(priority)s"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:589
+msgid "Financial Impact"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:595
+msgid "Risk Reduction"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:608
+msgid "Drift Reduction"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:617
+msgid "Action Steps:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:643
+#, python-format
+msgid "Specific Product Recommendations (%(count)s asset classes)"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:675
+msgid "Current Holding"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:677
+msgid "New Suggestion"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:682
+msgid "Code:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:696
+msgid "Yield:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:701
+msgid "Risk:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:706
+msgid "Liquidity:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:711
+msgid "Min:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:718
+msgid "Rationale:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:725
+msgid "How to Execute:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:742
+msgid "Sub-Class Breakdown:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:782
+msgid "Tax Impact"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:800
+msgid "Tactical Rebalancing Analysis"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:808
+msgid "Understanding Strategic vs Tactical Recommendations"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:810
+msgid "Strategic Recommendations (above):"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:810
+msgid ""
+"Market regime-based advice\n"
+"                        driven by macroeconomic conditions,"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:812
+msgid ""
+"valuation metrics, and sentiment indicators. These provide high-level "
+"guidance on overall\n"
+"                        portfolio positioning"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:814
+msgid "and asset class selection based on market cycles."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:817
+msgid "Tactical Rebalancing Analysis (below):"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:817
+msgid ""
+"Drift-based guidance\n"
+"                        comparing your current allocation"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:819
+msgid ""
+"against target weights. These recommendations focus on maintaining "
+"portfolio discipline\n"
+"                        and risk management"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:821
+msgid ""
+"by rebalancing when allocations deviate significantly from your "
+"investment strategy."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:825
+msgid "Best Practice:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:825
+msgid ""
+"Use\n"
+"                        strategic recommendations for new capital"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:827
+msgid ""
+"deployment and market-timing decisions. Use tactical rebalancing for "
+"portfolio maintenance\n"
+"                        and risk control."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:829
+msgid ""
+"When they conflict, consider your investment timeline and market "
+"conditions to determine\n"
+"                        the appropriate balance."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:842
+msgid "Rebalancing Overview"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:844
+msgid "Hide"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:848
+msgid ""
+"The following recommendations are based on the rebalanceable portion of "
+"your portfolio."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:849
+msgid ""
+"Assets such as Real Estate and Insurance are excluded from this "
+"calculation."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:856
+#: src/html_reporter/templates/portfolio_report.html:30
+#: src/html_reporter/templates/portfolio_report.html:430
+#: src/web_app/templates/reports/portfolio.html:28
+msgid "Total Portfolio Value"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:863
+msgid "Non-Rebalanceable Assets"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:869
+msgid "Rebalanceable Sub-Portfolio"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:886
+msgid "New Capital Injection Simulation"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:887
+msgid "新资金注入模拟"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:892
+msgid ""
+"Simulate how new capital should be deployed to minimize portfolio "
+"allocation drift."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:893
+msgid "The system recommends investing in the most under-allocated asset class."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:898
+msgid "Portfolio Allocation Gaps:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:900
+msgid ""
+"asset classes are\n"
+"                        under-allocated"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:904
+msgid "Primary gap:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:910
+msgid "is under-allocated by"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:914
+#: src/html_reporter/templates/wealth_insights.html:221
+msgid "Current:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:915
+msgid "Target:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:923
+msgid "Enter New Capital Amount (¥)"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:930
+msgid "Calculate Allocation"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:930
+msgid "计算分配"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:938
+msgid ""
+"Recommended Proportional\n"
+"                            Allocation"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:948
+msgid "Portfolio Impact"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:951
+msgid "Total Drift Before"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:955
+msgid "Total Drift After"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:959
+msgid "Improvement"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:972
+msgid "No allocation gap detected."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:973
+msgid ""
+"Your portfolio is currently well-balanced according to your target "
+"allocation."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:989
+msgid "Rebalancing Drift Analysis"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:994
+msgid ""
+"Two-level analysis showing drift for both top-level asset classes and "
+"sub-categories, with\n"
+"                    targets based on the Growth strategy profile."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:999
+msgid "Top-Level Asset Classes"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1004
+#: src/html_reporter/templates/action_compass.html:1386
+#: src/html_reporter/templates/portfolio_report.html:244
+#: src/html_reporter/templates/portfolio_report.html:633
+#: src/html_reporter/templates/wealth_insights.html:118
+#: src/web_app/templates/data_workbench/index.html:270
+#: src/web_app/templates/reports/portfolio.html:595
+msgid "Asset Class"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1005
+#: src/html_reporter/templates/action_compass.html:1064
+msgid "Current %"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1006
+#: src/html_reporter/templates/action_compass.html:1065
+msgid "Target %"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1007
+#: src/html_reporter/templates/action_compass.html:1066
+#: src/html_reporter/templates/action_compass.html:1433
+msgid "Drift"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1008
+#: src/html_reporter/templates/action_compass.html:1067
+#: src/html_reporter/templates/portfolio_report.html:641
+msgid "Current Value"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1009
+#: src/html_reporter/templates/action_compass.html:1068
+msgid "Target Value"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1010
+#: src/html_reporter/templates/action_compass.html:1069
+#: src/html_reporter/templates/index.html:197
+#: src/html_reporter/templates/portfolio_report.html:479
+#: src/html_reporter/templates/portfolio_report.html:637
+#: src/html_reporter/templates/portfolio_report.html:734
+#: src/web_app/templates/data_workbench/index.html:168
+#: src/web_app/templates/data_workbench/index.html:318
+#: src/web_app/templates/reports/portfolio.html:613
+msgid "Status"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1028
+#: src/html_reporter/templates/action_compass.html:1088
+msgid "Non-Rebalanceable"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1032
+#: src/html_reporter/templates/action_compass.html:1042
+#: src/html_reporter/templates/action_compass.html:1092
+#: src/html_reporter/templates/action_compass.html:1102
+msgid "High Risk"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1034
+#: src/html_reporter/templates/action_compass.html:1044
+#: src/html_reporter/templates/action_compass.html:1094
+#: src/html_reporter/templates/action_compass.html:1104
+msgid "Medium Risk"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1036
+#: src/html_reporter/templates/action_compass.html:1046
+#: src/html_reporter/templates/action_compass.html:1096
+#: src/html_reporter/templates/action_compass.html:1106
+msgid "On Target"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1057
+msgid "Sub-Class Breakdown"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1062
+msgid "Top-Level Class"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1063
+msgid "Sub-Category"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1124
+msgid "Recommended Actions"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1131
+#: src/html_reporter/templates/action_compass.html:1201
+msgid "Rebalancing Recommended:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1131
+#: src/html_reporter/templates/action_compass.html:1201
+msgid ""
+"Your portfolio has drifted from target\n"
+"                    allocations."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1133
+msgid "Consider the following hierarchical actions:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1144
+#: src/html_reporter/templates/action_compass.html:1164
+msgid "的"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1149
+msgid "偏移"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1168
+msgid "当前持仓:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1171
+msgid "偏移:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1187
+msgid "Implementation Notes:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1188
+msgid ""
+"Execute trades gradually to minimize market impact. Prioritize sub-"
+"categories with larger\n"
+"                        drifts first."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1190
+msgid ""
+"Consider transaction costs and tax implications before implementing "
+"changes."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1191
+msgid ""
+"Review your investment timeline and risk tolerance before making "
+"significant\n"
+"                        adjustments."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1203
+msgid "Consider the following actions:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1210
+msgid "Action Required"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1218
+msgid "Portfolio Well-Balanced:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1218
+msgid ""
+"Your current allocation is within\n"
+"                    acceptable tolerance\n"
+"                    levels."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1221
+msgid "No immediate rebalancing actions are required."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1227
+msgid "Maintenance:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1228
+#, python-format
+msgid ""
+"Continue monitoring your portfolio quarterly. Consider rebalancing if any"
+" category drifts\n"
+"                        more\n"
+"                        than 5% from target allocation."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1247
+msgid "RSU Risk Management Alerts"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1253
+msgid "Automated alerts for RSU vesting events requiring action."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1254
+msgid "Review your planned actions and ensure timely execution."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1262
+msgid "Action Required:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1262
+msgid "Recent Vesting Event"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1264
+msgid "Upcoming:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1264
+msgid "Vesting Event Approaching"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1270
+#: src/html_reporter/templates/action_compass.html:1275
+msgid "A batch of"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1270
+#: src/html_reporter/templates/action_compass.html:1275
+msgid "shares of"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1272
+msgid "vested on"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1273
+msgid "days ago"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1277
+msgid "will vest on"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1278
+msgid "in"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1278
+msgid "days"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1282
+msgid "Your Plan:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1290
+msgid "Note:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1290
+msgid "RSU alerts are configured in"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1292
+msgid "Update this file to manage your vesting schedule and action plans."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1346
+msgid "Please enter a valid capital amount greater than 0."
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1379
+msgid "to"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1382
+msgid "Allocate:"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1386
+msgid "Amount (¥)"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1386
+msgid "Percentage"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1386
+msgid "Current"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1386
+#: src/html_reporter/templates/wealth_insights.html:204
+#: src/html_reporter/templates/wealth_insights.html:374
+msgid "Target"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1386
+msgid "New Drift"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1416
+msgid "Detailed Sub-Class Breakdown"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1433
+#: src/html_reporter/templates/portfolio_report.html:286
+msgid "Sub-Class"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1433
+#: src/web_app/templates/data_workbench/index.html:180
+msgid "Amount"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1433
+#: src/web_app/templates/logic_studio/index.html:411
+msgid "Priority"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1433
+msgid "Rationale"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1467
+msgid "Based on your current allocation gap, allocate the entire"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1467
+msgid "to purchase"
+msgstr ""
+
+#: src/html_reporter/templates/action_compass.html:1467
+msgid "assets."
+msgstr ""
+
+#: src/html_reporter/templates/base_template.html:7
+msgid "Personal Investment Report"
+msgstr ""
+
+#: src/html_reporter/templates/base_template.html:501
+msgid "Investment Hub"
+msgstr ""
+
+#: src/html_reporter/templates/base_template.html:517
+#: src/html_reporter/templates/base_template.html:572
+msgid "Portfolio"
+msgstr ""
+
+#: src/html_reporter/templates/base_template.html:523
+#: src/html_reporter/templates/base_template.html:575
+msgid "Market"
+msgstr ""
+
+#: src/html_reporter/templates/base_template.html:529
+#: src/html_reporter/templates/base_template.html:578
+#: src/web_app/templates/data_workbench/index.html:108
+#: src/web_app/templates/data_workbench/index.html:186
+#: src/web_app/templates/logic_studio/index.html:219
+#: src/web_app/templates/logic_studio/index.html:285
+#: src/web_app/templates/logic_studio/index.html:372
+#: src/web_app/templates/logic_studio/index.html:413
+msgid "Actions"
+msgstr ""
+
+#: src/html_reporter/templates/base_template.html:560
+msgid "Personal Investment System"
+msgstr ""
+
+#: src/html_reporter/templates/base_template.html:563
+#: src/html_reporter/templates/wealth_insights.html:11
+msgid "Generated:"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:3
+msgid "Investment Hub - Home"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:9
+msgid "Personal Investment Hub"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:10
+msgid "Your comprehensive financial overview and actionable insights"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:22
+msgid "Portfolio Summary"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:25
+#: src/html_reporter/templates/index.html:138
+msgid "Last Updated:"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:31
+msgid "Total Value"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:37
+#: src/html_reporter/templates/portfolio_report.html:74
+msgid "Overall XIRR"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:43
+msgid "Last Month"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:47
+msgid "Holdings"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:54
+#: src/html_reporter/templates/portfolio_report.html:57
+msgid "Asset Allocation Overview"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:69
+msgid "Report Navigator"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:77
+msgid "Portfolio & Performance"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:78
+msgid ""
+"View detailed holdings, historical performance, asset allocation, and "
+"comprehensive portfolio\n"
+"                    analytics"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:82
+#: src/html_reporter/templates/index.html:97
+#: src/html_reporter/templates/index.html:112
+msgid "View Report"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:92
+#: src/html_reporter/templates/market_thermometer.html:13
+msgid "Market Thermometer"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:93
+msgid ""
+"Check real-time market sentiment indicators, valuation metrics, and "
+"global market conditions"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:108
+msgid ""
+"Get personalized recommendations, rebalancing suggestions, and actionable"
+" investment tactics"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:127
+msgid "System Status"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:130
+msgid "All reports are generated from your latest financial data."
+msgstr ""
+
+#: src/html_reporter/templates/index.html:131
+msgid ""
+"Data sources include balance sheets, transaction records, and market "
+"indicators."
+msgstr ""
+
+#: src/html_reporter/templates/index.html:137
+msgid "Data Current"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:139
+msgid "Source: Financial Summary & Transaction Records"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:163
+msgid "Data Validation Report"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:168
+#, python-format
+msgid "All %(total)s consistency checks passed"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:173
+#, python-format
+msgid "%(warnings)s warning(s) detected - Review recommended"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:178
+#, python-format
+msgid "%(failures)s critical issue(s) detected - Action required"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:183
+msgid "Validation system error:"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:190
+msgid "View Validation Details"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:196
+msgid "Check"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:198
+msgid "Result"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:208
+msgid "PASS"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:210
+msgid "WARN"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:212
+msgid "FAIL"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:214
+msgid "SKIP"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:229
+msgid "Data Checksums (for debugging)"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:232
+msgid "Total Portfolio Value:"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:233
+msgid "Rebalanceable Value:"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:234
+msgid "Non-Rebalanceable:"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:235
+msgid "Holdings Count:"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:236
+msgid "Data Hash:"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:250
+msgid "Quick Navigation Tips"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:253
+msgid "Portfolio Report:"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:253
+msgid ""
+"Start here for a complete view of your\n"
+"                        investments, performance metrics, and holdings "
+"breakdown"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:255
+msgid "Market Thermometer:"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:255
+msgid ""
+"Check current market conditions before\n"
+"                        making investment decisions"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:257
+msgid "Action Compass:"
+msgstr ""
+
+#: src/html_reporter/templates/index.html:257
+msgid ""
+"Get specific recommendations and use the\n"
+"                        capital allocation calculator for new investments"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:3
+msgid "Market Thermometer - Sentiment Indicators"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:14
+msgid "Real-time market sentiment and valuation indicators"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:30
+msgid "Current Market Regime:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:42
+msgid "Trigger Conditions:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:47
+msgid "Valuation:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:49
+msgid "Shiller PE"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:53
+msgid "OR Buffett US"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:62
+msgid "Fear & Greed:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:68
+msgid "Regional Divergence: US"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:70
+msgid "vs. China"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:83
+msgid "Dynamic Targets Active"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:84
+msgid "Allocation adjusted for regime"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:88
+msgid "Baseline Targets"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:89
+msgid "Standard allocation"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:95
+msgid "Detected:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:95
+msgid "Now"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:99
+msgid "View Action Compass →"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:113
+msgid "Market Sentiment Indicators"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:116
+msgid ""
+"Real-time macroeconomic indicators providing a quick assessment of "
+"current market conditions."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:117
+msgid "Data updated:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:146
+msgid ""
+"The Cyclically Adjusted P/E ratio measures market valuation by comparing "
+"stock prices to\n"
+"                        10-year average earnings."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:149
+#: src/html_reporter/templates/market_thermometer.html:151
+#: src/html_reporter/templates/market_thermometer.html:153
+#: src/html_reporter/templates/market_thermometer.html:155
+#: src/html_reporter/templates/market_thermometer.html:157
+#: src/html_reporter/templates/market_thermometer.html:201
+#: src/html_reporter/templates/market_thermometer.html:203
+#: src/html_reporter/templates/market_thermometer.html:205
+#: src/html_reporter/templates/market_thermometer.html:207
+#: src/html_reporter/templates/market_thermometer.html:209
+#: src/html_reporter/templates/market_thermometer.html:247
+#: src/html_reporter/templates/market_thermometer.html:249
+#: src/html_reporter/templates/market_thermometer.html:251
+#: src/html_reporter/templates/market_thermometer.html:253
+#: src/html_reporter/templates/market_thermometer.html:255
+#: src/html_reporter/templates/market_thermometer.html:473
+#: src/html_reporter/templates/market_thermometer.html:476
+#: src/html_reporter/templates/market_thermometer.html:479
+#: src/html_reporter/templates/market_thermometer.html:482
+#: src/html_reporter/templates/market_thermometer.html:485
+#: src/html_reporter/templates/market_thermometer.html:539
+#: src/html_reporter/templates/market_thermometer.html:542
+#: src/html_reporter/templates/market_thermometer.html:545
+#: src/html_reporter/templates/market_thermometer.html:548
+#: src/html_reporter/templates/market_thermometer.html:551
+#: src/html_reporter/templates/market_thermometer.html:606
+#: src/html_reporter/templates/market_thermometer.html:609
+#: src/html_reporter/templates/market_thermometer.html:612
+#: src/html_reporter/templates/market_thermometer.html:615
+#: src/html_reporter/templates/market_thermometer.html:618
+#: src/html_reporter/templates/market_thermometer.html:831
+#: src/html_reporter/templates/market_thermometer.html:834
+#: src/html_reporter/templates/market_thermometer.html:837
+#: src/html_reporter/templates/market_thermometer.html:840
+#: src/html_reporter/templates/market_thermometer.html:843
+#: src/html_reporter/templates/market_thermometer.html:899
+#: src/html_reporter/templates/market_thermometer.html:903
+#: src/html_reporter/templates/market_thermometer.html:907
+#: src/html_reporter/templates/market_thermometer.html:910
+#: src/html_reporter/templates/market_thermometer.html:914
+#: src/html_reporter/templates/market_thermometer.html:970
+#: src/html_reporter/templates/market_thermometer.html:974
+#: src/html_reporter/templates/market_thermometer.html:977
+#: src/html_reporter/templates/market_thermometer.html:980
+#: src/html_reporter/templates/market_thermometer.html:983
+#: src/html_reporter/templates/market_thermometer.html:1039
+#: src/html_reporter/templates/market_thermometer.html:1042
+#: src/html_reporter/templates/market_thermometer.html:1045
+#: src/html_reporter/templates/market_thermometer.html:1049
+#: src/html_reporter/templates/market_thermometer.html:1052
+msgid "Interpretation:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:149
+msgid "Market is extremely undervalued."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:151
+msgid "Market is undervalued."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:153
+msgid "Market is fairly valued."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:155
+msgid "Market is overvalued."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:157
+msgid "Market is extremely overvalued."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:169
+#: src/html_reporter/templates/market_thermometer.html:221
+#: src/html_reporter/templates/market_thermometer.html:267
+#: src/html_reporter/templates/market_thermometer.html:313
+#: src/html_reporter/templates/market_thermometer.html:348
+#: src/html_reporter/templates/market_thermometer.html:383
+#: src/html_reporter/templates/market_thermometer.html:498
+#: src/html_reporter/templates/market_thermometer.html:564
+#: src/html_reporter/templates/market_thermometer.html:631
+#: src/html_reporter/templates/market_thermometer.html:739
+msgid "Data Unavailable"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:199
+msgid "CNN's Fear & Greed Index measures investor sentiment on a 0-100 scale."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:201
+msgid "Extreme fear - contrarian opportunity."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:203
+msgid "Fearful sentiment."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:205
+msgid "Neutral sentiment."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:207
+msgid "Greedy sentiment."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:209
+msgid "Extreme greed - high risk."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:223
+msgid "API temporarily unavailable (rate limited)"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:245
+msgid ""
+"CBOE Volatility Index measures expected market volatility. Higher VIX = "
+"higher fear."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:247
+msgid "Extreme fear - potential opportunity."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:249
+msgid "Elevated fear - caution warranted."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:251
+msgid "Normal volatility."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:253
+msgid "Low fear - complacency risk."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:255
+msgid "Extreme complacency - high risk."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:280
+msgid "Buffett Indicator - Global View"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:281
+msgid "Total market capitalization to GDP ratio by region"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:299
+#: src/html_reporter/templates/market_thermometer.html:334
+#: src/html_reporter/templates/market_thermometer.html:369
+#: src/html_reporter/templates/market_thermometer.html:404
+msgid "Data as of"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:301
+#: src/html_reporter/templates/market_thermometer.html:336
+#: src/html_reporter/templates/market_thermometer.html:371
+#: src/html_reporter/templates/market_thermometer.html:406
+msgid "Source:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:310
+msgid "United States"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:345
+msgid "China"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:380
+msgid "Japan"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:430
+msgid "Gold Market Indicators"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:433
+msgid ""
+"Real-time gold market indicators providing insights into volatility, "
+"relative value, and market\n"
+"                positioning."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:465
+#: src/html_reporter/templates/market_thermometer.html:824
+#: src/html_reporter/templates/market_thermometer.html:890
+msgid "Extreme Fear"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:465
+msgid "Elevated"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:466
+#: src/html_reporter/templates/market_thermometer.html:825
+#: src/html_reporter/templates/market_thermometer.html:892
+msgid "Complacency"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:466
+#: src/html_reporter/templates/market_thermometer.html:892
+msgid ""
+"Low\n"
+"                                Volatility"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:467
+#: src/html_reporter/templates/market_thermometer.html:826
+#: src/html_reporter/templates/market_thermometer.html:894
+msgid "Normal"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:470
+msgid ""
+"Cboe Gold ETF Volatility Index measures market's expectation of 30-day "
+"gold price\n"
+"                                volatility."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:473
+#: src/html_reporter/templates/market_thermometer.html:831
+msgid ""
+"Extreme volatility indicates elevated\n"
+"                                market fear and uncertainty."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:476
+msgid ""
+"Elevated volatility suggests market\n"
+"                                uncertainty and increased risk."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:479
+msgid ""
+"Very low volatility suggests market\n"
+"                                complacency."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:482
+#: src/html_reporter/templates/market_thermometer.html:840
+msgid ""
+"Low volatility indicates a relatively\n"
+"                                calm market environment."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:485
+msgid ""
+"Normal gold market volatility levels\n"
+"                                observed."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:492
+msgid "GVZ (Gold Volatility)"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:532
+msgid "Gold Cheap"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:532
+msgid ""
+"Gold Fair\n"
+"                                Value"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:533
+msgid "Gold Very Expensive"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:534
+msgid "Gold Expensive"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:534
+#: src/html_reporter/templates/market_thermometer.html:600
+#: src/html_reporter/templates/market_thermometer.html:965
+#: src/html_reporter/templates/market_thermometer.html:1034
+msgid "Normal Range"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:537
+msgid "Measures relative value of gold to silver. Historical range: 40-95."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:539
+msgid ""
+"Gold is historically cheap relative to\n"
+"                                silver - potential buy opportunity."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:542
+msgid ""
+"Gold moderately undervalued relative\n"
+"                                to silver."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:545
+msgid ""
+"Gold is very expensive relative to\n"
+"                                silver - consider taking profits."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:548
+msgid ""
+"Gold moderately overvalued relative to\n"
+"                                silver."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:551
+msgid ""
+"Gold and silver in normal relative\n"
+"                                valuation range."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:558
+msgid "Gold/Silver Ratio"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:598
+msgid "Stocks Very Expensive"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:599
+msgid "Stocks Expensive"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:599
+msgid "Stocks Very Cheap"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:600
+msgid "Stocks Cheap"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:604
+msgid ""
+"Measures relative performance of stocks vs gold. Historical range: "
+"0.5-3.5."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:606
+msgid ""
+"Stocks very expensive relative to gold\n"
+"                                - gold may be undervalued."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:609
+msgid ""
+"Stocks moderately expensive - gold\n"
+"                                relatively attractive."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:612
+msgid ""
+"Stocks very cheap relative to gold -\n"
+"                                equities more attractive."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:615
+msgid ""
+"Stocks moderately cheap - equities\n"
+"                                relatively attractive."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:618
+msgid ""
+"Balanced relative valuation between\n"
+"                                stocks and gold."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:625
+msgid "S&P 500/Gold Ratio"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:645
+msgid "Gold Market Overview"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:647
+msgid ""
+"Based on the 3 indicators above, the gold market shows mixed signals "
+"across volatility,\n"
+"                    relative value, and market positioning metrics."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:649
+msgid "Each indicator provides a different perspective on gold market conditions."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:653
+msgid "For detailed buy/sell recommendations and action items, visit the"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:654
+#: src/html_reporter/templates/market_thermometer.html:1092
+msgid "tab."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:666
+#: src/html_reporter/templates/market_thermometer.html:682
+msgid "Crypto Market Indicators"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:669
+msgid ""
+"Real-time cryptocurrency market indicators tracking volatility, relative "
+"value, and market\n"
+"                dominance for\n"
+"                Bitcoin and Ethereum."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:684
+msgid "The cards below show raw indicator values and market zones."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:685
+msgid "For investment recommendations based on these indicators, see"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:686
+msgid ""
+"Action Compass → Alternative Assets\n"
+"                            Recommendations"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:712
+msgid "Crypto market sentiment index (0-100) from Alternative.me."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:715
+msgid "Data"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:717
+msgid "days old"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:733
+msgid "Crypto Fear & Greed"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:765
+msgid ""
+"BTC price divided by QQQ (Nasdaq-100 ETF) price. Measures crypto "
+"performance vs tech\n"
+"                        stocks."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:825
+#: src/html_reporter/templates/market_thermometer.html:891
+msgid "High Volatility"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:826
+msgid "Low Volatility"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:829
+msgid "30-day Bitcoin realized volatility (annualized)."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:834
+msgid ""
+"Elevated volatility reflects increased\n"
+"                                market uncertainty."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:837
+#: src/html_reporter/templates/market_thermometer.html:907
+msgid ""
+"Very low volatility may indicate\n"
+"                                market complacency."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:843
+msgid ""
+"Normal Bitcoin volatility levels\n"
+"                                observed."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:897
+msgid "30-day Ethereum realized volatility (annualized)."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:899
+msgid ""
+"Extreme volatility indicates elevated\n"
+"                                market fear and\n"
+"                                uncertainty."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:903
+msgid ""
+"Elevated volatility reflects increased\n"
+"                                market\n"
+"                                uncertainty."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:910
+msgid ""
+"Low volatility indicates a relatively\n"
+"                                calm market\n"
+"                                environment."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:914
+msgid ""
+"Normal Ethereum volatility levels\n"
+"                                observed."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:961
+msgid "BTC Cheap"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:961
+msgid ""
+"BTC\n"
+"                                Fair Value"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:963
+msgid "BTC Expensive"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:963
+msgid ""
+"BTC\n"
+"                                Premium"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:968
+msgid "Relative value of Bitcoin to Ethereum. Historical range: 10-35."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:970
+msgid ""
+"BTC is cheap relative to ETH -\n"
+"                                potential BTC buy\n"
+"                                opportunity."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:974
+msgid ""
+"BTC moderately undervalued relative to\n"
+"                                ETH."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:977
+msgid ""
+"BTC expensive relative to ETH -\n"
+"                                consider ETH over BTC."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:980
+msgid ""
+"BTC moderately overvalued relative to\n"
+"                                ETH."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:983
+msgid ""
+"BTC and ETH in normal relative\n"
+"                                valuation."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1030
+msgid "BTC Undervalued"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1031
+msgid "Low Dominance"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1032
+msgid "BTC Overvalued"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1033
+msgid "High Dominance"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1037
+#, python-format
+msgid "BTC market cap as % of total crypto market. Historical range: 30-70%."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1039
+msgid ""
+"Low dominance - altcoin season, BTC\n"
+"                                may be undervalued."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1042
+msgid ""
+"Below average dominance - altcoins\n"
+"                                outperforming."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1045
+msgid ""
+"High dominance - BTC overvalued,\n"
+"                                altcoins may offer\n"
+"                                value."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1049
+msgid ""
+"Above average dominance - BTC flight\n"
+"                                to quality."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1052
+msgid ""
+"Normal market balance between BTC and\n"
+"                                altcoins."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1079
+msgid "Crypto Market Overview"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1082
+msgid ""
+"Based on the 6 indicators above (Phase 2 enhanced), the crypto market "
+"analysis now includes:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1084
+msgid "BTC/QQQ ratio"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1084
+msgid "(crypto vs tech stocks performance) and"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1085
+msgid "Crypto Fear & Greed Index"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1085
+msgid ""
+"(sentiment extremes for contrarian\n"
+"                    signals),"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1087
+msgid ""
+"in addition to volatility, relative value (BTC vs ETH), and market "
+"dominance metrics."
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1091
+msgid "For detailed BTC/ETH buy/sell recommendations and action items, visit the"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1104
+msgid "About Market Thermometer"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1106
+msgid ""
+"The Market Thermometer provides a snapshot of current market conditions "
+"using complementary\n"
+"                    indicators:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1110
+msgid "Shiller P/E Ratio:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1110
+msgid ""
+"Long-term valuation metric smoothing\n"
+"                        short-term earnings\n"
+"                        volatility"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1113
+msgid "Fear & Greed Index:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1113
+msgid ""
+"Real-time sentiment gauge (CNN - may be\n"
+"                        rate limited)"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1115
+msgid "Market volatility expectations (inverse sentiment indicator)"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1117
+msgid "Buffett Indicator:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1117
+msgid ""
+"Macro valuation comparing market size to\n"
+"                        GDP by region"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1119
+msgid "Gold Indicators:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1119
+msgid ""
+"GVZ volatility, Gold/Silver ratio, S&P\n"
+"                        500/Gold ratio"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1121
+msgid "Crypto Indicators (Phase 2 Enhanced):"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1121
+msgid ""
+"BTC/ETH volatility\n"
+"                        (30-day annualized),\n"
+"                        price ratio, BTC dominance, BTC/QQQ ratio (crypto"
+" vs tech stocks), Crypto Fear & Greed Index\n"
+"                        (sentiment extremes)"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1127
+msgid ""
+"Data Sources & Manual\n"
+"                        Verification:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1131
+msgid "Market Indicators:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1133
+msgid ""
+"Shiller\n"
+"                                    P/E\n"
+"                                    (multpl.com)"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1137
+msgid ""
+"CNN\n"
+"                                    Fear & Greed Index"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1140
+msgid ""
+"VIX\n"
+"                                    (FRED)"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1143
+msgid "Buffett Indicators (GuruFocus)"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1148
+msgid "Gold & Crypto Data:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1151
+msgid "GVZ Gold Volatility (Google Finance)"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1154
+msgid ""
+"Gold\n"
+"                                    Price (Yahoo Finance)"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1157
+msgid ""
+"Silver\n"
+"                                    Price (Yahoo Finance)"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1160
+msgid "Bitcoin Data (CoinGecko)"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1163
+msgid "Ethereum Data (CoinGecko)"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1165
+msgid "Crypto Market Cap & Dominance (CoinGecko)"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1167
+msgid ""
+"QQQ\n"
+"                                    Nasdaq-100 ETF (Yahoo Finance)"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1171
+msgid "Crypto Fear & Greed Index (Alternative.me)"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1179
+msgid "Investment Tip:"
+msgstr ""
+
+#: src/html_reporter/templates/market_thermometer.html:1179
+msgid ""
+"Use these indicators as context, not timing\n"
+"                    signals.\n"
+"                    Markets can remain overvalued or undervalued for "
+"extended periods. Consider dollar-cost averaging in\n"
+"                    extreme zones."
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:3
+#: src/html_reporter/templates/portfolio_report.html:13
+msgid "Portfolio & Performance Report"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:6
+msgid "Portfolio Report"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:14
+msgid "Detailed analysis of your investment portfolio and historical performance"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:22
+msgid "Portfolio At-a-Glance"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:36
+msgid "Total Liability"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:42
+msgid "Total Net Assets"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:48
+msgid "Total Liquid Portfolio"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:76
+msgid "approximated"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:84
+msgid "Portfolio Growth"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:85
+msgid "Includes cash flows"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:92
+msgid "True TWR"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:93
+msgid "Cash flow adjusted"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:99
+msgid "Sharpe Ratio"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:108
+msgid "6-Month Cash Flow Forecast"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:125
+msgid "12-Month XIRR"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:127
+msgid "Phase 4 enhancement"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:137
+msgid "12-Month Growth"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:146
+msgid "12-Month TWR"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:152
+msgid "12-Month Sharpe"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:160
+msgid "Current Asset Allocation"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:167
+msgid "Allocation by Top-Level Class"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:173
+msgid "Allocation by Strategic Tier"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:182
+msgid "Historical Performance"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:187
+msgid "Portfolio Growth Over Time"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:188
+msgid "Total portfolio value progression over historical periods"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:198
+msgid "Monthly Cash Flow Analysis"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:199
+msgid "Income, expenses, and investments breakdown over time"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:209
+msgid "Time-Weighted Return (TWR)"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:210
+msgid "Pure investment performance excluding the impact of cash flows"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:221
+msgid "Portfolio Drawdown History"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:222
+msgid ""
+"Historical peak-to-trough decline analysis showing portfolio\n"
+"                        volatility"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:234
+msgid "Performance by Asset Class"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:239
+msgid "Top-Level Classes"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:245
+#: src/html_reporter/templates/portfolio_report.html:287
+msgid "Market Value (CNY)"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:246
+#: src/html_reporter/templates/portfolio_report.html:288
+#, python-format
+msgid "% of Portfolio"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:247
+#: src/html_reporter/templates/portfolio_report.html:289
+msgid "Weighted Avg. XIRR (%)"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:281
+msgid "Sub-Classes"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:328
+msgid "12-Month Financial Forecast"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:330
+msgid ""
+"SARIMA-based forecasting for the next 12 months of income, expenses, and "
+"investments."
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:331
+msgid ""
+"Projections are based on historical patterns and trends in your financial"
+" data."
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:339
+msgid "Cash Flow Forecast (Next 12 Months)"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:351
+msgid "Forecast Summary"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:358
+msgid "Metric"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:359
+msgid "Monthly Average"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:360
+msgid "12-Month Total"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:361
+msgid "Trend"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:366
+#: src/html_reporter/templates/portfolio_report.html:1046
+#: src/web_app/templates/reports/portfolio.html:929
+msgid "Income"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:372
+#: src/html_reporter/templates/portfolio_report.html:1053
+#: src/web_app/templates/reports/portfolio.html:936
+msgid "Expenses"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:378
+#: src/html_reporter/templates/portfolio_report.html:1060
+#: src/web_app/templates/reports/portfolio.html:943
+msgid "Investments"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:384
+msgid "Net Cash Flow"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:395
+msgid ""
+"Forecasts are generated using SARIMA (Seasonal AutoRegressive Integrated "
+"Moving\n"
+"                                Average) models based on historical data "
+"patterns."
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:397
+msgid ""
+"Actual results may vary due to market conditions and personal financial\n"
+"                                decisions."
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:410
+#: src/web_app/templates/reports/portfolio.html:222
+msgid "Realized vs. Unrealized Gains Analysis"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:417
+#: src/web_app/templates/reports/portfolio.html:231
+msgid "Total Realized Gains"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:424
+#: src/web_app/templates/reports/portfolio.html:237
+msgid "Total Unrealized Gains"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:439
+msgid "Gains Breakdown"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:448
+msgid "Sub-Class Level Realized vs Unrealized"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:464
+msgid "Detailed Holdings"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:469
+#: src/web_app/templates/reports/portfolio.html:586
+msgid "Top Class"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:470
+#: src/web_app/templates/reports/portfolio.html:589
+msgid "Sub-class"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:471
+#: src/html_reporter/templates/portfolio_report.html:631
+#: src/html_reporter/templates/portfolio_report.html:731
+#: src/web_app/templates/data_workbench/index.html:251
+#: src/web_app/templates/logic_studio/index.html:119
+#: src/web_app/templates/reports/portfolio.html:592
+msgid "Asset Name"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:473
+#: src/web_app/templates/reports/portfolio.html:598
+msgid "Market Value"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:474
+msgid "Price"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:475
+msgid "Total Gain"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:476
+msgid "Gain %"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:477
+msgid "Holding Duration"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:478
+#: src/html_reporter/templates/portfolio_report.html:647
+msgid "XIRR"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:622
+#: src/web_app/templates/reports/portfolio.html:311
+msgid "Lifetime Asset Performance"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:624
+#: src/html_reporter/templates/portfolio_report.html:1596
+msgid "Show Table"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:635
+msgid "Holding Period"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:639
+msgid "Total Invested"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:643
+msgid "Profit/Loss"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:645
+#: src/web_app/templates/reports/portfolio.html:342
+msgid "Return %"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:648
+msgid "Performance Status"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:704
+msgid "XIRR Diagnostics"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:706
+msgid "Show Diagnostics"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:714
+msgid "XIRR Calculation Details:"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:716
+msgid ""
+"XIRR (Extended Internal Rate of Return) calculations include all cash "
+"flows:\n"
+"                                purchases, sales, dividends, and current "
+"market value."
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:718
+msgid ""
+"A robust Newton-Raphson method with multiple fallback approaches ensures "
+"accurate\n"
+"                                calculations even for complex cash flow "
+"patterns."
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:732
+msgid "XIRR Result"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:733
+msgid "Calculation Method"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:735
+msgid "Reason/Notes"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:736
+msgid "Cash Flows Count"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:737
+msgid "Period (Days)"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:751
+msgid "Underperforming"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:791
+msgid "Successful"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:799
+msgid "Warnings"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:807
+msgid "Failures"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:815
+msgid "Total Assets"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:823
+msgid ""
+"No XIRR diagnostic data available. This may occur if no assets have "
+"sufficient transaction\n"
+"                        history for XIRR calculation."
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:969
+msgid "Portfolio Growth(%)"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:1104
+msgid "Net Cash Flow: "
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:1146
+msgid "Time- Weighted Return(%)"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:1186
+msgid "TWR: "
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:1226
+msgid "Drawdown(%)"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:1266
+msgid "Drawdown: "
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:1270
+msgid "Max Drawdown: "
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:1314
+msgid "Income Forecast"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:1327
+msgid "Expenses Forecast"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:1340
+msgid "Investments Forecast"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:1395
+msgid "Projected Net Flow: "
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:1468
+#: src/html_reporter/templates/portfolio_report.html:1495
+msgid "Realized Gains"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:1468
+#: src/html_reporter/templates/portfolio_report.html:1502
+msgid "Unrealized Gains"
+msgstr ""
+
+#: src/html_reporter/templates/portfolio_report.html:1593
+msgid "Hide Table"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:11
+msgid "Analysis Period:"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:16
+msgid "Print Report"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:26
+msgid "Performance Attribution"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:32
+msgid "Goal Tracking"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:38
+msgid "Strategic Insights"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:53
+msgid "Excess Return"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:64
+msgid "Portfolio Return"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:72
+msgid "Benchmark Return"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:80
+msgid "Active Risk"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:90
+msgid "Return Attribution Waterfall"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:97
+msgid "Allocation Effect:"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:98
+msgid "Value added by overweighting/underweighting asset classes."
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:99
+msgid "Selection Effect:"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:100
+msgid "Value added by selecting better securities within asset classes."
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:102
+msgid "Interaction Effect:"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:104
+msgid "Combined effect of allocation and selection decisions."
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:112
+msgid "Asset Class Contribution"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:119
+msgid "Avg Weight"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:120
+msgid "Return"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:121
+msgid "Contribution"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:151
+msgid "Goal Allocation Overview"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:153
+msgid "On Track"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:165
+msgid "Total Portfolio"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:170
+msgid "Allocated to Goals"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:175
+msgid "Unallocated / Surplus"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:212
+msgid "Progress"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:227
+msgid "Projection (Monte Carlo)"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:232
+msgid "Success Probability:"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:247
+msgid "Work in Progress:"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:247
+msgid ""
+"The AI-driven insights engine is currently analyzing\n"
+"                your portfolio data. Check back soon for personalized "
+"recommendations."
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:253
+msgid "Key Observations"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:257
+msgid "Your portfolio outperformed the benchmark by"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:258
+msgid ""
+"over the last 12\n"
+"                            months."
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:261
+msgid "The primary driver of excess return was"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:261
+msgid "Selection"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:262
+msgid "Allocation"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:263
+msgid "decisions."
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:264
+msgid "out of"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:265
+msgid "financial goals are currently on track."
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:295
+msgid "Total: "
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:295
+msgid "Effect: "
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:303
+msgid "Return (%)"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:348
+msgid "90th Percentile"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:357
+msgid "Median"
+msgstr ""
+
+#: src/html_reporter/templates/wealth_insights.html:366
+msgid "10th Percentile"
+msgstr ""
+
+#: src/report_builders/rebalancing_builder.py:298
+#, python-brace-format
+msgid "Buy ¥{amount} of '{category}' assets"
+msgstr ""
+
+#: src/report_builders/rebalancing_builder.py:300
+#, python-brace-format
+msgid "Sell ¥{amount} of '{category}' assets"
+msgstr ""
+
+#: src/report_builders/rebalancing_builder.py:441
+#: src/report_builders/rebalancing_builder.py:476
+msgid "Buy"
+msgstr ""
+
+#: src/report_builders/rebalancing_builder.py:444
+#: src/report_builders/rebalancing_builder.py:471
+msgid "Sell"
+msgstr ""
+
+#: src/report_builders/table_builder.py:208
+msgid "Category Total"
+msgstr ""
+
+#: src/report_builders/table_builder.py:235
+msgid "Subtotal"
+msgstr ""
+
+#: src/web_app/templates/base.html:21
+msgid "Dashboard"
+msgstr ""
+
+#: src/web_app/templates/base.html:23
+#: src/web_app/templates/data_workbench/index.html:3
+#: src/web_app/templates/data_workbench/index.html:8
+msgid "Data Workbench"
+msgstr ""
+
+#: src/web_app/templates/base.html:25
+#: src/web_app/templates/logic_studio/index.html:3
+#: src/web_app/templates/logic_studio/index.html:8
+msgid "Logic Studio"
+msgstr ""
+
+#: src/web_app/templates/base.html:30
+msgid "Health Check"
+msgstr ""
+
+#: src/web_app/templates/base.html:49
+msgid "Reports"
+msgstr ""
+
+#: src/web_app/templates/base.html:127
+msgid "Logout"
+msgstr ""
+
+#: src/web_app/templates/base.html:132
+msgid "Login"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:9
+msgid "Import, clean, and promote data to the production system."
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:17
+msgid "Staging Area"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:21
+#: src/web_app/templates/data_workbench/index.html:297
+msgid "Import History"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:34
+msgid "Import Data"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:39
+msgid ""
+"Select\n"
+"                                    Excel/CSV File"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:60
+msgid "Upload & Process"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:76
+msgid "Import Details"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:78
+msgid "Source"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:79
+msgid "Currency"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:81
+msgid "Imported"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:82
+msgid "rows"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:83
+#: src/web_app/templates/data_workbench/index.html:134
+#: src/web_app/templates/data_workbench/index.html:312
+msgid "Valid"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:85
+#: src/web_app/templates/data_workbench/index.html:137
+#: src/web_app/templates/data_workbench/index.html:183
+#: src/web_app/templates/data_workbench/index.html:314
+msgid "Errors"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:87
+msgid "Skipped"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:92
+msgid "Column Mapping"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:114
+msgid "Promote Valid Records"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:119
+msgid "Clear Staging Area"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:129
+msgid "Staging Data"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:132
+#: src/web_app/templates/data_workbench/index.html:310
+msgid "Total"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:145
+msgid "rows selected"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:149
+msgid "Batch Resolve"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:153
+msgid "Clear Selection"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:171
+msgid "Date"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:174
+msgid "Asset ID"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:177
+#: src/web_app/templates/logic_studio/index.html:273
+msgid "Type"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:204
+msgid "Resolve Unknown Asset"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:218
+msgid "Map to Existing Asset"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:222
+msgid "Create New Asset"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:230
+msgid "Search for Asset"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:233
+msgid "Type asset name or ID..."
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:236
+msgid "Start typing to search..."
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:241
+#: src/web_app/templates/data_workbench/index.html:280
+msgid "Cancel"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:257
+#: src/web_app/templates/logic_studio/index.html:623
+msgid "Asset Type"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:271
+msgid "Optional"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:283
+msgid "Create & Resolve"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:304
+msgid "Batch ID"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:306
+msgid "Filename"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:308
+msgid "Uploaded"
+msgstr ""
+
+#: src/web_app/templates/data_workbench/index.html:316
+msgid "Promoted"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:9
+msgid "Configure classification rules and calculation strategies."
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:20
+#: src/web_app/templates/logic_studio/index.html:56
+msgid "Taxonomy Editor"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:25
+#: src/web_app/templates/logic_studio/index.html:101
+msgid "Strategy Selector"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:30
+#: src/web_app/templates/logic_studio/index.html:190
+msgid "Auto-Classification Rules"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:35
+#: src/web_app/templates/logic_studio/index.html:232
+msgid "Asset Audit"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:40
+msgid "Asset Tier"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:45
+#: src/web_app/templates/logic_studio/index.html:298
+msgid "Target Allocation"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:59
+msgid "New Taxonomy"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:66
+msgid "Loading taxonomies..."
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:82
+msgid ""
+"Manage tags for this\n"
+"                                taxonomy"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:88
+msgid "New Tag"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:106
+msgid "Search for an asset to configure..."
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:130
+msgid "Cost Basis Method"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:139
+msgid ""
+"Determines how realized gains are\n"
+"                                    calculated."
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:145
+msgid "Currency Strategy"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:160
+msgid "Dividend Strategy"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:171
+msgid "Notes"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:180
+msgid "Save Configuration"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:194
+#: src/web_app/templates/logic_studio/index.html:328
+msgid "Run Auto-Tagging"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:198
+msgid "New Rule"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:210
+msgid "Name"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:213
+#: src/web_app/templates/logic_studio/index.html:407
+msgid "Pattern"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:216
+msgid "Tag"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:234
+#: src/web_app/templates/logic_studio/index.html:346
+msgid "Filter assets..."
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:251
+msgid ""
+"assets\n"
+"                            selected"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:256
+msgid "Edit Type"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:270
+#: src/web_app/templates/logic_studio/index.html:363
+msgid "Asset"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:276
+msgid "Current Tag"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:279
+msgid "Top Level"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:282
+#: src/web_app/templates/logic_studio/index.html:369
+msgid "Active Rule"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:302
+msgid "Select a Profile..."
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:310
+msgid "Select a profile to view allocations."
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:324
+msgid "Asset Tier Manager"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:332
+msgid "Add Tier Rule"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:344
+msgid "Tier Classification Audit"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:351
+msgid "All Assets"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:352
+msgid "Unclassified Only"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:366
+msgid "Current Tier"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:385
+msgid "Tier Target Allocations"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:388
+msgid "Save Allocations"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:399
+msgid "Tier Classification Rules"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:405
+#: src/web_app/templates/logic_studio/index.html:543
+msgid "Rule Name"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:409
+msgid "Tier"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:431
+msgid "Create New Taxonomy"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:433
+msgid "Name (e.g. Region)"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:435
+msgid "Description"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:439
+msgid ""
+"Hierarchical (allows parent\n"
+"                        tags)"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:444
+msgid "Allow Multiple Tags per Asset"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:451
+msgid "Create"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:466
+msgid "Create New Tag"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:473
+#: src/web_app/templates/logic_studio/index.html:511
+msgid "Color"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:488
+msgid "Create Tag"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:503
+msgid "Edit Tag"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:526
+#: src/web_app/templates/logic_studio/index.html:631
+msgid "Save Changes"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:541
+msgid "Create Classification Rule"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:547
+msgid "Pattern (Regex or Text)"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:551
+msgid "Match Type"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:553
+msgid "Contains"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:554
+msgid "Exact Match"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:555
+msgid "Regex"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:558
+msgid "Apply Tag"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:561
+msgid "Select Taxonomy..."
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:564
+msgid "Select Tag..."
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:567
+msgid "Priority (higher = runs first)"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:575
+msgid "Create Rule"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:590
+msgid "Batch Edit Asset Type"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:591
+msgid "Updating"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:592
+msgid "assets"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:595
+msgid "New Asset Type"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:604
+msgid "Update All"
+msgstr ""
+
+#: src/web_app/templates/logic_studio/index.html:619
+msgid "Edit Asset Details"
+msgstr ""
+
+#: src/web_app/templates/reports/portfolio.html:10
+msgid ""
+"Portfolio & Performance\n"
+"            Report"
+msgstr ""
+
+#: src/web_app/templates/reports/portfolio.html:12
+msgid ""
+"Comprehensive analysis of your investments, holdings, and historical "
+"performance"
+msgstr ""
+
+#: src/web_app/templates/reports/portfolio.html:20
+msgid ""
+"Portfolio\n"
+"            At-a-Glance"
+msgstr ""
+
+#: src/web_app/templates/reports/portfolio.html:244
+msgid "Total Gains"
+msgstr ""
+
+#: src/web_app/templates/reports/portfolio.html:344
+msgid "XIRR %"
+msgstr ""
+
+#: src/web_app/templates/reports/portfolio.html:410
+msgid "Asset Correlation & Risk Monitoring"
+msgstr ""
+
+#: src/web_app/templates/reports/portfolio.html:577
+msgid ""
+"Detailed\n"
+"                Holdings"
+msgstr ""
+
+#: src/web_app/templates/reports/portfolio.html:816
+#: src/web_app/templates/reports/portfolio.html:848
+msgid "XIRR (%)"
+msgstr ""
+
+#: src/web_app/templates/reports/portfolio.html:882
+msgid "Portfolio Growth (%)"
+msgstr ""
+

@@ -1,0 +1,234 @@
+# Settings Configuration Example
+# This file contains application settings, file paths, and analysis parameters
+# Copy this file to settings.yaml and modify the paths to match your environment
+
+# --- Database Mode ---
+database:
+  mode: "database" # Options: "excel", "database"
+  sync_on_startup: true
+
+# --- Data Sources ---
+data_sources:
+  fx_rates: "api_with_fallback" # Options: "excel", "api", "api_with_fallback"
+  stock_prices: "api_with_fallback" # Options: "excel", "api", "api_with_fallback"
+  crypto_prices: "api_with_fallback" # Options: "excel", "api", "api_with_fallback"
+
+# --- Data Paths and Sheet Names ---
+# Structure associating each data file key with its path and relevant sheet names
+data_files:
+  financial_summary:
+    path: "data/Financial_Summary.xlsx"  # Update with your file path
+    sheets:
+      balance_sheet: "Balance_Sheet"
+      monthly_income_expense: "Monthly_Income_Expense"
+  insurance_portfolio:
+    path: "data/Insurance_Portfolio.xlsx"
+    sheets:
+      summary: "Summary"
+      premiums: "Premiums"
+  gold_transactions:
+    path: "data/Gold_transactions.xlsx"
+    sheets:
+      holdings: "Holdings"
+      transactions: "Transactions"
+  fund_transactions:
+    path: "data/funding_transactions.xlsx"
+    sheets:
+      holdings: "Fund_Holdings"
+      transactions: "Fund_Transactions"
+  rsu_transactions:
+    path: "data/RSU_transactions.xlsx"
+    sheets:
+      transactions: "Transactions"
+  schwab_investments:
+    holdings_path_pattern: "data/Individual-Positions-*.csv"
+    transactions_path_pattern: "data/Individual_*_Transactions_*.csv"
+
+# --- Output Directory ---
+output_directory: "output/"
+
+# --- Google Finance Integration ---
+google_finance:
+  enabled: true
+  timeout: 5.0
+  cache_duration: 3600
+
+# --- Data Processing Parameters ---
+data_processing:
+  use_shrinkage: true
+  filter_outliers: true
+  outlier_threshold: 3.0
+
+# --- MPT Parameters ---
+mpt_params:
+  risk_free_rate: 0.02
+  frontier_points: 50
+  annualization_factor: 12
+
+# --- Analysis Parameters ---
+analysis_params:
+  risk_preference: "balanced"  # Options: conservative, balanced, growth, aggressive
+  rebalancing_threshold: 0.05
+  new_investment: 0
+  tax_rate: 0.20
+  transaction_cost_rate: 0.001
+  min_transaction_amount: 1000
+
+# --- Investment Analysis ---
+investment_analysis:
+  benchmark_index: "SPY"
+  tracking_periods:
+    - 3M
+    - 6M
+    - YTD
+    - 1Y
+    - 3Y
+    - All
+  allocation_thresholds:
+    high_concentration: 0.25
+    cash_reserve_min: 0.05
+    cash_reserve_max: 0.2
+
+# --- Data Quality Thresholds ---
+data_quality_thresholds:
+  min_required_months: 24
+  min_required_assets: 3
+  min_completeness: 0.7
+
+# --- Visualization Settings ---
+visualization:
+  figure_size: [12, 8]
+  color_palette: "viridis"
+  chinese_font: null
+  show_values_on_charts: true
+  save_charts: true
+  chart_format: "png"
+  chart_dpi: 300
+
+# --- Reporting Settings ---
+reporting:
+  generate_pdf: false
+  generate_html: true
+  currency_format: "{:,.0f}"
+  percentage_format: "{:.1%}"
+  language: "en_US"  # Options: en_US, zh_CN
+
+# --- General Settings ---
+general:
+  debug_mode: false
+
+# --- Historical Data ---
+historical_data:
+  enable_snapshots: true
+  default_frequency: monthly
+  retention_period_months: 36
+  auto_snapshot: true
+  snapshot_schedule: monthly
+  storage_format: excel
+  snapshots_directory: "data/historical_snapshots/"
+
+# --- Cost Basis Tracking ---
+cost_basis:
+  method: FIFO  # Options: FIFO, LIFO, Average
+  track_wash_sales: true
+  include_reinvested_dividends: true
+  lots_storage_directory: "data/cost_basis_lots/"
+
+# --- External Data Sources ---
+external_data:
+  schwab:
+    enabled: false
+    api_base_url: "https://api.schwabapi.com"
+    api_key: ""  # Add your API key
+    api_secret: ""  # Add your API secret
+    account_numbers: []
+    sync_frequency: daily
+    auto_sync: false
+  market_data:
+    enabled: true
+    provider: yahoo
+    api_key: ""
+    rate_limit: 1.0
+    auto_update_prices: true
+    update_frequency: daily
+    base_currency: USD
+    supported_currencies:
+      - USD
+      - CNY
+      - EUR
+      - JPY
+  fred:
+    enabled: true
+    api_key: ""  # Get your key at https://fred.stlouisfed.org/docs/api/api_key.html
+
+# --- Performance Attribution ---
+performance_attribution:
+  enabled: true
+  methods:
+    - sector
+    - asset_class
+    - security
+  default_period_months: 12
+  benchmarks:
+    equity:
+      name: "S&P 500"
+      symbol: SPY
+      weight: 0.6
+    fixed_income:
+      name: "AGG"
+      symbol: AGG
+      weight: 0.4
+  results_directory: "data/attribution_results/"
+
+# --- Multi-Timeframe Analysis ---
+multi_timeframe:
+  supported_frequencies:
+    - daily
+    - weekly
+    - monthly
+    - quarterly
+    - annually
+  default_frequencies:
+    performance_analysis: monthly
+    risk_analysis: daily
+    attribution_analysis: monthly
+    cost_basis_analysis: daily
+  gap_filling:
+    default_method: forward
+    max_gap_days: 7
+
+# --- Advanced Analytics ---
+advanced_analytics:
+  risk_metrics:
+    enabled: true
+    lookback_periods: [30, 90, 252, 504]
+    confidence_levels: [0.95, 0.99]
+  stress_testing:
+    enabled: true
+    scenarios:
+      - name: "2008 Financial Crisis"
+        start_date: "2008-09-01"
+        end_date: "2009-03-31"
+      - name: "COVID-19 Crash"
+        start_date: "2020-02-01"
+        end_date: "2020-04-30"
+  monte_carlo:
+    enabled: true
+    num_simulations: 10000
+    simulation_years: 10
+    confidence_intervals: [0.05, 0.25, 0.5, 0.75, 0.95]
+
+# --- Data Quality ---
+data_quality:
+  validation_rules:
+    check_negative_prices: true
+    check_zero_quantities: true
+    check_missing_asset_names: true
+    check_duplicate_transactions: true
+  auto_cleaning:
+    enabled: true
+    remove_duplicates: true
+    fill_missing_asset_names: true
+    standardize_currencies: true
+  generate_quality_reports: true
+  quality_report_directory: "output/data_quality/"

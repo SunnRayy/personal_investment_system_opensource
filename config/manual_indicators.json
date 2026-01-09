@@ -1,0 +1,46 @@
+{
+  "description": "Manual override for market indicators when automated data sources fail or are outdated.",
+  "instructions": "Set 'enabled': true for any indicator you want to manually input. Enter 'value' and 'date' (YYYY-MM-DD format). System will use manual data if enabled and date is within 30 days.",
+  "shiller_pe": {
+    "enabled": false,
+    "value": null,
+    "date": null,
+    "notes": "Shiller P/E (CAPE) Ratio. Enter value like 30.5"
+  },
+  "fear_greed": {
+    "enabled": true,
+    "value": 59,
+    "date": "2025-12-24",
+    "notes": "CNN Fear & Greed Index (0-100). Manually set to 59 per CNN website"
+  },
+  "vix": {
+    "enabled": false,
+    "value": null,
+    "date": null,
+    "notes": "CBOE Volatility Index"
+  },
+  "buffett_us": {
+    "enabled": false,
+    "value": null,
+    "date": null,
+    "notes": "US Buffett Indicator (Total Market Cap / GDP as %)"
+  },
+  "buffett_china": {
+    "enabled": false,
+    "value": null,
+    "date": null,
+    "notes": "China Buffett Indicator (%)"
+  },
+  "buffett_japan": {
+    "enabled": false,
+    "value": null,
+    "date": null,
+    "notes": "Japan Buffett Indicator (%)"
+  },
+  "buffett_europe": {
+    "enabled": false,
+    "value": null,
+    "date": null,
+    "notes": "Europe (UK) Buffett Indicator (%)"
+  }
+}

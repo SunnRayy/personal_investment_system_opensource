@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Dashboard</title>
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Financial Dashboard</h1>
+            <p>Personal Investment System - Web Interface</p>
+        </header>
+        
+        <main id="dashboard-container">
+            <!-- Debug info -->
+            <div id="debug-info" style="background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; font-size: 12px;">
+                <strong>Debug Info:</strong><br>
+                <span id="chart-status">Loading...</span><br>
+                <span id="api-status">API: Not called</span><br>
+                <span id="data-status">Data: Not loaded</span>
+            </div>
+            
+            <!-- Dashboard content will be populated by JavaScript -->
+            <div class="dashboard-grid">
+                <!-- Portfolio Overview Section -->
+                <div class="dashboard-section">
+                    <h2>💰 Portfolio Overview</h2>
+                    <div id="portfolio-overview-container">
+                        <div id="portfolio-metrics">
+                            <div class="metric-card">
+                                <h3>Total Value</h3>
+                                <p id="total-portfolio-value">Loading...</p>
+                            </div>
+                            <div class="metric-card">
+                                <h3>Holdings Count</h3>
+                                <p id="holdings-count">Loading...</p>
+                            </div>
+                            <div class="metric-card">
+                                <h3>Historical Records</h3>
+                                <p id="historical-records">Loading...</p>
+                            </div>
+                        </div>
+                        <canvas id="portfolioChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Cash Flow Forecasting Section -->
+                <div class="dashboard-section">
+                    <h2>📈 Cash Flow Forecast (12 Months)</h2>
+                    <div id="cashflow-forecast-container">
+                        <div id="forecast-metrics">
+                            <div class="metric-card">
+                                <h3>Historical Periods</h3>
+                                <p id="forecast-historical-periods">Loading...</p>
+                            </div>
+                            <div class="metric-card">
+                                <h3>Model Status</h3>
+                                <p id="forecast-model-status">Loading...</p>
+                            </div>
+                        </div>
+                        <canvas id="cashflowForecastChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Goal Planning Section -->
+                <div class="dashboard-section">
+                    <h2>🎯 Goal Planning & Monte Carlo Simulation</h2>
+                    <div id="goal-planning-container">
+                        <div id="goal-metrics">
+                            <div class="metric-card">
+                                <h3>Simulation Iterations</h3>
+                                <p id="simulation-iterations">Loading...</p>
+                            </div>
+                            <div class="metric-card">
+                                <h3>Projection Years</h3>
+                                <p id="projection-years">Loading...</p>
+                            </div>
+                            <div class="metric-card">
+                                <h3>Final Value (Median)</h3>
+                                <p id="final-value-median">Loading...</p>
+                            </div>
+                        </div>
+                        <div id="goal-probabilities-container">
+                            <h4>Goal Success Probabilities</h4>
+                            <div id="goal-probabilities-list">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Performance Attribution Section -->
+                <div class="dashboard-section">
+                    <h2>📊 Performance Attribution (24 Months)</h2>
+                    <div id="performance-attribution-container">
+                        <div id="attribution-metrics">
+                            <div class="metric-card">
+                                <h3>Analysis Periods</h3>
+                                <p id="attribution-periods">Loading...</p>
+                            </div>
+                            <div class="metric-card">
+                                <h3>Allocation Effect</h3>
+                                <p id="allocation-effect">Loading...</p>
+                            </div>
+                            <div class="metric-card">
+                                <h3>Selection Effect</h3>
+                                <p id="selection-effect">Loading...</p>
+                            </div>
+                            <div class="metric-card">
+                                <h3>Total Excess Return</h3>
+                                <p id="excess-return">Loading...</p>
+                            </div>
+                        </div>
+                        <canvas id="attributionChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Net Worth Trend (Original) -->
+                <div class="dashboard-section">
+                    <h2>Net Worth Historical Trend</h2>
+                    <div id="networth-chart-container">
+                        <canvas id="networthChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Asset Allocation -->
+                <div class="dashboard-section">
+                    <h2>Asset Allocation</h2>
+                    <div id="allocation-chart-container">
+                        <canvas id="allocationChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Investment Recommendations Section -->
+                <div class="dashboard-section">
+                    <h2>🧠 Tax-Optimized Investment Recommendations</h2>
+                    <div id="recommendations-container">
+                        <div id="recommendation-summary">
+                            <div class="metric-card">
+                                <h3>Financial Recommendations</h3>
+                                <p id="financial-recommendations-count">Loading...</p>
+                            </div>
+                            <div class="metric-card">
+                                <h3>Portfolio Recommendations</h3>
+                                <p id="portfolio-recommendations-count">Loading...</p>
+                            </div>
+                            <div class="metric-card">
+                                <h3>Risk Recommendations</h3>
+                                <p id="risk-recommendations-count">Loading...</p>
+                            </div>
+                            <div class="metric-card">
+                                <h3>Tax Recommendations</h3>
+                                <p id="tax-recommendations-count">Loading...</p>
+                            </div>
+                        </div>
+                        <div id="recommendations-table-container">
+                            <table id="recommendations-table" class="recommendations-table">
+                                <thead>
+                                    <tr>
+                                        <th>Priority</th>
+                                        <th>Category</th>
+                                        <th>Description</th>
+                                        <th>Suggested Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recommendations-tbody">
+                                    <tr>
+                                        <td colspan="4" class="loading-message">Loading recommendations...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Local JavaScript -->
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

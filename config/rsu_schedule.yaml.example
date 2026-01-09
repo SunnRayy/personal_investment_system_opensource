@@ -1,0 +1,26 @@
+# RSU Vesting Schedule Configuration
+# This file tracks RSU vesting events and planned actions for risk management
+#
+# Copy this file to rsu_schedule.yaml and update with your actual vesting schedule.
+
+# Configuration notes:
+# - vesting_date: Date when shares vest (YYYY-MM-DD format)
+# - shares: Number of shares vesting
+# - asset_id: Asset identifier (e.g., Employer_Stock_A)
+# - plan: Brief description of intended action (e.g., "Sell 50% within 30 days")
+
+vesting_events:
+  # Example entries (uncomment and modify with your actual data):
+  
+  # - vesting_date: "2025-03-15"
+  #   shares: 0
+  #   asset_id: "Employer_Stock_A"
+  #   plan: "Sell 50% within 30 days to cover taxes and diversify"
+  
+  # - vesting_date: "2025-09-15"
+  #   shares: 0
+  #   asset_id: "Employer_Stock_A"
+  #   plan: "Sell 50% on the vest date to cover taxes and diversify"
+  
+  # Add your actual vesting events below:
+  []

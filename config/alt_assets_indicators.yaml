@@ -1,0 +1,322 @@
+# Alternative Assets Indicators Configuration
+# Configuration for gold and crypto volatility indicators scoring system
+# Last Updated: 2025-10-29
+
+# =============================================================================
+# GOLD INDICATORS CONFIGURATION
+# =============================================================================
+
+gold_indicators:
+  # Gold/Silver Ratio - Measures relative value of gold vs silver
+  # Lower ratio = Gold relatively cheap (bullish signal)
+  # Higher ratio = Gold relatively expensive (bearish signal)
+  # Historical range: 40-95, typical: 55-85
+  gold_silver_ratio:
+    strong_buy_threshold: 55      # Ratio < 55: Gold very cheap relative to silver
+    buy_threshold: 70             # Ratio 55-70: Gold moderately cheap
+    sell_threshold: 85            # Ratio 85-95: Gold moderately expensive
+    strong_sell_threshold: 95     # Ratio > 95: Gold very expensive
+    
+    interpretation:
+      strong_buy: "Gold/Silver ratio < 55 indicates gold is historically cheap relative to silver. Strong buy signal."
+      buy: "Gold/Silver ratio 55-70 suggests gold is moderately undervalued. Buy signal."
+      hold: "Gold/Silver ratio 70-85 is in normal range. Hold current position."
+      sell: "Gold/Silver ratio 85-95 suggests gold is moderately overvalued. Sell signal."
+      strong_sell: "Gold/Silver ratio > 95 indicates gold is historically expensive. Strong sell signal."
+
+  # S&P 500/Gold Ratio - Measures relative performance of stocks vs gold
+  # Lower ratio = Stocks cheap relative to gold (equity bullish, gold bearish)
+  # Higher ratio = Stocks expensive relative to gold (equity bearish, gold bullish)
+  # Historical range: 0.5-3.5, typical: 1.5-2.5
+  sp500_gold_ratio:
+    strong_buy_threshold: 1.5     # Ratio < 1.5: Stocks very cheap (gold expensive)
+    buy_threshold: 1.7            # Ratio 1.5-1.7: Stocks moderately cheap
+    sell_threshold: 2.2           # Ratio 2.2-2.5: Stocks moderately expensive
+    strong_sell_threshold: 2.5    # Ratio > 2.5: Stocks very expensive (gold cheap)
+    
+    interpretation:
+      strong_buy: "S&P 500/Gold ratio < 1.5 indicates stocks are historically cheap. Strong sell signal for gold."
+      buy: "S&P 500/Gold ratio 1.5-1.7 suggests stocks are moderately undervalued. Sell signal for gold."
+      hold: "S&P 500/Gold ratio 1.7-2.2 is in normal range. Hold current position."
+      sell: "S&P 500/Gold ratio 2.2-2.5 suggests stocks are moderately expensive. Buy signal for gold."
+      strong_sell: "S&P 500/Gold ratio > 2.5 indicates stocks are historically expensive. Strong buy signal for gold."
+
+  # GVZ (Cboe Gold Volatility Index) - Measures gold market fear/uncertainty
+  # Higher GVZ = High fear/uncertainty (contrarian buy signal)
+  # Lower GVZ = Low fear/complacency (contrarian sell signal)
+  # Historical range: 5-100, typical: 10-50
+  gvz:
+    strong_buy_threshold: 35      # GVZ > 35: Extreme fear (contrarian buy)
+    buy_threshold: 28             # GVZ 28-35: Elevated fear (buy)
+    sell_threshold: 15            # GVZ 10-15: Low volatility (complacency, sell)
+    strong_sell_threshold: 10     # GVZ < 10: Extreme complacency (strong sell)
+    
+    interpretation:
+      strong_buy: "GVZ > 35 indicates extreme fear in gold market. Contrarian strong buy signal."
+      buy: "GVZ 28-35 suggests elevated uncertainty. Buy signal."
+      hold: "GVZ 15-28 is normal volatility. Hold current position."
+      sell: "GVZ 10-15 indicates low volatility/complacency. Sell signal."
+      strong_sell: "GVZ < 10 shows extreme complacency. Strong sell signal."
+
+  # Overall scoring system
+  # Each indicator contributes: -1 (bullish), 0 (neutral), +1 (bearish)
+  # Total score range: -3 to +3
+  scoring:
+    score_to_recommendation:
+      strong_buy:
+        min_score: -3
+        max_score: -2
+        description: "Multiple indicators show strong bullish signals for gold"
+      buy:
+        min_score: -1.5
+        max_score: -0.5
+        description: "Indicators lean bullish for gold"
+      hold:
+        min_score: -0.5
+        max_score: 0.5
+        description: "Mixed or neutral signals for gold"
+      sell:
+        min_score: 0.5
+        max_score: 1.5
+        description: "Indicators lean bearish for gold"
+      strong_sell:
+        min_score: 2
+        max_score: 3
+        description: "Multiple indicators show strong bearish signals for gold"
+
+  # =============================================================================
+  # PHASE 3: WEIGHTED SCORING CONFIGURATION FOR GOLD
+  # =============================================================================
+  # Individual indicator scoring: -2 (strong buy) to +2 (strong sell)
+  # Weighted total score range: -10 to +10
+  # 5-tier recommendation system: Strong Buy / Buy / Hold / Sell / Strong Sell
+  
+  weights:
+    gvz: 1.2                      # Highest weight - direct fear gauge
+    gold_silver_ratio: 1.0        # Standard weight - relative value
+    sp500_gold_ratio: 0.8         # Lower weight - broader market context
+  
+  weighted_scoring:
+    score_to_recommendation:
+      strong_buy:
+        min_score: -10
+        max_score: -6
+        description: "Multiple strong bearish signals for gold. Extreme fear creates contrarian buying opportunity."
+      buy:
+        min_score: -5.99
+        max_score: -3
+        description: "Moderate bearish signals suggest favorable risk/reward for gold accumulation."
+      hold:
+        min_score: -2.99
+        max_score: 2.99
+        description: "Mixed or neutral signals across indicators. No clear directional bias."
+      sell:
+        min_score: 3
+        max_score: 5.99
+        description: "Moderate bullish signals indicate gold strength. Consider taking profits."
+      strong_sell:
+        min_score: 6
+        max_score: 10
+        description: "Multiple strong bullish signals suggest extreme greed. Contrarian sell opportunity."
+
+# =============================================================================
+# CRYPTO INDICATORS CONFIGURATION (Phase 2)
+# =============================================================================
+
+crypto_indicators:
+  # Bitcoin 30-day Annualized Volatility (calculated from CoinGecko)
+  # Higher volatility = Higher risk/opportunity (contrarian indicator)
+  # Lower volatility = Complacency (contrarian sell signal)
+  # Typical range: 30-80%, extreme: 10-150%+
+  btc_volatility:
+    strong_buy_threshold: 80      # > 80%: Extreme volatility (contrarian buy opportunity)
+    buy_threshold: 60             # 60-80%: High volatility (buy)
+    sell_threshold: 25            # 20-25%: Low volatility (complacency, sell)
+    strong_sell_threshold: 20     # < 20%: Extreme complacency (strong sell)
+    
+    interpretation:
+      strong_buy: "BTC volatility > 80% indicates extreme market fear. Contrarian strong buy signal."
+      buy: "BTC volatility 60-80% suggests elevated uncertainty. Buy signal."
+      hold: "BTC volatility 25-60% is normal range. Hold current position."
+      sell: "BTC volatility 20-25% indicates complacency. Sell signal."
+      strong_sell: "BTC volatility < 20% shows extreme complacency. Strong sell signal."
+    
+  # Ethereum 30-day Annualized Volatility (calculated from CoinGecko)
+  # ETH typically 1.2-1.5x more volatile than BTC
+  # Typical range: 40-100%, extreme: 15-200%+
+  eth_volatility:
+    strong_buy_threshold: 100     # > 100%: Extreme volatility (contrarian buy)
+    buy_threshold: 75             # 75-100%: High volatility (buy)
+    sell_threshold: 30            # 25-30%: Low volatility (sell)
+    strong_sell_threshold: 25     # < 25%: Extreme complacency (strong sell)
+    
+    interpretation:
+      strong_buy: "ETH volatility > 100% indicates extreme market fear. Contrarian strong buy signal."
+      buy: "ETH volatility 75-100% suggests elevated uncertainty. Buy signal."
+      hold: "ETH volatility 30-75% is normal range. Hold current position."
+      sell: "ETH volatility 25-30% indicates complacency. Sell signal."
+      strong_sell: "ETH volatility < 25% shows extreme complacency. Strong sell signal."
+
+  # BTC/ETH Price Ratio - Measures relative strength between major cryptos
+  # Higher ratio = BTC outperforming (risk-off, flight to safety in crypto)
+  # Lower ratio = ETH outperforming (risk-on, altcoin strength)
+  # Typical range: 15-25, extreme: 10-35
+  btc_eth_ratio:
+    strong_buy_threshold: 12      # Ratio < 12: ETH extremely strong (BTC weak, buy BTC)
+    buy_threshold: 15             # Ratio 12-15: ETH moderately strong (buy BTC)
+    sell_threshold: 22            # Ratio 22-25: BTC moderately strong (sell BTC for ETH)
+    strong_sell_threshold: 25     # Ratio > 25: BTC extremely strong (strong sell BTC)
+    
+    # Note: Scoring is inverted for BTC vs ETH
+    # For BTC: Lower ratio = Buy (BTC cheap), Higher ratio = Sell (BTC expensive)
+    # For ETH: Lower ratio = Sell (ETH expensive), Higher ratio = Buy (ETH cheap)
+    interpretation:
+      strong_buy_btc: "BTC/ETH ratio < 12 indicates BTC is extremely cheap relative to ETH."
+      buy_btc: "BTC/ETH ratio 12-15 suggests BTC is moderately undervalued vs ETH."
+      hold: "BTC/ETH ratio 15-22 is in normal range."
+      sell_btc: "BTC/ETH ratio 22-25 suggests BTC is moderately expensive vs ETH."
+      strong_sell_btc: "BTC/ETH ratio > 25 indicates BTC is extremely expensive relative to ETH."
+
+  # BTC Dominance - Bitcoin's percentage of total crypto market cap
+  # Higher dominance = Flight to safety in crypto (risk-off sentiment)
+  # Lower dominance = Altcoin season (risk-on sentiment)
+  # Typical range: 40-60%, extreme: 30-70%
+  btc_dominance:
+    strong_buy_threshold: 35      # < 35%: Extreme altcoin season (buy BTC)
+    buy_threshold: 42             # 35-42%: Altcoin season (buy BTC)
+    sell_threshold: 55            # 55-60%: BTC dominance high (sell BTC for alts)
+    strong_sell_threshold: 60     # > 60%: Extreme BTC dominance (strong sell BTC)
+    
+    # Note: For BTC, low dominance = buy (undervalued), high dominance = sell (overvalued)
+    # For alts/ETH, low dominance = sell (alt season ending), high dominance = buy (alts cheap)
+    interpretation:
+      strong_buy_btc: "BTC dominance < 35% indicates extreme altcoin season. Buy BTC."
+      buy_btc: "BTC dominance 35-42% suggests altcoins are strong. Buy BTC."
+      hold: "BTC dominance 42-55% is normal range."
+      sell_btc: "BTC dominance 55-60% indicates strong BTC dominance. Sell for alts."
+      strong_sell_btc: "BTC dominance > 60% shows extreme BTC dominance. Strong sell BTC."
+
+  # ===== PHASE 2: NEW CRYPTO SENTIMENT INDICATORS =====
+  
+  # BTC/QQQ Ratio - Measures crypto performance vs tech stocks
+  # Distinguishes crypto-specific trends from general tech/risk sentiment
+  # Higher ratio = BTC outperforming tech stocks (crypto-specific strength)
+  # Lower ratio = BTC underperforming tech stocks (risk-off or crypto weakness)
+  # Typical range: 0.15-0.30, extreme: < 0.10 or > 0.40
+  btc_qqq_ratio:
+    hot_threshold: 0.30           # > 0.30: Crypto-specific strength (bullish)
+    normal_min: 0.15              # 0.15-0.30: Normal range
+    cold_threshold: 0.15          # < 0.15: Crypto weakness vs tech (bearish)
+    
+    interpretation:
+      hot: "BTC/QQQ ratio > 0.30 indicates crypto outperforming tech stocks. Bullish crypto-specific strength."
+      normal: "BTC/QQQ ratio 0.15-0.30 is normal range. Crypto tracking tech sentiment."
+      cold: "BTC/QQQ ratio < 0.15 indicates crypto underperforming tech. Risk-off or crypto-specific weakness."
+    
+    # Scoring contribution:
+    # Hot (> 0.30) = -1 (bullish for crypto)
+    # Normal (0.15-0.30) = 0 (neutral)
+    # Cold (< 0.15) = +1 (bearish for crypto)
+  
+  # Crypto Fear & Greed Index - Alternative.me sentiment indicator
+  # Contrarian indicator: Extreme Fear = Buy opportunity, Extreme Greed = Sell signal
+  # Value range: 0-100
+  crypto_fear_greed:
+    extreme_fear_threshold: 25    # 0-24: Extreme Fear (strong buy)
+    fear_threshold: 45            # 25-44: Fear (buy)
+    neutral_min: 45               # 45-55: Neutral (hold)
+    neutral_max: 55
+    greed_threshold: 76           # 56-75: Greed (sell)
+    extreme_greed_threshold: 76   # 76-100: Extreme Greed (strong sell)
+    
+    interpretation:
+      extreme_fear: "Crypto F&G < 25: Extreme Fear detected. Contrarian strong buy signal - market panic creates opportunity."
+      fear: "Crypto F&G 25-44: Fear sentiment. Contrarian buy signal - caution prevails but not panic."
+      neutral: "Crypto F&G 45-55: Neutral sentiment. Hold current position."
+      greed: "Crypto F&G 56-75: Greed sentiment. Consider taking profits."
+      extreme_greed: "Crypto F&G > 75: Extreme Greed detected. Contrarian strong sell signal - euphoria often precedes correction."
+    
+    # Scoring contribution (contrarian):
+    # Extreme Fear (0-24) = -2 (strong buy)
+    # Fear (25-44) = -1 (buy)
+    # Neutral (45-55) = 0 (hold)
+    # Greed (56-75) = +1 (sell)
+    # Extreme Greed (76-100) = +2 (strong sell)
+
+  # ===== PHASE 3: WEIGHTED SCORING SYSTEM =====
+  
+  # Indicator weights for weighted scoring calculation
+  # Each indicator produces -2 to +2 score, multiplied by weight
+  # Total weighted score range: -10 to +10
+  weights:
+    btc_volatility: 0.8       # Technical volatility indicator
+    eth_volatility: 0.8       # Technical volatility indicator
+    btc_eth_ratio: 0.7        # Relative value (lowest weight - internal crypto metric)
+    btc_dominance: 0.9        # Market structure indicator
+    btc_qqq_ratio: 1.0        # Balanced weight - crypto vs traditional market
+    crypto_fear_greed: 1.2    # Highest weight - direct sentiment measure
+    # Total weight sum: 5.4 → Max score: 2 × 5.4 = 10.8, Min score: -2 × 5.4 = -10.8
+    # Normalized to -10 to +10 range by weight selection
+  
+  # Overall scoring system for crypto (UPDATED for Phase 3)
+  # Phase 1: 3 indicators (volatility, ratio, dominance) → -3 to +3
+  # Phase 2: 5 indicators (adds BTC/QQQ and F&G) → -5 to +5 range
+  # Phase 3: 6 indicators with weighted scoring → -10 to +10 range
+  # 
+  # Scoring methodology:
+  # 1. Each indicator produces -2 to +2 score:
+  #    - Volatility: High vol (-2, fear/buy) → Low vol (+2, complacency/sell)
+  #    - BTC/ETH: Low ratio (-2, BTC cheap) → High ratio (+2, BTC expensive)
+  #    - BTC Dom: Low (<35%, -2, altcoin season) → High (>60%, +2, BTC dominance)
+  #    - BTC/QQQ: Low (<0.15, -2, crypto weak) → High (>0.30, +2, crypto strong vs tech)
+  #    - Fear & Greed: Extreme Fear (0-24, -2, buy) → Extreme Greed (76-100, +2, sell)
+  # 2. Apply weights: weighted_score = sum(indicator_score × weight)
+  # 3. Map total to recommendation using thresholds below
+  #
+  # BTC uses: all 6 indicators
+  # ETH uses: all 6 indicators (btc_eth_ratio and btc_dominance inverted)
+  scoring:
+    score_to_recommendation:
+      strong_buy:
+        min_score: -10
+        max_score: -6
+        description: "Multiple strong bearish signals detected. Contrarian strong buy opportunity - extreme fear/weakness in crypto market."
+      buy:
+        min_score: -5.99
+        max_score: -3
+        description: "Moderate bearish signals detected. Buy opportunity - favorable risk/reward as market sentiment turns cautious."
+      hold:
+        min_score: -2.99
+        max_score: 2.99
+        description: "Mixed or neutral signals. Hold current position - no clear directional bias."
+      sell:
+        min_score: 3
+        max_score: 5.99
+        description: "Moderate bullish signals detected. Consider taking profits - market showing strength but not euphoric."
+      strong_sell:
+        min_score: 6
+        max_score: 10
+        description: "Multiple strong bullish signals detected. Contrarian strong sell opportunity - extreme greed/strength suggests overbought conditions."
+
+# =============================================================================
+# GENERAL SETTINGS
+# =============================================================================
+
+general:
+  # Data freshness requirements
+  max_data_age_hours: 48
+  
+  # Scoring weights (for future multi-asset optimization)
+  weights:
+    gold_silver_ratio: 1.0
+    sp500_gold_ratio: 1.0
+    gvz: 1.0
+    btc_volatility: 1.0
+    eth_volatility: 1.0
+  
+  # Display settings
+  display:
+    show_score: true
+    show_individual_contributions: true
+    show_interpretation: true
+    precision: 2  # Decimal places for displayed values

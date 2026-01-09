@@ -1,0 +1,1013 @@
+{% extends "base.html" %}
+
+{% block title %}Cash Flow & Wealth Report{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div
+    class="bg-gradient-to-r from-teal-600 to-cyan-600 rounded-b-lg shadow-lg text-white p-6 mb-8 -mt-8 mx-4 rounded-t-none">
+    <div class="container mx-auto flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold mb-2"><i class="fas fa-money-bill-wave mr-2"></i> Cash Flow & Wealth Report
+            </h1>
+            <p class="opacity-90">Comprehensive analysis of your income, expenses, savings, and net worth trends</p>
+        </div>
+        <div class="flex items-center gap-4">
+            <select id="yearSelect"
+                class="bg-white/20 border border-white/30 text-white rounded-lg px-4 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-white/50">
+                <option value="2025" class="text-gray-800">2025</option>
+                <option value="2024" class="text-gray-800">2024</option>
+                <option value="2023" class="text-gray-800">2023</option>
+                <option value="2022" class="text-gray-800">2022</option>
+                <option value="2021" class="text-gray-800">2021</option>
+                <option value="2020" class="text-gray-800">2020</option>
+            </select>
+            <a href="{{ url_for('reports.cashflow_parity') }}"
+                class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center">
+                <i class="fas fa-balance-scale mr-2"></i> Data Parity Check
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container mx-auto px-4">
+    <!-- At-a-Glance KPIs (YTD with YoY %) -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-teal-500 pb-2 mb-6"><span
+                id="yearTitle">2025</span> Year-to-Date Overview
+        </h2>
+
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- YTD Income -->
+            <div
+                class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32 border-t-4 border-green-500">
+                <div class="text-2xl font-bold text-gray-800 mb-1" id="kpi-ytd-income">--</div>
+                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">YTD Income</div>
+                <div class="text-sm mt-1" id="kpi-ytd-income-yoy">--</div>
+            </div>
+
+            <!-- YTD Expense -->
+            <div
+                class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32 border-t-4 border-red-500">
+                <div class="text-2xl font-bold text-gray-800 mb-1" id="kpi-ytd-expense">--</div>
+                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">YTD Expense</div>
+                <div class="text-sm mt-1" id="kpi-ytd-expense-yoy">--</div>
+            </div>
+
+            <!-- YTD Investment -->
+            <div
+                class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32 border-t-4 border-blue-500">
+                <div class="text-2xl font-bold text-gray-800 mb-1" id="kpi-ytd-investment">--</div>
+                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">YTD Investment</div>
+                <div class="text-sm mt-1" id="kpi-ytd-investment-yoy">--</div>
+            </div>
+
+            <!-- YTD Net Cash Flow -->
+            <div
+                class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32 border-t-4 border-teal-500">
+                <div class="text-2xl font-bold text-gray-800 mb-1" id="kpi-ytd-net-cf">--</div>
+                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">YTD Net Cash Flow</div>
+                <div class="text-sm mt-1" id="kpi-ytd-net-cf-yoy">--</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="mb-8">
+        <div class="flex flex-wrap gap-2 mb-6">
+            <button onclick="showTab('net-worth')" id="tab-btn-net-worth"
+                class="tab-btn px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-md">
+                <i class="fas fa-chart-line mr-2"></i>Net Worth & Health
+            </button>
+            <button onclick="showTab('cash-flow')" id="tab-btn-cash-flow"
+                class="tab-btn px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300">
+                <i class="fas fa-exchange-alt mr-2"></i>Cash Flow Summary
+            </button>
+            <button onclick="showTab('expenses')" id="tab-btn-expenses"
+                class="tab-btn px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300">
+                <i class="fas fa-receipt mr-2"></i>Expenses Analysis
+            </button>
+            <button onclick="showTab('income')" id="tab-btn-income"
+                class="tab-btn px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300">
+                <i class="fas fa-coins mr-2"></i>Income Analysis
+            </button>
+            <button onclick="showTab('analysis')" id="tab-btn-analysis"
+                class="tab-btn px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300">
+                <i class="fas fa-chart-bar mr-2"></i>Period Comparisons
+            </button>
+            <button onclick="showTab('forecast')" id="tab-btn-forecast"
+                class="tab-btn px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300">
+                <i class="fas fa-magic mr-2"></i>12M Forecast
+            </button>
+            <!-- Adjusted Data Badge with Enhanced Tooltip -->
+            <div id="adjusted-badge"
+                class="hidden ml-auto flex items-center bg-yellow-100 text-yellow-800 px-3 py-2 rounded-lg text-xs font-medium relative group animate-pulse">
+                <i class="fas fa-filter mr-2"></i>
+                <span>Adjusted Data</span>
+                <span class="ml-2 cursor-help">ⓘ</span>
+                <!-- Tooltip -->
+                <div
+                    class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-50">
+                    Excludes Work Reimbursements and Aug 2020 Property (Income: -880k, Expense: -929k)
+                    <div
+                        class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Net Worth & Health -->
+        <div id="tab-net-worth" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Net Worth Trend Chart -->
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-chart-area mr-2 text-teal-500"></i> Net Worth Trend
+                    </h3>
+                    <div class="h-80">
+                        <canvas id="chart-net-worth-trend"></canvas>
+                    </div>
+                </div>
+
+                <!-- Asset Allocation -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-pie-chart mr-2 text-purple-500"></i> Asset Allocation
+                    </h3>
+                    <div class="h-80">
+                        <canvas id="chart-asset-allocation"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Health Ratios -->
+            <div class="mt-6 bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-heartbeat mr-2 text-red-500"></i> Financial Health Ratios
+                </h3>
+                <div class="h-64">
+                    <canvas id="chart-ratios"></canvas>
+                </div>
+                <div class="mt-4 text-xs text-gray-500 grid grid-cols-2 gap-4">
+                    <div><strong>Debt/Asset Ratio</strong>: Total Liabilities ÷ Total Assets (lower = healthier)</div>
+                    <div><strong>Liquidity Ratio</strong>: Liquid Assets ÷ Short-term Liabilities (higher = more
+                        flexible)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Cash Flow Summary -->
+        <div id="tab-cash-flow" class="tab-content hidden">
+            <!-- Income vs Expense -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-balance-scale mr-2 text-green-500"></i> Income vs Expense Trend
+                </h3>
+                <div class="h-80">
+                    <canvas id="chart-income-expense"></canvas>
+                </div>
+            </div>
+
+            <!-- Net Cash Flow -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-arrow-trend-up mr-2 text-blue-500"></i> Net Cash Flow
+                </h3>
+                <div class="h-64">
+                    <canvas id="chart-net-cash-flow"></canvas>
+                </div>
+            </div>
+
+            <!-- Savings Rate Trend -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-piggy-bank mr-2 text-pink-500"></i> Savings Rate Trend
+                </h3>
+                <div class="h-64">
+                    <canvas id="chart-savings-rate"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Expenses Analysis -->
+        <div id="tab-expenses" class="tab-content hidden">
+            <!-- Row 1: YTD Expense Pie (Left) + YTD Expense Table (Right) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- YTD Expense Pie Chart -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-chart-pie mr-2 text-orange-500"></i> YTD Expense Distribution
+                    </h3>
+                    <div class="h-72">
+                        <canvas id="chart-expense-breakdown"></canvas>
+                    </div>
+                </div>
+
+                <!-- YTD Expense Table with YoY % -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-table mr-2 text-teal-500"></i> YTD Expense Categories (YoY Comparison)
+                    </h3>
+                    <div class="overflow-y-auto max-h-72">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-gray-50 sticky top-0">
+                                <tr>
+                                    <th class="px-3 py-2 text-left font-semibold">Category</th>
+                                    <th class="px-3 py-2 text-right font-semibold">YTD Value</th>
+                                    <th class="px-3 py-2 text-right font-semibold">Val YoY</th>
+                                    <th class="px-3 py-2 text-right font-semibold">% of Total</th>
+                                    <th class="px-3 py-2 text-right font-semibold">% YoY</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-expense-yoy" class="divide-y divide-gray-100">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: Essential vs Non-Essential Trend -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-layer-group mr-2 text-indigo-500"></i> Essential vs Non-Essential
+                    </h3>
+                    <div class="h-64">
+                        <canvas id="chart-expense-trend"></canvas>
+                    </div>
+                </div>
+
+                <!-- Essential % Trend -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-percentage mr-2 text-red-400"></i> Essential Expense %
+                    </h3>
+                    <div class="h-64">
+                        <canvas id="chart-essential-pct"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Income Analysis (NEW from Notebook) -->
+        <div id="tab-income" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- Annual Income/Expense Summary -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-calendar-alt mr-2 text-blue-500"></i> Annual Summary
+                    </h3>
+                    <div class="h-80">
+                        <canvas id="chart-annual-summary"></canvas>
+                    </div>
+                </div>
+
+                <!-- YoY Income Comparison -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-chart-line mr-2 text-green-500"></i> Year-over-Year Income
+                    </h3>
+                    <div class="h-80">
+                        <canvas id="chart-yoy-income"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Income Sources Breakdown -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-coins mr-2 text-yellow-500"></i> Income Sources (Recent 12 months)
+                </h3>
+                <div class="h-64">
+                    <canvas id="chart-income-sources"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Period Comparisons (Analysis) -->
+        <div id="tab-analysis" class="tab-content hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <!-- MoM Card -->
+                <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-purple-500">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase mb-3 flex items-center">
+                        <i class="fas fa-calendar-day mr-2 text-purple-500"></i>Month-over-Month
+                    </h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 text-sm">Income</span>
+                            <span id="comp-mom-income" class="font-bold">--</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 text-sm">Expense</span>
+                            <span id="comp-mom-expense" class="font-bold">--</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 text-sm">Investment</span>
+                            <span id="comp-mom-investment" class="font-bold">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QoQ Card -->
+                <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-blue-500">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase mb-3 flex items-center">
+                        <i class="fas fa-calendar-week mr-2 text-blue-500"></i>Quarter-over-Quarter
+                    </h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 text-sm">Income</span>
+                            <span id="comp-qoq-income" class="font-bold">--</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 text-sm">Expense</span>
+                            <span id="comp-qoq-expense" class="font-bold">--</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 text-sm">Investment</span>
+                            <span id="comp-qoq-investment" class="font-bold">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YTD Card -->
+                <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-green-500">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase mb-3 flex items-center">
+                        <i class="fas fa-calendar-alt mr-2 text-green-500"></i>Year-to-Date vs Last Year
+                    </h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 text-sm">Income</span>
+                            <span id="comp-ytd-income" class="font-bold">--</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 text-sm">Expense</span>
+                            <span id="comp-ytd-expense" class="font-bold">--</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 text-sm">Investment</span>
+                            <span id="comp-ytd-investment" class="font-bold">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- L12M Card -->
+                <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-teal-500">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase mb-3 flex items-center">
+                        <i class="fas fa-history mr-2 text-teal-500"></i>Last 12 Months
+                    </h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 text-sm">Income</span>
+                            <span id="comp-l12m-income" class="font-bold">--</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 text-sm">Expense</span>
+                            <span id="comp-l12m-expense" class="font-bold">--</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 text-sm">Investment</span>
+                            <span id="comp-l12m-investment" class="font-bold">--</span>
+                        </div>
+                        <div class="flex justify-between items-center border-t pt-2">
+                            <span class="text-gray-600 font-semibold text-sm">Net Savings</span>
+                            <span id="comp-l12m-savings" class="font-bold">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- L12M Summary Chart -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-chart-area mr-2 text-teal-500"></i> L12M Income vs Expense Trend
+                </h3>
+                <div class="h-80">
+                    <canvas id="chart-l12m-trend"></canvas>
+                </div>
+            </div>
+
+            <!-- New L12M Detailed Breakdowns -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-sm font-semibold text-gray-600 mb-4 uppercase tracking-wider">Income Sources (L12M)
+                    </h3>
+                    <div class="h-64">
+                        <canvas id="chart-l12m-income-detail"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-sm font-semibold text-gray-600 mb-4 uppercase tracking-wider">Expense Details (L12M)
+                    </h3>
+                    <div class="h-64">
+                        <canvas id="chart-l12m-expense-detail"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-sm font-semibold text-gray-600 mb-4 uppercase tracking-wider">Investment Split
+                        (L12M)</h3>
+                    <div class="h-64">
+                        <canvas id="chart-l12m-investment-detail"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Forecast (NEW) -->
+        <div id="tab-forecast" class="tab-content hidden">
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-magic mr-2 text-yellow-500"></i> 12-Month Financial Forecast
+                </h3>
+                <div class="h-96">
+                    <canvas id="chart-forecast"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Tab switching
+    function showTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.getElementById('tab-' + tabName).classList.remove('hidden');
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('bg-gradient-to-r', 'from-teal-600', 'to-cyan-600', 'text-white', 'shadow-md');
+            btn.classList.add('bg-gray-200', 'text-gray-700');
+        });
+        const activeBtn = document.getElementById('tab-btn-' + tabName);
+        activeBtn.classList.remove('bg-gray-200', 'text-gray-700');
+        activeBtn.classList.add('bg-gradient-to-r', 'from-teal-600', 'to-cyan-600', 'text-white', 'shadow-md');
+    }
+
+    // Chart color palette
+    const COLORS = {
+        primary: '#0d9488', secondary: '#06b6d4', success: '#22c55e',
+        danger: '#ef4444', warning: '#f59e0b', purple: '#8b5cf6',
+        navy: '#1e40af', gray: '#6b7280', pink: '#ec4899'
+    };
+    const CHART_COLORS = ['#0d9488', '#8b5cf6', '#22c55e', '#f59e0b', '#1e40af', '#ec4899'];
+
+    // Store chart instances for destruction on re-render
+    let chartInstances = {};
+
+    function destroyAllCharts() {
+        Object.values(chartInstances).forEach(chart => {
+            if (chart && typeof chart.destroy === 'function') {
+                chart.destroy();
+            }
+        });
+        chartInstances = {};
+    }
+
+    function formatCurrency(value) {
+        if (Math.abs(value) >= 1000000) return '¥' + (value / 1000000).toFixed(1) + 'M';
+        if (Math.abs(value) >= 1000) return '¥' + (value / 1000).toFixed(0) + 'K';
+        return '¥' + value.toFixed(0);
+    }
+
+    const commonLineOptions = {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'top', labels: { usePointStyle: true, padding: 15 } },
+            tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ¥' + ctx.parsed.y.toLocaleString() } }
+        },
+        scales: {
+            y: { ticks: { callback: v => formatCurrency(v) }, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { grid: { display: false } }
+        }
+    };
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        fetchData();
+        document.getElementById('yearSelect').addEventListener('change', fetchData);
+    });
+
+    function fetchData() {
+        const year = document.getElementById('yearSelect').value;
+        document.getElementById('yearTitle').textContent = year;
+
+        fetch(`/reports/cashflow/api/summary?year=${year}`, { credentials: 'same-origin' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) { console.error("API Error:", data.error); return; }
+                console.log("Dashboard Data:", data);
+                updateKPIs(data.summary);
+                renderCharts(data);
+            })
+            .catch(err => console.error("Fetch Error:", err));
+    }
+
+
+    function updateKPIs(summary) {
+        if (!summary) return;
+
+        // Helper to add YoY color
+        const colorYoY = (el, yoyStr) => {
+            if (!yoyStr || yoyStr === '--') return;
+            const isPositive = yoyStr.startsWith('+');
+            el.innerHTML = `<span class="${isPositive ? 'text-green-600' : 'text-red-600'}">${yoyStr} YoY</span>`;
+        };
+
+        document.getElementById('kpi-ytd-income').innerText = summary.ytd_income || '--';
+        colorYoY(document.getElementById('kpi-ytd-income-yoy'), summary.ytd_income_yoy);
+
+        document.getElementById('kpi-ytd-expense').innerText = summary.ytd_expense || '--';
+        colorYoY(document.getElementById('kpi-ytd-expense-yoy'), summary.ytd_expense_yoy);
+
+        document.getElementById('kpi-ytd-investment').innerText = summary.ytd_investment || '--';
+        colorYoY(document.getElementById('kpi-ytd-investment-yoy'), summary.ytd_investment_yoy);
+
+        document.getElementById('kpi-ytd-net-cf').innerText = summary.ytd_net_cf || '--';
+        colorYoY(document.getElementById('kpi-ytd-net-cf-yoy'), summary.ytd_net_cf_yoy);
+    }
+
+    function renderCharts(data) {
+        // Destroy existing charts before re-rendering
+        destroyAllCharts();
+
+        // 1. Net Worth Trend
+        const nwCtx = document.getElementById('chart-net-worth-trend').getContext('2d');
+        if (data.balance_sheet?.trend_chart?.labels?.length > 0) {
+            const nwDs = data.balance_sheet.trend_chart.datasets.find(d => d.label === 'Net_Worth_Calc_CNY');
+            const assetsDs = data.balance_sheet.trend_chart.datasets.find(d => d.label === 'Total_Assets_Calc_CNY');
+            const liabDs = data.balance_sheet.trend_chart.datasets.find(d => d.label === 'Total_Liabilities_Calc_CNY');
+
+            new Chart(nwCtx, {
+                type: 'line',
+                data: {
+                    labels: data.balance_sheet.trend_chart.labels,
+                    datasets: [
+                        { label: 'Net Worth', data: nwDs?.data || [], borderColor: COLORS.primary, backgroundColor: 'rgba(13, 148, 136, 0.1)', fill: true, tension: 0.4, pointRadius: 0, borderWidth: 3 },
+                        { label: 'Assets', data: assetsDs?.data || [], borderColor: COLORS.purple, borderDash: [5, 5], tension: 0.4, pointRadius: 0, borderWidth: 2 },
+                        { label: 'Liabilities', data: liabDs?.data || [], borderColor: COLORS.danger, borderDash: [3, 3], tension: 0.4, pointRadius: 0, borderWidth: 2 }
+                    ]
+                },
+                options: commonLineOptions
+            });
+        }
+
+        // 2. Asset Allocation (Using Portfolio Report data for consistency)
+        const allocCtx = document.getElementById('chart-asset-allocation').getContext('2d');
+        const portfolioAlloc = data.portfolio_allocation?.top_level;
+        if (portfolioAlloc?.labels?.length > 0) {
+            new Chart(allocCtx, {
+                type: 'doughnut',
+                data: { labels: portfolioAlloc.labels, datasets: [{ data: portfolioAlloc.values, backgroundColor: CHART_COLORS, borderWidth: 2, borderColor: '#fff' }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { usePointStyle: true } }, tooltip: { callbacks: { label: ctx => ctx.label + ': ¥' + ctx.parsed.toLocaleString() } } } }
+            });
+        }
+
+        // 3. Financial Health Ratios
+        const ratiosCtx = document.getElementById('chart-ratios').getContext('2d');
+        if (data.balance_sheet?.ratios_chart?.labels?.length > 0) {
+            const debtDs = data.balance_sheet.ratios_chart.datasets.find(d => d.label === 'Debt_to_Asset_Ratio');
+            const liqDs = data.balance_sheet.ratios_chart.datasets.find(d => d.label === 'Liquidity_Ratio');
+            new Chart(ratiosCtx, {
+                type: 'line',
+                data: {
+                    labels: data.balance_sheet.ratios_chart.labels, datasets: [
+                        { label: 'Debt/Asset Ratio', data: debtDs?.data || [], borderColor: COLORS.danger, tension: 0.4, pointRadius: 2, borderWidth: 2, yAxisID: 'y' },
+                        { label: 'Liquidity Ratio', data: liqDs?.data || [], borderColor: COLORS.secondary, tension: 0.4, pointRadius: 2, borderWidth: 2, yAxisID: 'y1' }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { usePointStyle: true } } }, scales: { y: { type: 'linear', position: 'left', title: { display: true, text: 'Debt/Asset' }, ticks: { callback: v => (v * 100).toFixed(0) + '%' } }, y1: { type: 'linear', position: 'right', title: { display: true, text: 'Liquidity' }, grid: { drawOnChartArea: false }, ticks: { callback: v => v.toFixed(1) + 'x' } }, x: { grid: { display: false } } } }
+            });
+        }
+
+        // 4. Income / Expense / Investment (Using combined_chart)
+        const cfCtx = document.getElementById('chart-income-expense').getContext('2d');
+        const combined = data.cash_flow?.combined_chart;
+        if (combined?.labels?.length > 0) {
+            const incomeDs = combined.datasets?.find(d => d.label === 'Total_Income_Calc_CNY');
+            const expenseDs = combined.datasets?.find(d => d.label === 'Total_Expense_Calc_CNY');
+            const investDs = combined.datasets?.find(d => d.label === 'Total_Investment_Calc_CNY');
+            const datasets = [];
+            if (incomeDs) datasets.push({
+                label: 'Income', data: incomeDs.data,
+                backgroundColor: 'rgba(34, 197, 94, 0.7)', borderColor: COLORS.success, borderWidth: 1,
+                borderRadius: 4
+            });
+            if (expenseDs) datasets.push({
+                label: 'Expense', data: expenseDs.data,
+                backgroundColor: 'rgba(239, 68, 68, 0.7)', borderColor: COLORS.danger, borderWidth: 1,
+                borderRadius: 4
+            });
+            if (investDs) datasets.push({
+                label: 'Investment', data: investDs.data,
+                backgroundColor: 'rgba(59, 130, 246, 0.7)', borderColor: COLORS.primary, borderWidth: 1,
+                borderRadius: 4
+            });
+            new Chart(cfCtx, {
+                type: 'bar',
+                data: { labels: combined.labels, datasets },
+                options: {
+                    ...commonLineOptions,
+                    scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { stacked: true, ticks: { callback: v => formatCurrency(v) }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                    },
+                    plugins: {
+                        ...commonLineOptions.plugins,
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => {
+                                    const val = ctx.parsed.y;
+                                    const incVal = incomeDs ? incomeDs.data[ctx.dataIndex] : 0;
+                                    const pct = incVal > 0 ? ((val / incVal) * 100).toFixed(1) + '%' : '--';
+                                    return `${ctx.dataset.label}: ¥${val.toLocaleString()} (${pct} of Inc)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 5. Net Cash Flow (Quarterly Aggregation)
+        const netCfCtx = document.getElementById('chart-net-cash-flow').getContext('2d');
+        if (combined?.labels?.length > 0) {
+            const incDs = combined.datasets?.find(d => d.label === 'Total_Income_Calc_CNY');
+            const expDs = combined.datasets?.find(d => d.label === 'Total_Expense_Calc_CNY');
+            const invDs = combined.datasets?.find(d => d.label === 'Total_Investment_Calc_CNY');
+            if (incDs && expDs) {
+                // Aggregate to quarterly
+                const quarterlyData = {};
+                combined.labels.forEach((label, i) => {
+                    const [year, month] = label.split('-');
+                    const qtr = Math.ceil(parseInt(month) / 3);
+                    const qKey = `${year}-Q${qtr}`;
+                    if (!quarterlyData[qKey]) quarterlyData[qKey] = { income: 0, expense: 0, investment: 0 };
+                    quarterlyData[qKey].income += incDs.data[i] || 0;
+                    quarterlyData[qKey].expense += expDs.data[i] || 0;
+                    if (invDs) quarterlyData[qKey].investment += invDs.data[i] || 0;
+                });
+                const quarters = Object.keys(quarterlyData).sort();
+                const netCfData = quarters.map(q => quarterlyData[q].income - quarterlyData[q].expense - quarterlyData[q].investment);
+                const barColors = netCfData.map(v => v >= 0 ? COLORS.success : COLORS.danger);
+                new Chart(netCfCtx, {
+                    type: 'bar',
+                    data: { labels: quarters, datasets: [{ label: 'Net Cash Flow', data: netCfData, backgroundColor: barColors, borderRadius: 4 }] },
+                    options: { ...commonLineOptions, plugins: { ...commonLineOptions.plugins, legend: { display: false } } }
+                });
+            }
+        }
+
+        // 6. Savings Rate Trend
+        const srCtx = document.getElementById('chart-savings-rate').getContext('2d');
+        const srIncomeDs = combined?.datasets?.find(d => d.label === 'Total_Income_Calc_CNY');
+        const srExpenseDs = combined?.datasets?.find(d => d.label === 'Total_Expense_Calc_CNY');
+        if (srIncomeDs && srExpenseDs && srIncomeDs.data.length > 0) {
+            const savingsRateData = srIncomeDs.data.map((inc, i) => {
+                const exp = srExpenseDs.data[i] || 0;
+                return inc > 0 ? ((inc - exp) / inc) * 100 : 0;
+            });
+            new Chart(srCtx, {
+                type: 'line',
+                data: { labels: combined.labels, datasets: [{ label: 'Savings Rate %', data: savingsRateData, borderColor: COLORS.pink, backgroundColor: 'rgba(236, 72, 153, 0.1)', fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => v.toFixed(0) + '%' }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } } }
+            });
+        }
+
+        // 7. Expense Breakdown - REMOVED: Handled in section 16 with YTD data to avoid canvas conflict
+
+        // 8. Expense Trend (Stacked Bars Only)
+        const expTrendCtx = document.getElementById('chart-expense-trend').getContext('2d');
+        const estPctCtx = document.getElementById('chart-essential-pct').getContext('2d');
+        const stacked = data.cash_flow?.expense_stacked_chart;
+        if (stacked?.datasets?.length > 0) {
+            const essentialDs = stacked.datasets.find(ds => ds.label.includes('Essential'));
+            const nonEssentialDs = stacked.datasets.find(ds => ds.label.includes('NonEssential'));
+
+            // Bar chart for Totals
+            const barDatasets = stacked.datasets.map((ds, i) => ({
+                label: ds.label.replace('_Expense_Calc', '').replace('_', ' '),
+                data: ds.data,
+                backgroundColor: i === 0 ? COLORS.navy : COLORS.warning,
+                borderRadius: 2
+            }));
+
+            new Chart(expTrendCtx, {
+                type: 'bar',
+                data: { labels: stacked.labels, datasets: barDatasets },
+                options: {
+                    ...commonLineOptions,
+                    scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { stacked: true, ticks: { callback: v => formatCurrency(v) }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                    }
+                }
+            });
+
+            // Separate line chart for Essential %
+            if (essentialDs && nonEssentialDs) {
+                const essentialPct = essentialDs.data.map((val, i) => {
+                    const total = (val || 0) + (nonEssentialDs.data[i] || 0);
+                    return total > 0 ? (val / total) * 100 : 0;
+                });
+                new Chart(estPctCtx, {
+                    type: 'line',
+                    data: {
+                        labels: stacked.labels,
+                        datasets: [{
+                            label: 'Essential %',
+                            data: essentialPct,
+                            borderColor: COLORS.danger,
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            fill: true,
+                            borderWidth: 2,
+                            pointRadius: 2,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        ...commonLineOptions,
+                        scales: {
+                            x: { grid: { display: false } },
+                            y: { min: 0, max: 100, ticks: { callback: v => v + '%' }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                        }
+                    }
+                });
+            }
+        }
+
+        // 9. Annual Income Summary (Stacked Bar by Source)
+        const annualCtx = document.getElementById('chart-annual-summary')?.getContext('2d');
+        const incSourceChart = data.cash_flow?.income_source_chart;
+        if (annualCtx && incSourceChart?.labels?.length > 0) {
+            const years = [...new Set(incSourceChart.labels.map(l => l.split('-')[0]))].sort();
+            const yearIndexMap = {};
+            years.forEach((y, idx) => yearIndexMap[y] = idx);
+
+            const stackedDatasets = incSourceChart.datasets.map((ds, dsIdx) => {
+                const yearTotals = new Array(years.length).fill(0);
+                ds.data.forEach((val, i) => {
+                    const year = incSourceChart.labels[i].split('-')[0];
+                    if (yearIndexMap[year] !== undefined) {
+                        yearTotals[yearIndexMap[year]] += val || 0;
+                    }
+                });
+                return {
+                    label: ds.label.replace('Income_', '').replace('_CNY', '').replace('_', ' '),
+                    data: yearTotals,
+                    backgroundColor: CHART_COLORS[dsIdx % CHART_COLORS.length],
+                    borderRadius: 2
+                };
+            });
+
+            new Chart(annualCtx, {
+                type: 'bar',
+                data: { labels: years, datasets: stackedDatasets },
+                options: {
+                    ...commonLineOptions,
+                    scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { stacked: true, ticks: { callback: v => formatCurrency(v) }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                    }
+                }
+            });
+        }
+
+        // 10. YoY Income Comparison (Multi-line by year)
+        const yoyCtx = document.getElementById('chart-yoy-income')?.getContext('2d');
+        if (yoyCtx && combined?.labels?.length > 0 && srIncomeDs) {
+            // Group income by year and month
+            const yoyData = {};
+            combined.labels.forEach((label, i) => {
+                const [year, month] = label.split('-');
+                if (!yoyData[year]) yoyData[year] = {};
+                yoyData[year][parseInt(month)] = srIncomeDs.data[i] || 0;
+            });
+            const years = Object.keys(yoyData).sort();
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const yoyDatasets = years.slice(-5).map((year, i) => ({
+                label: year,
+                data: months.map((_, m) => yoyData[year][m + 1] || null),
+                borderColor: CHART_COLORS[i % CHART_COLORS.length],
+                fill: false,
+                tension: 0.3,
+                borderWidth: 2,
+                pointRadius: 2
+            }));
+            new Chart(yoyCtx, {
+                type: 'line',
+                data: { labels: months, datasets: yoyDatasets },
+                options: { ...commonLineOptions, plugins: { ...commonLineOptions.plugins, legend: { position: 'top' } } }
+            });
+        }
+
+        // 11. Income Sources (now using real API data)
+        const incSourcesCtx = document.getElementById('chart-income-sources')?.getContext('2d');
+        const incomeSources = data.cash_flow?.income_sources;
+        const incomeSourcesYoY = data.cash_flow?.income_sources_yoy;
+
+        if (incSourcesCtx && incomeSources?.labels?.length > 0) {
+            // Merge labels with YoY
+            const combinedLabels = incomeSources.labels.map(label => {
+                const yoyObj = incomeSourcesYoY ? Object.entries(incomeSourcesYoY).find(([k, v]) => k.toLowerCase() === label.toLowerCase() || label.toLowerCase().includes(k.toLowerCase())) : null;
+                const yoyStr = yoyObj ? ` (${yoyObj[1].yoy_str})` : '';
+                return label + yoyStr;
+            });
+
+            new Chart(incSourcesCtx, {
+                type: 'bar',
+                data: {
+                    labels: combinedLabels,
+                    datasets: [{
+                        label: 'Amount (L12M)',
+                        data: incomeSources.values,
+                        backgroundColor: CHART_COLORS.slice(0, incomeSources.labels.length),
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `¥${formatCurrency(ctx.raw)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { ticks: { callback: v => formatCurrency(v) }, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // 12. Populate Comparison Cards
+        const comparisons = data.cash_flow?.comparisons;
+        if (comparisons) {
+            const formatPct = (val) => {
+                if (!val || isNaN(val)) return '--';
+                const sign = val >= 0 ? '+' : '';
+                const color = val >= 0 ? 'text-green-600' : 'text-red-600';
+                return `<span class="${color}">${sign}${val.toFixed(1)}%</span>`;
+            };
+
+            // MoM
+            if (comparisons.mom) {
+                document.getElementById('comp-mom-income').innerHTML = formatPct(comparisons.mom.income_pct);
+                document.getElementById('comp-mom-expense').innerHTML = formatPct(comparisons.mom.expense_pct);
+                document.getElementById('comp-mom-investment').innerHTML = formatPct(comparisons.mom.investment_pct);
+            }
+            // QoQ
+            if (comparisons.qoq) {
+                document.getElementById('comp-qoq-income').innerHTML = formatPct(comparisons.qoq.income_pct);
+                document.getElementById('comp-qoq-expense').innerHTML = formatPct(comparisons.qoq.expense_pct);
+                document.getElementById('comp-qoq-investment').innerHTML = formatPct(comparisons.qoq.investment_pct);
+            }
+            // YTD
+            if (comparisons.ytd) {
+                document.getElementById('comp-ytd-income').innerHTML = formatPct(comparisons.ytd.income_pct);
+                document.getElementById('comp-ytd-expense').innerHTML = formatPct(comparisons.ytd.expense_pct);
+                document.getElementById('comp-ytd-investment').innerHTML = formatPct(comparisons.ytd.investment_pct);
+            }
+            // L12M
+            if (comparisons.l12m) {
+                document.getElementById('comp-l12m-income').innerHTML = formatPct(comparisons.l12m.income_pct);
+                document.getElementById('comp-l12m-expense').innerHTML = formatPct(comparisons.l12m.expense_pct);
+                document.getElementById('comp-l12m-investment').innerHTML = formatPct(comparisons.l12m.investment_pct);
+                document.getElementById('comp-l12m-savings').innerText = formatCurrency(comparisons.l12m.total_savings || 0);
+            }
+        }
+
+        // 13. Show Adjusted Data Badge
+        if (data.cash_flow?.data_adjusted) {
+            document.getElementById('adjusted-badge')?.classList.remove('hidden');
+        }
+
+        // 14. L12M Trend Chart (last 12 months from combined_chart)
+        const l12mCtx = document.getElementById('chart-l12m-trend')?.getContext('2d');
+        if (l12mCtx && combined?.labels?.length > 0) {
+            const incDs = combined.datasets?.find(d => d.label === 'Total_Income_Calc_CNY');
+            const expDs = combined.datasets?.find(d => d.label === 'Total_Expense_Calc_CNY');
+            if (incDs && expDs) {
+                const last12Labels = combined.labels.slice(-12);
+                const last12Income = incDs.data.slice(-12);
+                const last12Expense = expDs.data.slice(-12);
+                new Chart(l12mCtx, {
+                    type: 'line',
+                    data: {
+                        labels: last12Labels,
+                        datasets: [
+                            { label: 'Income', data: last12Income, borderColor: COLORS.success, backgroundColor: 'rgba(34, 197, 94, 0.1)', fill: true, tension: 0.4 },
+                            { label: 'Expense', data: last12Expense, borderColor: COLORS.danger, backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.4 }
+                        ]
+                    },
+                    options: commonLineOptions
+                });
+            }
+        }
+
+        // 15. L12M Detailed Breakdowns (Stacked for level-2 detail)
+        const l12mIncCtx = document.getElementById('chart-l12m-income-detail')?.getContext('2d');
+        const l12mExpCtx = document.getElementById('chart-l12m-expense-detail')?.getContext('2d');
+        const l12mInvCtx = document.getElementById('chart-l12m-investment-detail')?.getContext('2d');
+
+        const helper_get_l12_totals = (chartData) => {
+            if (!chartData || !chartData.datasets) return [];
+            return chartData.datasets.map((ds, i) => {
+                const last12Val = ds.data.slice(-12).reduce((a, b) => a + (b || 0), 0);  // Handle null/undefined
+                return {
+                    label: ds.label.replace('Income_', '').replace('Expense_', '').replace('Outflow_Invest_', '').replace('_CNY', '').replace('_', ' '),
+                    value: last12Val,
+                    color: CHART_COLORS[i % CHART_COLORS.length]
+                };
+            }).filter(d => Math.abs(d.value) > 100).sort((a, b) => b.value - a.value);
+        };
+
+        if (l12mIncCtx && data.cash_flow?.income_source_chart) {
+            const totals = helper_get_l12_totals(data.cash_flow.income_source_chart);
+            new Chart(l12mIncCtx, { type: 'bar', data: { labels: totals.map(t => t.label), datasets: [{ label: 'Income', data: totals.map(t => t.value), backgroundColor: totals.map(t => t.color), borderRadius: 4 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { callback: v => formatCurrency(v) } } } } });
+        }
+        if (l12mExpCtx && data.cash_flow?.expense_cat_chart) {
+            const totals = helper_get_l12_totals(data.cash_flow.expense_cat_chart);
+            new Chart(l12mExpCtx, { type: 'bar', data: { labels: totals.map(t => t.label), datasets: [{ label: 'Expense', data: totals.map(t => t.value), backgroundColor: totals.map(t => t.color), borderRadius: 4 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { callback: v => formatCurrency(v) } } } } });
+        }
+        if (l12mInvCtx && data.cash_flow?.investment_cat_chart) {
+            const totals = helper_get_l12_totals(data.cash_flow.investment_cat_chart);
+            new Chart(l12mInvCtx, { type: 'bar', data: { labels: totals.map(t => t.label), datasets: [{ label: 'Investment', data: totals.map(t => t.value), backgroundColor: totals.map(t => t.color), borderRadius: 4 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { callback: v => formatCurrency(v) } } } } });
+        }
+
+        // 16. YTD Expense Breakdown Table
+        if (data.cash_flow?.ytd_expense_breakdown) {
+            const tbody = document.getElementById('table-expense-yoy');
+            if (tbody) {
+                const breakdown = data.cash_flow.ytd_expense_breakdown;
+                const sorted = Object.entries(breakdown).sort((a, b) => b[1].value - a[1].value);
+                tbody.innerHTML = sorted.map(([cat, info]) => `
+                    <tr>
+                        <td class="px-2 py-1">${cat}</td>
+                        <td class="px-2 py-1 text-right">${formatCurrency(info.value)}</td>
+                        <td class="px-2 py-1 text-right ${info.yoy > 0 ? 'text-red-500' : 'text-green-500'} font-medium">
+                            ${info.yoy_str}
+                        </td>
+                        <td class="px-2 py-1 text-right text-gray-600">${info.percentage.toFixed(1)}%</td>
+                        <td class="px-2 py-1 text-right ${info.pct_yoy > 0 ? 'text-red-500' : 'text-green-500'} font-medium">
+                            ${info.pct_yoy_str || '--'}
+                        </td>
+                    </tr>
+                `).join('');
+
+                // Also update the Pie chart to use YTD data instead of generic L12M if available
+                const expCtx = document.getElementById('chart-expense-breakdown')?.getContext('2d');
+                if (expCtx) {
+                    const pieLabels = sorted.slice(0, 6).map(s => s[0]);
+                    const pieData = sorted.slice(0, 6).map(s => s[1].value);
+                    chartInstances['expense-breakdown'] = new Chart(expCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: pieLabels,
+                            datasets: [{
+                                data: pieData,
+                                backgroundColor: CHART_COLORS
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                }
+            }
+        }
+
+        // 17. 12-Month Forecast
+        console.log('Forecast Data:', data.forecast);
+        const forecastCtx = document.getElementById('chart-forecast')?.getContext('2d');
+        if (forecastCtx && data.forecast && data.forecast.labels && data.forecast.labels.length > 0 && !data.forecast.error) {
+            console.log('Rendering Forecast Chart...');
+            new Chart(forecastCtx, {
+                type: 'line',
+                data: {
+                    labels: data.forecast.labels,
+                    datasets: [
+                        { label: 'Income', data: data.forecast.income, borderColor: COLORS.success, tension: 0.3, fill: false, pointRadius: 3 },
+                        { label: 'Expense', data: data.forecast.expense, borderColor: COLORS.danger, tension: 0.3, fill: false, pointRadius: 3 },
+                        { label: 'Investment', data: data.forecast.investment, borderColor: COLORS.purple, tension: 0.3, fill: false, pointRadius: 3 },
+                        { label: 'Net CF', data: data.forecast.net_cf, backgroundColor: 'rgba(59, 130, 246, 0.2)', borderColor: COLORS.primary, fill: true, borderDash: [5, 5], pointRadius: 3 }
+                    ]
+                },
+                options: {
+                    ...commonLineOptions,
+                    scales: {
+                        ...commonLineOptions.scales,
+                        y: { ...commonLineOptions.scales.y, title: { display: true, text: 'CNY' } }
+                    }
+                }
+            });
+        } else {
+            console.warn('Forecast chart not rendered. Ctx:', !!forecastCtx, 'Data:', data.forecast);
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,345 @@
+# Market Regimes Configuration
+# Defines 4 market scenarios with indicator thresholds, dynamic targets, and strategic advice
+# 
+# DESIGN PRINCIPLE: This config extends asset_taxonomy.yaml by providing regime-specific
+# allocation adjustments. The baseline "成长型" profile serves as the reference point.
+#
+# INTEGRATION: Dynamic targets here override risk_profiles.成长型 in asset_taxonomy.yaml
+# when a specific regime is active. When no regime matches, the system uses 成长型 directly.
+
+regimes:
+  # ========================================================================
+  # 状态一："最高防御"配置 (Maximum Defense) - 高估 & 贪婪 (泡沫区)
+  # ========================================================================
+  - name: "Maximum Defense"
+    name_cn: "最高防御"
+    description: "Market extremely overvalued with excessive greed - Bubble risk"
+    description_cn: "市场严重高估且贪婪情绪高涨 - 泡沫风险"
+    priority: 1  # Highest priority - checked first
+    
+    # Trigger Conditions (ALL must be true):
+    # 席勒市盈率 > 30 AND 恐惧与贪婪指数 > 75 AND 美国巴菲特指标 > 180%
+    # Rationale: 三大指标（盈利估值、市场情绪、宏观估值）都已达到历史极值
+    conditions:
+      shiller_pe:
+        min_value: 30.0  # Extreme earnings valuation
+      fear_greed:
+        min_value: 75.0  # Extreme greed sentiment
+      buffett_us:
+        min_value: 180.0  # Extreme macro valuation (US Buffett > 180%)
+    
+    # Dynamic target modifiers (Deltas applied to Active Profile)
+    target_modifiers:
+      # Top-level asset class modifiers (sum should be 0)
+      top_level:
+        Equity: -0.20       # Reduce equity by 20%
+        Fixed Income: +0.10   # Increase fixed income by 10%
+        Commodities: 0.00        # Unchanged
+        Alternative: 0.00    # Unchanged
+        Cash: +0.10       # Increase cash by 10%
+        Real Estate: 0.00      # Non-rebalanceable
+        Insurance: 0.00        # Non-rebalanceable
+      
+      # Sub-category targets within Equity (Absolute proportions still apply for rotation)
+      sub_category:
+        Equity:
+          CN Equity: 0.70    # +20% concentration in relatively safer Chinese assets
+          HK ETF: 0.10       # Unchanged (Updated name)
+          US Equity: 0.20    # -20% significantly reduce exposure to bubble epicenter
+    
+    # Strategic recommendations (保全资本，准备弹药)
+    strategic_recommendations:
+      - action: "Dramatically reduce equity exposure - preserve capital"
+        action_cn: "大幅降低股票仓位 - 保全资本"
+        priority: 100
+        rationale: "Market in bubble territory (Shiller PE > 30, Greed > 75, US Buffett > 180%) - risk of severe correction"
+        rationale_cn: "市场进入泡沫区域（席勒市盈率 > 30，贪婪指数 > 75，美国巴菲特指标 > 180%）- 严重回调风险"
+      
+      - action: "Build strategic cash reserves (15% target) for future opportunities"
+        action_cn: "建立战略现金储备（目标15%）为未来机会做准备"
+        priority: 95
+        rationale: "Prepare dry powder to deploy during inevitable market crash"
+        rationale_cn: "储备弹药以便在市场崩盘时果断出击"
+      
+      - action: "Shift away from overvalued US equities toward Chinese assets"
+        action_cn: "从高估的美国股票转向中国资产"
+        priority: 90
+        rationale: "US market at bubble peak - rotate to relatively safer regions"
+        rationale_cn: "美国市场处于泡沫顶峰 - 轮动至相对安全区域"
+      
+      - action: "Increase fixed income allocation to 20% for stability"
+        action_cn: "将固定收益配置提升至20%以增加稳定性"
+        priority: 85
+        rationale: "Bonds provide cushion during equity market turmoil"
+        rationale_cn: "债券在股市动荡期提供缓冲"
+
+  # ========================================================================
+  # 状态二："谨慎轮动"配置 (Cautious Rotation) - 谨慎轮动 (矛盾区) - CURRENT STATE
+  # ========================================================================
+  - name: "Cautious Rotation"
+    name_cn: "谨慎轮动"
+    description: "Market overvalued but fear rising - Regional divergence (US expensive, China cheap)"
+    description_cn: "市场高估但恐惧上升 - 地域分化（美国贵，中国便宜）"
+    priority: 2
+    
+    # Trigger Conditions (ALL must be true):
+    # (席勒市盈率 > 25 OR 美国巴菲特指标 > 150%) AND 恐惧与贪婪指数 < 45 
+    # AND 美国巴菲特指标显著高于中国巴菲特指标 (美国 > 150% AND 中国 < 90%)
+    # Rationale: 美国市场很昂贵但情绪差，市场间估值鸿沟大，执行"卖出昂贵、买入便宜"
+    conditions:
+      # At least one valuation metric shows overvaluation (increased sensitivity)
+      valuation_or:  # Special OR logic: (Shiller PE > 25) OR (US Buffett > 150%)
+        shiller_pe:
+          min_value: 25.0
+        buffett_us:
+          min_value: 150.0
+      # Fear is rising (sentiment indicator)
+      fear_greed:
+        max_value: 45.0  # Fear < 45
+      # Regional valuation divergence (core rotation trigger)
+      regional_divergence:  # US expensive AND China cheap
+        buffett_us:
+          min_value: 150.0  # US Buffett > 150%
+        buffett_china:
+          max_value: 90.0   # China Buffett < 90%
+    
+    # Dynamic target modifiers (Deltas applied to Active Profile)
+    target_modifiers:
+      # Top-level asset class modifiers
+      top_level:
+        Equity: -0.05       # Reduce equity by 5%
+        Fixed Income: +0.05   # Increase fixed income by 5%
+        Commodities: 0.00        # Unchanged
+        Alternative: 0.00    # Unchanged
+        Cash: 0.00        # Unchanged
+        Real Estate: 0.00      # Non-rebalanceable
+        Insurance: 0.00        # Non-rebalanceable
+      
+      # Sub-category targets within Equity (Absolute proportions for rotation)
+      sub_category:
+        Equity:
+          CN Equity: 0.60    # +10% significantly increase undervalued Chinese assets
+          HK ETF: 0.15       # +5% increase Hong Kong exposure (Updated name)
+          US Equity: 0.25    # -15% significantly reduce overvalued US exposure
+    
+    # Strategic recommendations (适度降低总体风险，权益内部坚决轮动)
+    strategic_recommendations:
+      - action: "Rotate from overvalued US stocks to undervalued Chinese assets"
+        action_cn: "从高估的美国股票轮动至低估的中国资产"
+        priority: 100
+        rationale: "Severe regional valuation divergence - US expensive (Buffett > 150%), China cheap (Buffett < 90%)"
+        rationale_cn: "严重的地域估值分化 - 美国昂贵（巴菲特指标 > 150%），中国便宜（< 90%）"
+      
+      - action: "Moderately reduce overall equity exposure from 75% to 70%"
+        action_cn: "适度降低整体股票仓位从75%至70%"
+        priority: 95
+        rationale: "High valuations + rising fear = increased risk - take chips off table"
+        rationale_cn: "高估值 + 恐惧上升 = 风险增加 - 适度降低风险暴露"
+      
+      - action: "Increase Chinese equity allocation to 60% of equity portfolio"
+        action_cn: "将中国股票配置提升至股票仓位的60%"
+        priority: 90
+        rationale: "Chinese market offers better value - seize regional opportunity"
+        rationale_cn: "中国市场提供更好估值 - 把握区域性机会"
+      
+      - action: "Increase fixed income to 15% for defensive positioning"
+        action_cn: "将固定收益提升至15%以增强防御"
+        priority: 85
+        rationale: "Rising fear signals potential volatility - add ballast"
+        rationale_cn: "恐惧上升预示潜在波动 - 增加稳定性"
+
+  # ========================================================================
+  # 状态2.5：高估值风险配置 (Elevated Valuation Risk) - 高估 + 中性情绪
+  # ========================================================================
+  - name: "Elevated Valuation Risk"
+    name_cn: "高估值风险"
+    description: "Market significantly overvalued with neutral-to-greedy sentiment - Reduce exposure"
+    description_cn: "市场显著高估且情绪偏贪婪 - 降低风险暴露"
+    priority: 2  # Higher than Benchmark Cruising, same as Cautious Rotation
+    
+    # Trigger Conditions:
+    # 席勒市盈率 > 30 (extreme overvaluation) AND 恐惧与贪婪指数 45-75 (neutral to greedy)
+    # Rationale: 当估值极端高时,即使情绪未达到极端贪婪,也应提高警惕
+    conditions:
+      shiller_pe:
+        min_value: 30.0  # Extreme earnings valuation
+      fear_greed:
+        min_value: 45.0  # Not in fear territory
+        max_value: 75.0  # Not yet extreme greed (which triggers Maximum Defense)
+    
+    # Dynamic target modifiers (Deltas applied to Active Profile)
+    target_modifiers:
+      # Top-level asset class modifiers
+      top_level:
+        Equity: -0.10       # Reduce equity by 10%
+        Fixed Income: +0.05   # Increase fixed income by 5%
+        Commodities: 0.00        # Unchanged
+        Alternative: 0.00    # Unchanged
+        Cash: +0.05       # Increase cash by 5%
+        Real Estate: 0.00      # Non-rebalanceable
+        Insurance: 0.00        # Non-rebalanceable
+      
+      # Sub-category targets within Equity (Absolute proportions for rotation)
+      sub_category:
+        Equity:
+          CN Equity: 0.55    # +5% shift toward China
+          HK ETF: 0.15       # Unchanged
+          US Equity: 0.30    # -10% reduce US exposure
+    
+    # Strategic recommendations
+    strategic_recommendations:
+      - action: "Reduce overall equity exposure due to extreme valuations"
+        action_cn: "因估值过高而降低整体股票仓位"
+        priority: 95
+        rationale: "Shiller PE > 30 indicates extreme overvaluation regardless of sentiment"
+        rationale_cn: "席勒市盈率 > 30 表明市场估值过高，无论情绪如何"
+      
+      - action: "Build cash reserves (10% target) for potential correction"
+        action_cn: "建立现金储备（目标10%）应对可能的回调"
+        priority: 90
+        rationale: "High valuations increase probability of market correction"
+        rationale_cn: "高估值增加市场回调概率"
+      
+      - action: "Begin rotating from expensive US equities toward Chinese assets"
+        action_cn: "开始从昂贵的美国股票轮动至中国资产"
+        priority: 85
+        rationale: "US market more expensive - start gradual reallocation"
+        rationale_cn: "美国市场更昂贵 - 开始逐步重新配置"
+
+  # ========================================================================
+  # 状态四："全力进攻"配置 (Maximum Offense) - 低估 & 恐惧 (黄金坑)
+  # ========================================================================
+  - name: "Maximum Offense"
+    name_cn: "全力进攻"
+    description: "Market severely undervalued with extreme fear - Historic opportunity"
+    description_cn: "市场严重低估且极度恐慌 - 历史性机遇"
+    priority: 3
+    
+    # Trigger Conditions (ALL must be true):
+    # 席勒市盈率 < 17 AND 恐惧与贪婪指数 < 25 AND 美国巴菲特指标 < 90%
+    # Rationale: 盈利估值、市场情绪和宏观估值三大指标都指向"极度便宜"，百年一遇的机会
+    conditions:
+      shiller_pe:
+        max_value: 17.0  # Extreme earnings undervaluation
+      fear_greed:
+        max_value: 25.0  # Extreme fear sentiment
+      buffett_us:
+        max_value: 90.0  # Extreme macro undervaluation (US Buffett < 90%)
+    
+    # Dynamic target modifiers (Deltas applied to Active Profile)
+    target_modifiers:
+      # Top-level asset class modifiers
+      top_level:
+        Equity: +0.10       # Increase equity by 10%
+        Fixed Income: -0.10   # Decrease fixed income by 10%
+        Commodities: 0.00        # Unchanged
+        Alternative: +0.05   # Increase alts by 5%
+        Cash: -0.05       # Decrease cash by 5%
+        Real Estate: 0.00      # Non-rebalanceable
+        Insurance: 0.00        # Non-rebalanceable
+      
+      # Sub-category targets within Equity (Absolute proportions for rotation)
+      sub_category:
+        Equity:
+          CN Equity: 0.50    # Restore to baseline strategic allocation
+          HK ETF: 0.10       # Restore to baseline (Updated name)
+          US Equity: 0.40    # Restore to baseline
+    
+    # Strategic recommendations (果断出击，实现财富跨越)
+    strategic_recommendations:
+      - action: "Aggressively deploy ALL cash reserves into equities"
+        action_cn: "积极将所有现金储备投入股票市场"
+        priority: 100
+        rationale: "Market crash creates once-in-decade opportunity (Shiller PE < 17, Fear < 25, US Buffett < 90%)"
+        rationale_cn: "市场崩盘创造十年一遇的机会（席勒市盈率 < 17，恐惧指数 < 25，美国巴菲特指标 < 90%）"
+      
+      - action: "Maximize equity allocation to 85% - push to aggressive limit"
+        action_cn: "将股票配置最大化至85% - 推向进攻极限"
+        priority: 95
+        rationale: "Blood in the streets - be greedy when others are fearful"
+        rationale_cn: "遍地黄金时刻 - 别人恐惧时我贪婪"
+      
+      - action: "Eliminate fixed income (0%) - convert bonds to stocks"
+        action_cn: "清空固定收益（0%）- 将债券转为股票"
+        priority: 90
+        rationale: "Defense unnecessary during fire sale - maximize offensive position"
+        rationale_cn: "跳楼价时无需防守 - 最大化进攻头寸"
+      
+      - action: "Restore balanced geographic allocation (50% China, 30% US, 10% HK)"
+        action_cn: "恢复均衡的地域配置（50%中国，30%美国，10%港股）"
+        priority: 85
+        rationale: "Crisis affects all markets - return to diversified strategic allocation"
+        rationale_cn: "危机影响所有市场 - 恢复多元化战略配置"
+      
+      - action: "Consider leveraging opportunities if available (margin, options)"
+        action_cn: "如果可行，考虑杠杆机会（融资融券、期权）"
+        priority: 80
+        rationale: "Historic opportunities justify prudent use of leverage for amplified gains"
+        rationale_cn: "历史性机遇值得审慎使用杠杆以放大收益"
+
+  # ========================================================================
+  # 状态三："基准巡航"配置 (Benchmark Cruising) - 基准巡航 (正常区) - DEFAULT
+  # ========================================================================
+  - name: "Benchmark Cruising"
+    name_cn: "基准巡航"
+    description: "Normal market conditions - Follow baseline growth strategy"
+    description_cn: "正常市场环境 - 遵循基准成长策略"
+    priority: 4  # Lowest priority - default fallback
+    
+    # Trigger Conditions: Market未触发任何极端状态
+    # (大致范围: 席勒市盈率 17-25, 美国巴菲特指标 100%-150%)
+    # Rationale: 市场没有发出极端信号，最佳策略是相信战略资产配置，机械再平衡
+    conditions:
+      default: true  # Always matches if no other regime matches
+      # Typical range (informational):
+      # Shiller PE: 17-25
+      # US Buffett: 100%-150%
+      # Fear & Greed: 45-55 (neutral)
+    
+    # Dynamic target modifiers: null means no adjustment to Active Profile
+    target_modifiers: null
+    
+    # Strategic recommendations (严格定期再平衡，保持战略定力)
+    strategic_recommendations:
+      - action: "Continue regular investment schedule - maintain discipline"
+        action_cn: "继续常规投资计划 - 保持纪律"
+        priority: 70
+        rationale: "Market conditions normal (Shiller PE 17-25, US Buffett 100-150%, Neutral sentiment) - stick to plan"
+        rationale_cn: "市场环境正常（席勒市盈率17-25，美国巴菲特指标100-150%，中性情绪）- 坚持计划"
+      
+      - action: "Execute strict periodic rebalancing to maintain target allocation"
+        action_cn: "严格执行定期再平衡以维持目标配置"
+        priority: 65
+        rationale: "No regime signals - follow baseline 成长型 strategy (75% equity, 10% bonds)"
+        rationale_cn: "无特殊信号 - 遵循基准成长型策略（75%股票，10%债券）"
+      
+      - action: "Maintain strategic geographic balance (50% China, 30% US, 10% HK)"
+        action_cn: "维持战略地域平衡（50%中国，30%美国，10%港股）"
+        priority: 60
+        rationale: "Neutral conditions favor diversified long-term allocation"
+        rationale_cn: "中性环境下维持多元化长期配置"
+
+# ============================================================================
+# Integration Notes (整合说明)
+# ============================================================================
+# 
+# BASELINE REFERENCE: All dynamic targets above are deltas from the "成长型" 
+# (Growth) risk profile defined in asset_taxonomy.yaml:
+#   股票: 0.75, 固定收益: 0.10, 商品: 0.05, 另类投资: 0.05, 现金: 0.05
+#
+# REGIME PRIORITY: Regimes are evaluated in priority order (1 → 4). First match wins.
+#
+# FALLBACK BEHAVIOR: If no regime conditions match OR dynamic_targets is null,
+# the system uses the baseline "成长型" allocation from asset_taxonomy.yaml.
+#
+# SUB-CATEGORY WEIGHTS: When a regime specifies sub_category targets, they OVERRIDE
+# the sub_category_weights.股票 section in asset_taxonomy.yaml for that regime only.
+#
+# NON-REBALANCEABLE CLASSES: 房地产 and 保险 remain non-rebalanceable regardless of regime.
+#
+# SPECIAL CONDITION LOGIC:
+# - "valuation_or": At least ONE of the listed conditions must be true (OR logic)
+# - "regional_divergence": BOTH conditions must be true (AND logic)
+# - "default: true": Always matches if no other regime matches (fallback)
+#
+# ============================================================================

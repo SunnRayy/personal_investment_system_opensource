@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Performance Attribution Report{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div
+    class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-b-lg shadow-lg text-white p-6 mb-8 -mt-8 mx-4 rounded-t-none">
+    <div class="container mx-auto">
+        <h1 class="text-3xl font-bold mb-2"><i class="fas fa-project-diagram mr-2"></i> Performance Attribution Report
+        </h1>
+        <p class="opacity-90">Analyze sources of portfolio returns vs. benchmark (Brinson-Fachler Model)</p>
+    </div>
+</div>
+
+<div class="container mx-auto px-4">
+    <!-- Summary Metrics -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-indigo-500 pb-2 mb-6">Performance Summary</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Portfolio Return -->
+            <div
+                class="bg-white rounded-xl shadow-md p-5 flex flex-col justify-center items-center text-center h-32 border-t-4 border-blue-500">
+                <div class="text-2xl font-bold text-gray-800 mb-1">
+                    {{ "{:.2f}".format(summary.portfolio_return|default(0)) }}%
+                </div>
+                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Portfolio Return</div>
+            </div>
+
+            <!-- Benchmark Return -->
+            <div
+                class="bg-white rounded-xl shadow-md p-5 flex flex-col justify-center items-center text-center h-32 border-t-4 border-gray-500">
+                <div class="text-2xl font-bold text-gray-800 mb-1">
+                    {{ "{:.2f}".format(summary.benchmark_return|default(0)) }}%
+                </div>
+                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Benchmark Return</div>
+            </div>
+
+            <!-- Excess Return -->
+            <div
+                class="bg-white rounded-xl shadow-md p-5 flex flex-col justify-center items-center text-center h-32 border-t-4 {% if (summary.excess_return|default(0)) >= 0 %}border-green-500{% else %}border-red-500{% endif %}">
+                <div
+                    class="text-2xl font-bold {% if (summary.excess_return|default(0)) >= 0 %}text-green-600{% else %}text-red-600{% endif %} mb-1">
+                    {{ "{:+.2f}".format(summary.excess_return|default(0)) }}%
+                </div>
+                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Excess Return</div>
+            </div>
+
+            <!-- Selection Contribution (Key metric) -->
+            <div
+                class="bg-white rounded-xl shadow-md p-5 flex flex-col justify-center items-center text-center h-32 border-t-4 border-purple-500">
+                <div class="text-2xl font-bold text-gray-800 mb-1">
+                    {{ "{:+.2f}".format(summary.selection_contrib|default(0)) }}%
+                </div>
+                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Selection Effect</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Waterfall Chart -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-indigo-500 pb-2 mb-6">Return Attribution
+            Waterfall</h2>
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="relative h-96">
+                <canvas id="waterfallChart"></canvas>
+            </div>
+            <p class="text-sm text-gray-500 mt-4 text-center">
+                Breakdown of how Allocation (Asset Mix), Selection (Picking Assets), and Interaction impacts total
+                return relative to the Benchmark.
+            </p>
+        </div>
+    </div>
+
+    <!-- Detailed Attribution Table -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-indigo-500 pb-2 mb-6">Asset Class Details</h2>
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Asset Class</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Allocation Effect</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Selection Effect</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Interaction Effect</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Total Effect</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                        {% for item in asset_class_table %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ item.name }}</td>
+
+                            <!-- Allocation -->
+                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <span
+                                    class="{% if (item.allocation_effect|default(0)) > 0 %}text-green-600{% elif (item.allocation_effect|default(0)) < 0 %}text-red-600{% endif %}">
+                                    {{ "{:+.2f}".format(item.allocation_effect|default(0)) }}%
+                                </span>
+                            </td>
+
+                            <!-- Selection -->
+                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <span
+                                    class="{% if (item.selection_effect|default(0)) > 0 %}text-green-600{% elif (item.selection_effect|default(0)) < 0 %}text-red-600{% endif %}">
+                                    {{ "{:+.2f}".format(item.selection_effect|default(0)) }}%
+                                </span>
+                            </td>
+
+                            <!-- Interaction -->
+                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <span
+                                    class="{% if (item.interaction_effect|default(0)) > 0 %}text-green-600{% elif (item.interaction_effect|default(0)) < 0 %}text-red-600{% endif %}">
+                                    {{ "{:+.2f}".format(item.interaction_effect|default(0)) }}%
+                                </span>
+                            </td>
+
+                            <!-- Total -->
+                            <td class="px-6 py-4 whitespace-nowrap text-right font-bold">
+                                <span
+                                    class="{% if (item.total_effect|default(0)) > 0 %}text-green-600{% elif (item.total_effect|default(0)) < 0 %}text-red-600{% endif %}">
+                                    {{ "{:+.2f}".format(item.total_effect|default(0)) }}%
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart Script -->
+<script>
+    const waterfallData = JSON.parse('{{ waterfall_chart_json | safe }}');
+
+    // Waterfall Chart implementation using Bar chart with floating bars
+    // Note: Chart.js needs 'skipNull' or manual calculation for floating bars [start, end]
+    // Here we will implement a simplified version: simple bar chart where values are effects.
+    // Ideally, a true waterfall connects bars. For MVP, showing effects side-by-side or as a cumulative line + bars is ok.
+
+    // Better: We construct the floating bar data manually for visual "waterfall"
+    // Step 0: Benchmark Return (Start)
+    // Step 1: Allocation (+/-)
+    // Step 2: Selection (+/-)
+    // Step 3: Interaction (+/-)
+    // Step 4: Portfolio Return (End)
+
+    // Let's use the simple values first.
+
+    const ctx = document.getElementById('waterfallChart').getContext('2d');
+
+    // Colors based on positive/negative
+    const colors = waterfallData.values.map((v, i) => {
+        // Last bar (Portfolio Return) and First bar (Benchmark) are totals, usually Blue/Gray
+        if (i === 0 || i === waterfallData.values.length - 1) return 'rgba(54, 162, 235, 0.7)'; // Blue
+        return v >= 0 ? 'rgba(75, 192, 192, 0.7)' : 'rgba(255, 99, 132, 0.7)'; // Green / Red
+    });
+
+    new Chart(ctx, {
+        type: 'bar', // Using Bar chart to represent effects
+        data: {
+            labels: waterfallData.labels,
+            datasets: [{
+                label: 'Return Contribution (%)',
+                data: waterfallData.values,
+                backgroundColor: colors,
+                borderColor: colors.map(c => c.replace('0.7', '1')),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return context.parsed.y.toFixed(2) + '%';
+                        }
+                    }
+                },
+                annotation: {
+                    // We could add arrows or lines if we include the annotation plugin
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function (value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

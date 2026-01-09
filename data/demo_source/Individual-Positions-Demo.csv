@@ -1,0 +1,13 @@
+"Positions for account Demo Account XXXX-1234 as of 01/08/2026"
+""
+Symbol,Description,Quantity,Price,Market Value,Cost Basis,Day Change $,Day Change %
+VOO,Vanguard S&P 500 ETF,91,$414.16,"$37,639.48","$30,399.28",$45.62,1.35%
+VTI,Vanguard Total Stock Market ETF,28,$827.37,"$23,166.37","$19,482.11",$-4.84,-0.37%
+QQQ,Invesco QQQ Trust,57,$558.28,"$31,931.00","$26,529.39",$11.17,1.96%
+VEA,Vanguard Developed Markets ETF,87,$66.79,"$5,841.35","$5,014.91",$3.06,-0.84%
+IEMG,iShares Emerging Markets ETF,75,$47.56,"$3,586.38","$3,232.36",$20.03,1.16%
+BND,Vanguard Total Bond Market ETF,49,$62.04,"$3,019.08","$2,595.94",$44.21,0.03%
+AGG,iShares Core US Aggregate Bond ETF,29,$102.21,"$2,970.41","$2,299.94",$47.85,0.63%
+VNQ,Vanguard Real Estate ETF,83,$54.14,"$4,509.01","$3,524.58",$14.07,0.43%
+GLD,SPDR Gold Shares,63,$157.74,"$10,010.52","$9,494.49",$43.03,0.12%
+FBTC,Fidelity Wise Origin Bitcoin Fund,25,$24.78,$613.30,$562.05,$9.87,1.01%

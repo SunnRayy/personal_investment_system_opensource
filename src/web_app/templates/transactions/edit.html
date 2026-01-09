@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Transaction - Investment System{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Edit Transaction</h1>
+        <a href="{{ url_for('transactions.list_transactions') }}" class="text-gray-600 hover:text-gray-800">
+            <i class="fas fa-arrow-left mr-1"></i> Back to List
+        </a>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <form action="{{ url_for('transactions.edit_transaction', txn_id=transaction.id) }}" method="POST">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Date -->
+                <div>
+                    <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date *</label>
+                    <input type="date" id="date" name="date" required value="{{ transaction.date }}"
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 p-2 border">
+                </div>
+
+                <!-- Transaction Type -->
+                <div>
+                    <label for="transaction_type" class="block text-sm font-medium text-gray-700 mb-1">Type *</label>
+                    <select id="transaction_type" name="transaction_type" required
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 p-2 border">
+                        <option value="Buy" {% if transaction.transaction_type == 'Buy' %}selected{% endif %}>Buy</option>
+                        <option value="Sell" {% if transaction.transaction_type == 'Sell' %}selected{% endif %}>Sell</option>
+                        <option value="Dividend_Cash" {% if transaction.transaction_type == 'Dividend_Cash' %}selected{% endif %}>Dividend (Cash)</option>
+                        <option value="Dividend_Reinvest" {% if transaction.transaction_type == 'Dividend_Reinvest' %}selected{% endif %}>Dividend (Reinvest)</option>
+                        <option value="Interest" {% if transaction.transaction_type == 'Interest' %}selected{% endif %}>Interest</option>
+                        <option value="Fee" {% if transaction.transaction_type == 'Fee' %}selected{% endif %}>Fee</option>
+                    </select>
+                </div>
+
+                <!-- Asset ID -->
+                <div>
+                    <label for="asset_id" class="block text-sm font-medium text-gray-700 mb-1">Asset ID *</label>
+                    <input type="text" id="asset_id" name="asset_id" required value="{{ transaction.asset_id }}"
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 p-2 border">
+                </div>
+
+                <!-- Asset Name -->
+                <div>
+                    <label for="asset_name" class="block text-sm font-medium text-gray-700 mb-1">Asset Name *</label>
+                    <input type="text" id="asset_name" name="asset_name" required value="{{ transaction.asset_name }}"
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 p-2 border">
+                </div>
+
+                <!-- Amount -->
+                <div>
+                    <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">Amount (Net) *</label>
+                    <input type="number" id="amount" name="amount" step="0.01" required value="{{ transaction.amount }}"
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 p-2 border">
+                    <p class="text-xs text-gray-500 mt-1">Negative for outflow (Buy), Positive for inflow (Sell)</p>
+                </div>
+
+                <!-- Currency -->
+                <div>
+                    <label for="currency" class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                    <select id="currency" name="currency"
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 p-2 border">
+                        <option value="CNY" {% if transaction.currency == 'CNY' %}selected{% endif %}>CNY</option>
+                        <option value="USD" {% if transaction.currency == 'USD' %}selected{% endif %}>USD</option>
+                        <option value="HKD" {% if transaction.currency == 'HKD' %}selected{% endif %}>HKD</option>
+                    </select>
+                </div>
+
+                <!-- Shares -->
+                <div>
+                    <label for="shares" class="block text-sm font-medium text-gray-700 mb-1">Shares</label>
+                    <input type="number" id="shares" name="shares" step="0.0001" value="{{ transaction.shares if transaction.shares is not none else '' }}"
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 p-2 border">
+                </div>
+
+                <!-- Price -->
+                <div>
+                    <label for="price" class="block text-sm font-medium text-gray-700 mb-1">Price per Share</label>
+                    <input type="number" id="price" name="price" step="0.0001" value="{{ transaction.price if transaction.price is not none else '' }}"
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 p-2 border">
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3">
+                <a href="{{ url_for('transactions.list_transactions') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">Cancel</a>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition shadow">Update Transaction</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

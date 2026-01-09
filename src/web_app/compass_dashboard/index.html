@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Compass Dashboard</title>
+    <link rel="stylesheet" href="/compass/static/style.css">
+    <!-- Chart.js CDN for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+</head>
+<body>
+    <div class="main-container">
+        <header class="dashboard-header">
+            <h1>My Investment Compass</h1>
+            <div class="header-controls">
+                <div class="last-updated" id="last-updated">
+                    <!-- Last updated timestamp will be populated here -->
+                </div>
+                <button id="refresh-data-btn" class="refresh-btn">Refresh Data</button>
+            </div>
+        </header>
+
+        <main class="dashboard-content" id="dashboard-container">
+            <!-- Portfolio Snapshot Section -->
+            <section class="dashboard-section">
+                <h2>Portfolio Snapshot</h2>
+                <div id="portfolio-snapshot" class="component-container">
+                    <div class="loading">Loading portfolio data...</div>
+                </div>
+            </section>
+
+            <!-- Asset Allocation Section -->
+            <section class="dashboard-section">
+                <h2>📊 Two-Level Asset Allocation</h2>
+                <div class="component-container">
+                    <!-- Chart Container -->
+                    <div class="chart-container">
+                        <canvas id="allocation-chart"></canvas>
+                    </div>
+                    <!-- Asset Allocation Container -->
+                    <div id="asset-allocation" class="allocation-container">
+                        <div class="loading">Loading asset allocation data...</div>
+                    </div>
+                    <!-- Two-Level Allocation Container -->
+                    <div id="two-level-allocation" class="two-level-container">
+                        <div class="loading">Loading allocation data...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Rebalancing Advice Section -->
+            <section class="dashboard-section">
+                <h2>Rebalancing Recommendations</h2>
+                <div id="rebalancing-advice" class="component-container">
+                    <div class="loading">Loading rebalancing advice...</div>
+                </div>
+            </section>
+
+            <!-- Single Asset Risk Section -->
+            <section class="dashboard-section">
+                <h2>Risk Analysis</h2>
+                <div id="single-asset-risk" class="component-container">
+                    <div class="loading">Loading risk analysis...</div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="dashboard-footer">
+            <p>Investment Compass Dashboard - Personal Investment System</p>
+        </footer>
+    </div>
+
+    <script src="/compass/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1192 @@
+{% extends "base_template.html" %}
+
+{% block title %}{{ _('Market Thermometer - Sentiment Indicators') }}{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Market Thermometer</li>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="container">
+        <h1><i class="bi bi-thermometer-half"></i> {{ _('Market Thermometer') }}</h1>
+        <p>{{ _('Real-time market sentiment and valuation indicators') }}</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- MARKET REGIME CARD (moved from Action Compass) -->
+    {% if market_regime %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div
+                class="card shadow-sm border-{% if market_regime.priority == 1 %}danger{% elif market_regime.priority == 2 %}warning{% elif market_regime.priority == 3 %}success{% else %}secondary{% endif %} border-3">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h4 class="mb-2">
+                                <i class="bi bi-speedometer me-2"></i>
+                                <strong>{{ _('Current Market Regime:') }}</strong>
+                                <span
+                                    class="badge bg-{% if market_regime.priority == 1 %}danger{% elif market_regime.priority == 2 %}warning{% elif market_regime.priority == 3 %}success{% else %}secondary{% endif %} ms-2 fs-6">
+                                    {{ _(market_regime.regime_name_cn) }} ({{ _(market_regime.regime_name) }})
+                                </span>
+                            </h4>
+                            <p class="text-muted mb-2">
+                                {{ _(market_regime.description_cn|default(market_regime.description)) }}
+                            </p>
+
+                            {% if market_regime.matched_conditions %}
+                            <div class="mt-3">
+                                <small class="text-muted"><strong>{{ _('Trigger Conditions:') }}</strong></small>
+                                <ul class="list-unstyled ms-3 small">
+                                    {% if market_regime.matched_conditions.valuation_or %}
+                                    <li>
+                                        <i class="bi bi-check-circle-fill text-warning me-1"></i>
+                                        {{ _('Valuation:') }}
+                                        {% if market_regime.matched_conditions.valuation_or.shiller_pe.met %}
+                                        {{ _('Shiller PE') }} {{
+                                        market_regime.matched_conditions.valuation_or.shiller_pe.value }}
+                                        {% endif %}
+                                        {% if market_regime.matched_conditions.valuation_or.buffett_us.met %}
+                                        {{ _('OR Buffett US') }} {{
+                                        market_regime.matched_conditions.valuation_or.buffett_us.value
+                                        }}%
+                                        {% endif %}
+                                    </li>
+                                    {% endif %}
+                                    {% if market_regime.matched_conditions.fear_greed %}
+                                    <li>
+                                        <i class="bi bi-check-circle-fill text-warning me-1"></i>
+                                        {{ _('Fear & Greed:') }} {{ market_regime.matched_conditions.fear_greed.value }}
+                                    </li>
+                                    {% endif %}
+                                    {% if market_regime.matched_conditions.regional_divergence %}
+                                    <li>
+                                        <i class="bi bi-check-circle-fill text-warning me-1"></i>
+                                        {{ _('Regional Divergence: US') }} {{
+                                        market_regime.matched_conditions.regional_divergence.buffett_us.value }}% {{
+                                        _('vs. China') }} {{
+                                        market_regime.matched_conditions.regional_divergence.buffett_china.value }}%
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4 text-end">
+                            {% if market_regime.dynamic_targets %}
+                            <div
+                                class="alert alert-{% if market_regime.priority == 1 %}danger{% elif market_regime.priority == 2 %}warning{% elif market_regime.priority == 3 %}success{% else %}secondary{% endif %} mb-2">
+                                <small><strong>{{ _('Dynamic Targets Active') }}</strong></small><br>
+                                <small class="text-muted">{{ _('Allocation adjusted for regime') }}</small>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-secondary mb-2">
+                                <small><strong>{{ _('Baseline Targets') }}</strong></small><br>
+                                <small class="text-muted">{{ _('Standard allocation') }}</small>
+                            </div>
+                            {% endif %}
+
+                            <small class="text-muted d-block mb-2">
+                                <i class="bi bi-clock me-1"></i>
+                                {{ _('Detected:') }} {{ market_regime.detection_timestamp|default(_('Now')) }}
+                            </small>
+
+                            <a href="action_compass.html" class="btn btn-primary btn-sm">
+                                <i class="bi bi-compass me-1"></i>{{ _('View Action Compass →') }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <!-- END MARKET REGIME CARD -->
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="section-title">
+                <i class="bi bi-thermometer-half me-2"></i>{{ _('Market Sentiment Indicators') }}
+            </h2>
+            <p class="text-muted">
+                {{ _('Real-time macroeconomic indicators providing a quick assessment of current market conditions.') }}
+                {{ _('Data updated:') }} {{ market_thermometer.last_updated[:10] if market_thermometer.last_updated else
+                'N/A' }}
+            </p>
+        </div>
+    </div> <!-- End header row -->
+
+    <!-- Row 1: Shiller P/E, Fear & Greed, VIX -->
+    <div class="row mb-5">
+        <!-- Shiller P/E Ratio Card -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card thermometer-card">
+                {% if market_thermometer.shiller_pe.status == 'success' %}
+                <div class="card-header level-{{ market_thermometer.shiller_pe.level }}-header">
+                    <i class="bi bi-graph-up me-2"></i>Shiller P/E Ratio
+                </div>
+                <div class="card-body">
+                    <div class="indicator-value level-{{ market_thermometer.shiller_pe.level }}-text">
+                        {{ "%.2f"|format(market_thermometer.shiller_pe.value) }}
+                    </div>
+                    <div class="indicator-zone level-{{ market_thermometer.shiller_pe.level }}-text">
+                        {{ _(market_thermometer.shiller_pe.zone) }}
+                    </div>
+                    {% if market_thermometer.shiller_pe.data_age_warning %}
+                    <div class="alert alert-warning mt-2 mb-2 py-1 px-2" style="font-size: 0.8rem;">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>{{
+                        market_thermometer.shiller_pe.data_age_warning }}
+                    </div>
+                    {% endif %}
+                    <p class="indicator-explanation">
+                        {{ _('The Cyclically Adjusted P/E ratio measures market valuation by comparing stock prices to
+                        10-year average earnings.') }}
+                        {% if market_thermometer.shiller_pe.level == 0 %}
+                        <strong>{{ _('Interpretation:') }}</strong> {{ _('Market is extremely undervalued.') }}
+                        {% elif market_thermometer.shiller_pe.level == 1 %}
+                        <strong>{{ _('Interpretation:') }}</strong> {{ _('Market is undervalued.') }}
+                        {% elif market_thermometer.shiller_pe.level == 2 %}
+                        <strong>{{ _('Interpretation:') }}</strong> {{ _('Market is fairly valued.') }}
+                        {% elif market_thermometer.shiller_pe.level == 3 %}
+                        <strong>{{ _('Interpretation:') }}</strong> {{ _('Market is overvalued.') }}
+                        {% elif market_thermometer.shiller_pe.level == 4 %}
+                        <strong>{{ _('Interpretation:') }}</strong> {{ _('Market is extremely overvalued.') }}
+                        {% endif %}
+                    </p>
+                </div>
+                {% else %}
+                <div class="card-header level-error-header">
+                    <i class="bi bi-graph-up me-2"></i>Shiller P/E Ratio
+                </div>
+                <div class="card-body">
+                    <div class="indicator-value level-error-text">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <div class="indicator-zone level-error-text">{{ _('Data Unavailable') }}</div>
+                    <p class="indicator-explanation text-danger" style="font-size: 0.85rem; word-break: break-word;">
+                        {{ market_thermometer.shiller_pe.error_message }}
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Fear & Greed Index Card -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card thermometer-card">
+                {% if market_thermometer.fear_greed.status == 'success' %}
+                <div class="card-header level-{{ market_thermometer.fear_greed.level }}-header">
+                    <i class="bi bi-bar-chart-line me-2"></i>Fear & Greed Index
+                </div>
+                <div class="card-body">
+                    <div class="indicator-value level-{{ market_thermometer.fear_greed.level }}-text">
+                        {{ "%.0f"|format(market_thermometer.fear_greed.value) }}
+                    </div>
+                    <div class="indicator-zone level-{{ market_thermometer.fear_greed.level }}-text">
+                        {{ _(market_thermometer.fear_greed.zone) }}
+                    </div>
+                    {% if market_thermometer.fear_greed.data_age_warning %}
+                    <div class="alert alert-warning mt-2 mb-2 py-1 px-2" style="font-size: 0.8rem;">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>{{
+                        market_thermometer.fear_greed.data_age_warning }}
+                    </div>
+                    {% endif %}
+                    <p class="indicator-explanation">
+                        {{ _("CNN's Fear & Greed Index measures investor sentiment on a 0-100 scale.") }}
+                        {% if market_thermometer.fear_greed.level == 0 %}
+                        <strong>{{ _('Interpretation:') }}</strong> {{ _('Extreme fear - contrarian opportunity.') }}
+                        {% elif market_thermometer.fear_greed.level == 1 %}
+                        <strong>{{ _('Interpretation:') }}</strong> {{ _('Fearful sentiment.') }}
+                        {% elif market_thermometer.fear_greed.level == 2 %}
+                        <strong>{{ _('Interpretation:') }}</strong> {{ _('Neutral sentiment.') }}
+                        {% elif market_thermometer.fear_greed.level == 3 %}
+                        <strong>{{ _('Interpretation:') }}</strong> {{ _('Greedy sentiment.') }}
+                        {% elif market_thermometer.fear_greed.level == 4 %}
+                        <strong>{{ _('Interpretation:') }}</strong> {{ _('Extreme greed - high risk.') }}
+                        {% endif %}
+                    </p>
+                </div>
+                {% else %}
+                <div class="card-header level-error-header">
+                    <i class="bi bi-bar-chart-line me-2"></i>Fear & Greed Index
+                </div>
+                <div class="card-body">
+                    <div class="indicator-value level-error-text">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <div class="indicator-zone level-error-text">{{ _('Data Unavailable') }}</div>
+                    <p class="indicator-explanation text-danger" style="font-size: 0.85rem; word-break: break-word;">
+                        {{ _('API temporarily unavailable (rate limited)') }}
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- VIX Card -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card thermometer-card">
+                {% if market_thermometer.vix.status == 'success' %}
+                <div class="card-header level-{{ market_thermometer.vix.level }}-header">
+                    <i class="bi bi-activity me-2"></i>VIX (Volatility Index)
+                </div>
+                <div class="card-body">
+                    <div class="indicator-value level-{{ market_thermometer.vix.level }}-text">
+                        {{ "%.2f"|format(market_thermometer.vix.value) }}
+                    </div>
+                    <div class="indicator-zone level-{{ market_thermometer.vix.level }}-text">
+                        {{ _(market_thermometer.vix.zone) }}
+                    </div>
+                    <p class="indicator-explanation">
+                        {{ _('CBOE Volatility Index measures expected market volatility. Higher VIX = higher fear.') }}
+                        {% if market_thermometer.vix.level == 0 %}
+                        <strong>{{ _('Interpretation:') }}</strong> {{ _('Extreme fear - potential opportunity.') }}
+                        {% elif market_thermometer.vix.level == 1 %}
+                        <strong>{{ _('Interpretation:') }}</strong> {{ _('Elevated fear - caution warranted.') }}
+                        {% elif market_thermometer.vix.level == 2 %}
+                        <strong>{{ _('Interpretation:') }}</strong> {{ _('Normal volatility.') }}
+                        {% elif market_thermometer.vix.level == 3 %}
+                        <strong>{{ _('Interpretation:') }}</strong> {{ _('Low fear - complacency risk.') }}
+                        {% elif market_thermometer.vix.level == 4 %}
+                        <strong>{{ _('Interpretation:') }}</strong> {{ _('Extreme complacency - high risk.') }}
+                        {% endif %}
+                    </p>
+                </div>
+                {% else %}
+                <div class="card-header level-error-header">
+                    <i class="bi bi-activity me-2"></i>VIX (Volatility Index)
+                </div>
+                <div class="card-body">
+                    <div class="indicator-value level-error-text">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <div class="indicator-zone level-error-text">{{ _('Data Unavailable') }}</div>
+                    <p class="indicator-explanation text-danger" style="font-size: 0.85rem; word-break: break-word;">
+                        {{ market_thermometer.vix.error_message }}
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: International Buffett Indicators -->
+    <div class="row mb-5">
+        <div class="col-12 mb-3">
+            <h4 class="text-muted"><i class="bi bi-globe me-2"></i>{{ _('Buffett Indicator - Global View') }}</h4>
+            <p class="text-muted small">{{ _('Total market capitalization to GDP ratio by region') }}</p>
+        </div>
+
+        <!-- US Buffett Indicator -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card thermometer-card">
+                {% if market_thermometer.buffett_us.status == 'success' %}
+                <div class="card-header level-{{ market_thermometer.buffett_us.level }}-header">
+                    <i class="bi bi-flag-usa me-2"></i>United States
+                </div>
+                <div class="card-body">
+                    <div class="indicator-value level-{{ market_thermometer.buffett_us.level }}-text">
+                        {{ "%.1f%%"|format(market_thermometer.buffett_us.value) }}
+                    </div>
+                    <div class="indicator-zone level-{{ market_thermometer.buffett_us.level }}-text">
+                        {{ _(market_thermometer.buffett_us.zone) }}
+                    </div>
+                    <p class="indicator-explanation small mb-1">
+                        {{ _('Data as of') }} {{ market_thermometer.buffett_us.date if
+                        market_thermometer.buffett_us.date else
+                        'N/A' }} · {{ _('Source:') }} {{ market_thermometer.buffett_us.source if
+                        market_thermometer.buffett_us.source else 'Unknown' }}
+                    </p>
+                    {% if market_thermometer.buffett_us.data_age_warning %}
+                    <p class="indicator-warning mb-0">{{ market_thermometer.buffett_us.data_age_warning }}</p>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="card-header level-error-header">
+                    <i class="bi bi-flag-usa me-2"></i>{{ _('United States') }}
+                </div>
+                <div class="card-body">
+                    <div class="indicator-zone level-error-text">{{ _('Data Unavailable') }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- China Buffett Indicator -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card thermometer-card">
+                {% if market_thermometer.buffett_china.status == 'success' %}
+                <div class="card-header level-{{ market_thermometer.buffett_china.level }}-header">
+                    <i class="bi bi-globe-asia-australia me-2"></i>China
+                </div>
+                <div class="card-body">
+                    <div class="indicator-value level-{{ market_thermometer.buffett_china.level }}-text">
+                        {{ "%.1f%%"|format(market_thermometer.buffett_china.value) }}
+                    </div>
+                    <div class="indicator-zone level-{{ market_thermometer.buffett_china.level }}-text">
+                        {{ _(market_thermometer.buffett_china.zone) }}
+                    </div>
+                    <p class="indicator-explanation small mb-1">
+                        {{ _('Data as of') }} {{ market_thermometer.buffett_china.date if
+                        market_thermometer.buffett_china.date
+                        else 'N/A' }} · {{ _('Source:') }} {{ market_thermometer.buffett_china.source if
+                        market_thermometer.buffett_china.source else 'Unknown' }}
+                    </p>
+                    {% if market_thermometer.buffett_china.data_age_warning %}
+                    <p class="indicator-warning mb-0">{{ market_thermometer.buffett_china.data_age_warning }}</p>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="card-header level-error-header">
+                    <i class="bi bi-globe-asia-australia me-2"></i>{{ _('China') }}
+                </div>
+                <div class="card-body">
+                    <div class="indicator-zone level-error-text">{{ _('Data Unavailable') }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Japan Buffett Indicator -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card thermometer-card">
+                {% if market_thermometer.buffett_japan.status == 'success' %}
+                <div class="card-header level-{{ market_thermometer.buffett_japan.level }}-header">
+                    <i class="bi bi-globe-asia-australia me-2"></i>Japan
+                </div>
+                <div class="card-body">
+                    <div class="indicator-value level-{{ market_thermometer.buffett_japan.level }}-text">
+                        {{ "%.1f%%"|format(market_thermometer.buffett_japan.value) }}
+                    </div>
+                    <div class="indicator-zone level-{{ market_thermometer.buffett_japan.level }}-text">
+                        {{ _(market_thermometer.buffett_japan.zone) }}
+                    </div>
+                    <p class="indicator-explanation small mb-1">
+                        {{ _('Data as of') }} {{ market_thermometer.buffett_japan.date if
+                        market_thermometer.buffett_japan.date
+                        else 'N/A' }} · {{ _('Source:') }} {{ market_thermometer.buffett_japan.source if
+                        market_thermometer.buffett_japan.source else 'Unknown' }}
+                    </p>
+                    {% if market_thermometer.buffett_japan.data_age_warning %}
+                    <p class="indicator-warning mb-0">{{ market_thermometer.buffett_japan.data_age_warning }}</p>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="card-header level-error-header">
+                    <i class="bi bi-globe-asia-australia me-2"></i>{{ _('Japan') }}
+                </div>
+                <div class="card-body">
+                    <div class="indicator-zone level-error-text">{{ _('Data Unavailable') }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Europe Buffett Indicator -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card thermometer-card">
+                {% if market_thermometer.buffett_europe.status == 'success' %}
+                <div class="card-header level-{{ market_thermometer.buffett_europe.level }}-header">
+                    <i class="bi bi-globe-europe-africa me-2"></i>Europe (UK)
+                </div>
+                <div class="card-body">
+                    <div class="indicator-value level-{{ market_thermometer.buffett_europe.level }}-text">
+                        {{ "%.1f%%"|format(market_thermometer.buffett_europe.value) }}
+                    </div>
+                    <div class="indicator-zone level-{{ market_thermometer.buffett_europe.level }}-text">
+                        {{ _(market_thermometer.buffett_europe.zone) }}
+                    </div>
+                    <p class="indicator-explanation small mb-1">
+                        {{ _('Data as of') }} {{ market_thermometer.buffett_europe.date if
+                        market_thermometer.buffett_europe.date
+                        else 'N/A' }} · {{ _('Source:') }} {{ market_thermometer.buffett_europe.source if
+                        market_thermometer.buffett_europe.source else 'Unknown' }}
+                    </p>
+                    {% if market_thermometer.buffett_europe.data_age_warning %}
+                    <p class="indicator-warning mb-0">{{ market_thermometer.buffett_europe.data_age_warning }}</p>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="card-header level-error-header">
+                    <i class="bi bi-globe-europe-africa me-2"></i>Europe (UK)
+                </div>
+                <div class="card-body">
+                    <div class="indicator-zone level-error-text">Data Unavailable</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 3: Gold Market Indicators (Phase 1 Refactored) -->
+    {% if gold_analysis and gold_analysis.status == 'success' %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="section-title">
+                <i class="bi bi-coin me-2"></i>{{ _('Gold Market Indicators') }}
+            </h2>
+            <p class="text-muted">
+                {{ _('Real-time gold market indicators providing insights into volatility, relative value, and market
+                positioning.') }}
+            </p>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <!-- GVZ (Gold Volatility Index) Card -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card thermometer-card">
+                {% if gold_analysis.indicators.gvz.status == 'success' %}
+                {% set gvz = gold_analysis.indicators.gvz %}
+                {% set gvz_value = gvz.value %}
+                <!-- Classify GVZ level -->
+                {% if gvz_value > 35 %}
+                {% set gvz_level = 0 %} <!-- Extreme fear -->
+                {% elif gvz_value > 28 %}
+                {% set gvz_level = 1 %} <!-- Elevated -->
+                {% elif gvz_value < 15 %} {% set gvz_level=4 %} <!-- Complacency -->
+                    {% elif gvz_value < 20 %} {% set gvz_level=3 %} <!-- Low volatility -->
+                        {% else %}
+                        {% set gvz_level = 2 %} <!-- Normal -->
+                        {% endif %}
+
+                        <div class="card-header level-{{ gvz_level }}-header">
+                            <i class="bi bi-graph-up me-2"></i>GVZ (Gold Volatility)
+                        </div>
+                        <div class="card-body">
+                            <div class="indicator-value level-{{ gvz_level }}-text">
+                                {{ "%.2f"|format(gvz_value) }}
+                            </div>
+                            <div class="indicator-zone level-{{ gvz_level }}-text">
+                                {% if gvz_level == 0 %}{{ _('Extreme Fear') }}{% elif gvz_level == 1 %}{{ _('Elevated')
+                                }}{% elif gvz_level == 4 %}{{ _('Complacency') }}{% elif gvz_level == 3 %}{{ _('Low
+                                Volatility') }}{% else %}{{ _('Normal') }}{% endif %}
+                            </div>
+                            <p class="indicator-explanation">
+                                {{ _('Cboe Gold ETF Volatility Index measures market\'s expectation of 30-day gold price
+                                volatility.') }}
+                                {% if gvz_level == 0 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Extreme volatility indicates elevated
+                                market fear and uncertainty.') }}
+                                {% elif gvz_level == 1 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Elevated volatility suggests market
+                                uncertainty and increased risk.') }}
+                                {% elif gvz_level == 4 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Very low volatility suggests market
+                                complacency.') }}
+                                {% elif gvz_level == 3 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Low volatility indicates a relatively
+                                calm market environment.') }}
+                                {% else %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Normal gold market volatility levels
+                                observed.') }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% else %}
+                        <div class="card-header level-error-header">
+                            <i class="bi bi-graph-up me-2"></i>{{ _('GVZ (Gold Volatility)') }}
+                        </div>
+                        <div class="card-body">
+                            <div class="indicator-value level-error-text">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="indicator-zone level-error-text">{{ _('Data Unavailable') }}</div>
+                            <p class="indicator-explanation text-danger">
+                                {{ gold_analysis.indicators.gvz.error_message }}
+                            </p>
+                        </div>
+                        {% endif %}
+            </div>
+        </div>
+
+        <!-- Gold/Silver Ratio Card -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card thermometer-card">
+                {% if gold_analysis.indicators.gold_silver_ratio.status == 'success' %}
+                {% set gs_ratio = gold_analysis.indicators.gold_silver_ratio %}
+                {% set gs_value = gs_ratio.value %}
+                <!-- Classify Gold/Silver level -->
+                {% if gs_value < 55 %} {% set gs_level=0 %} <!-- Gold cheap -->
+                    {% elif gs_value < 65 %} {% set gs_level=1 %} <!-- Gold moderately cheap -->
+                        {% elif gs_value > 95 %}
+                        {% set gs_level = 4 %} <!-- Gold very expensive -->
+                        {% elif gs_value > 85 %}
+                        {% set gs_level = 3 %} <!-- Gold expensive -->
+                        {% else %}
+                        {% set gs_level = 2 %} <!-- Normal -->
+                        {% endif %}
+
+                        <div class="card-header level-{{ gs_level }}-header">
+                            <i class="bi bi-coin me-2"></i>Gold/Silver Ratio
+                        </div>
+                        <div class="card-body">
+                            <div class="indicator-value level-{{ gs_level }}-text">
+                                {{ "%.2f"|format(gs_value) }}
+                            </div>
+                            <div class="indicator-zone level-{{ gs_level }}-text">
+                                {% if gs_level == 0 %}{{ _('Gold Cheap') }}{% elif gs_level == 1 %}{{ _('Gold Fair
+                                Value') }}{% elif gs_level == 4 %}{{ _('Gold Very Expensive') }}{% elif gs_level == 3
+                                %}{{ _('Gold Expensive') }}{% else %}{{ _('Normal Range') }}{% endif %}
+                            </div>
+                            <p class="indicator-explanation">
+                                {{ _('Measures relative value of gold to silver. Historical range: 40-95.') }}
+                                {% if gs_level == 0 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Gold is historically cheap relative to
+                                silver - potential buy opportunity.') }}
+                                {% elif gs_level == 1 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Gold moderately undervalued relative
+                                to silver.') }}
+                                {% elif gs_level == 4 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Gold is very expensive relative to
+                                silver - consider taking profits.') }}
+                                {% elif gs_level == 3 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Gold moderately overvalued relative to
+                                silver.') }}
+                                {% else %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Gold and silver in normal relative
+                                valuation range.') }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% else %}
+                        <div class="card-header level-error-header">
+                            <i class="bi bi-coin me-2"></i>{{ _('Gold/Silver Ratio') }}
+                        </div>
+                        <div class="card-body">
+                            <div class="indicator-value level-error-text">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="indicator-zone level-error-text">{{ _('Data Unavailable') }}</div>
+                            <p class="indicator-explanation text-danger">
+                                {{ gold_analysis.indicators.gold_silver_ratio.error_message }}
+                            </p>
+                        </div>
+                        {% endif %}
+            </div>
+        </div>
+
+        <!-- S&P 500/Gold Ratio Card -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card thermometer-card">
+                {% if gold_analysis.indicators.sp500_gold_ratio.status == 'success' %}
+                {% set sp_gold = gold_analysis.indicators.sp500_gold_ratio %}
+                {% set sp_gold_value = sp_gold.value %}
+                <!-- Classify S&P/Gold level (inverted: high ratio = stocks expensive = gold buy) -->
+                {% if sp_gold_value > 2.8 %}
+                {% set sp_gold_level = 0 %} <!-- Stocks very expensive, gold cheap -->
+                {% elif sp_gold_value > 2.4 %}
+                {% set sp_gold_level = 1 %} <!-- Stocks expensive -->
+                {% elif sp_gold_value < 1.2 %} {% set sp_gold_level=4 %} <!-- Stocks very cheap, gold expensive -->
+                    {% elif sp_gold_value < 1.5 %} {% set sp_gold_level=3 %} <!-- Stocks cheap -->
+                        {% else %}
+                        {% set sp_gold_level = 2 %} <!-- Normal -->
+                        {% endif %}
+
+                        <div class="card-header level-{{ sp_gold_level }}-header">
+                            <i class="bi bi-graph-up-arrow me-2"></i>S&P 500/Gold Ratio
+                        </div>
+                        <div class="card-body">
+                            <div class="indicator-value level-{{ sp_gold_level }}-text">
+                                {{ "%.3f"|format(sp_gold_value) }}
+                            </div>
+                            <div class="indicator-zone level-{{ sp_gold_level }}-text">
+                                {% if sp_gold_level == 0 %}{{ _('Stocks Very Expensive') }}{% elif sp_gold_level == 1
+                                %}{{ _('Stocks Expensive') }}{% elif sp_gold_level == 4 %}{{ _('Stocks Very Cheap') }}{%
+                                elif sp_gold_level == 3 %}{{ _('Stocks Cheap') }}{% else %}{{ _('Normal Range') }}{%
+                                endif %}
+                            </div>
+                            <p class="indicator-explanation">
+                                {{ _('Measures relative performance of stocks vs gold. Historical range: 0.5-3.5.') }}
+                                {% if sp_gold_level == 0 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Stocks very expensive relative to gold
+                                - gold may be undervalued.') }}
+                                {% elif sp_gold_level == 1 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Stocks moderately expensive - gold
+                                relatively attractive.') }}
+                                {% elif sp_gold_level == 4 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Stocks very cheap relative to gold -
+                                equities more attractive.') }}
+                                {% elif sp_gold_level == 3 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Stocks moderately cheap - equities
+                                relatively attractive.') }}
+                                {% else %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Balanced relative valuation between
+                                stocks and gold.') }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% else %}
+                        <div class="card-header level-error-header">
+                            <i class="bi bi-graph-up-arrow me-2"></i>{{ _('S&P 500/Gold Ratio') }}
+                        </div>
+                        <div class="card-body">
+                            <div class="indicator-value level-error-text">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="indicator-zone level-error-text">{{ _('Data Unavailable') }}</div>
+                            <p class="indicator-explanation text-danger">
+                                {{ gold_analysis.indicators.sp500_gold_ratio.error_message }}
+                            </p>
+                        </div>
+                        {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Gold Market Overview Summary -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h5><i class="bi bi-award-fill me-2"></i><strong>{{ _('Gold Market Overview') }}</strong></h5>
+                <p class="mb-2">
+                    {{ _('Based on the 3 indicators above, the gold market shows mixed signals across volatility,
+                    relative value, and market positioning metrics.') }}
+                    {{ _('Each indicator provides a different perspective on gold market conditions.') }}
+                </p>
+                <p class="mb-0">
+                    <i class="bi bi-arrow-right-circle me-1"></i>
+                    {{ _('For detailed buy/sell recommendations and action items, visit the') }} <a
+                        href="action_compass.html" class="alert-link">{{ _('Action Compass') }}</a> {{ _('tab.') }}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Row 4: Crypto Market Indicators (Phase 1 Refactored) -->
+    {% if crypto_analysis and crypto_analysis.status == 'success' %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="section-title">
+                <i class="bi bi-currency-bitcoin me-2"></i>{{ _('Crypto Market Indicators') }}
+            </h2>
+            <p class="text-muted">
+                {{ _('Real-time cryptocurrency market indicators tracking volatility, relative value, and market
+                dominance for
+                Bitcoin and Ethereum.') }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Row 5: Crypto Market Indicators Section Header -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-info d-flex align-items-center" role="alert">
+                <i class="bi bi-info-circle-fill me-3" style="font-size: 1.5rem;"></i>
+                <div>
+                    <h5 class="alert-heading mb-1">{{ _('Crypto Market Indicators') }}</h5>
+                    <p class="mb-0">
+                        {{ _('The cards below show raw indicator values and market zones.') }}
+                        {{ _('For investment recommendations based on these indicators, see') }}
+                        <a href="action_compass.html" class="alert-link">{{ _('Action Compass → Alternative Assets
+                            Recommendations') }}</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 6: Crypto Indicator Cards (Raw Data Only) -->
+    <div class="row">
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card thermometer-card">
+                {% if crypto_analysis.indicators.crypto_fear_greed.status == 'success' %}
+                {% set crypto_fng = crypto_analysis.indicators.crypto_fear_greed %}
+
+                <div class="card-header level-{{ crypto_fng.zone_level }}-header">
+                    <i class="bi bi-emoji-smile me-2"></i>Crypto Fear & Greed
+                </div>
+                <div class="card-body">
+                    <div class="indicator-value level-{{ crypto_fng.zone_level }}-text">
+                        {{ crypto_fng.value }}
+                    </div>
+                    <div class="indicator-zone level-{{ crypto_fng.zone_level }}-text">
+                        {{ _(crypto_fng.zone) }}
+                    </div>
+                    <p class="indicator-explanation">
+                        {{ _('Crypto market sentiment index (0-100) from Alternative.me.') }}
+                        {% if crypto_fng.data_age_days > 1 %}
+                        <br><span class="badge bg-warning text-dark">
+                            <i class="bi bi-exclamation-circle"></i> {{ _('Data') }} {{
+                            "%.1f"|format(crypto_fng.data_age_days) }}
+                            {{ _('days old') }}
+                        </span>
+                        {% endif %}
+                    </p>
+                    <p class="indicator-interpretation mb-2">
+                        {{ _(crypto_fng.interpretation) }}
+                    </p>
+                    <div class="text-center mt-3 pt-2 border-top">
+                        <small class="text-muted">
+                            <i class="bi bi-clock"></i> {{ crypto_fng.last_updated[:10] }} |
+                            API: {{ crypto_fng.api_classification }}
+                        </small>
+                    </div>
+                </div>
+                {% else %}
+                <div class="card-header level-error-header">
+                    <i class="bi bi-emoji-smile me-2"></i>{{ _('Crypto Fear & Greed') }}
+                </div>
+                <div class="card-body">
+                    <div class="indicator-value level-error-text">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <div class="indicator-zone level-error-text">{{ _('Data Unavailable') }}</div>
+                    <p class="indicator-explanation text-danger">
+                        {{ crypto_analysis.indicators.crypto_fear_greed.error_message }}
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- BTC/QQQ Ratio Card -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card thermometer-card">
+                {% if crypto_analysis.indicators.btc_qqq_ratio.status == 'success' %}
+                {% set btc_qqq = crypto_analysis.indicators.btc_qqq_ratio %}
+
+                <div class="card-header level-{{ btc_qqq.zone_level }}-header">
+                    <i class="bi bi-graph-up-arrow me-2"></i>BTC/QQQ Ratio
+                </div>
+                <div class="card-body">
+                    <div class="indicator-value level-{{ btc_qqq.zone_level }}-text">
+                        {{ "%.4f"|format(btc_qqq.value) }}
+                    </div>
+                    <div class="indicator-zone level-{{ btc_qqq.zone_level }}-text">
+                        {{ _(btc_qqq.zone) }}
+                    </div>
+                    <p class="indicator-explanation">
+                        {{ _('BTC price divided by QQQ (Nasdaq-100 ETF) price. Measures crypto performance vs tech
+                        stocks.') }}
+                        <br><small class="text-muted">
+                            BTC: ${{ "{:,.0f}".format(btc_qqq.btc_price) }} |
+                            QQQ: ${{ "{:.2f}".format(btc_qqq.qqq_price) }}
+                        </small>
+                    </p>
+                    <p class="indicator-interpretation">
+                        {{ _(btc_qqq.interpretation) }}
+                    </p>
+                    <small class="text-muted d-block mt-2">
+                        <i class="bi bi-clock"></i> {{ btc_qqq.last_updated[:10] }}
+                    </small>
+                </div>
+                {% else %}
+                <div class="card-header bg-secondary text-white">
+                    <i class="bi bi-graph-up-arrow me-2"></i>BTC/QQQ Ratio
+                </div>
+                <div class="card-body">
+                    <div class="indicator-value level-error-text">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <div class="indicator-zone level-error-text">Data Unavailable</div>
+                    <p class="indicator-explanation text-danger">
+                        {{ crypto_analysis.indicators.btc_qqq_ratio.error_message }}
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 6: BTC and ETH specific indicators (Second Row) -->
+    <div class="row mb-3">
+        <!-- Bitcoin Volatility Card -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card thermometer-card">
+                {% if crypto_analysis.indicators.btc_volatility.status == 'success' %}
+                {% set btc_vol = crypto_analysis.indicators.btc_volatility %}
+                {% set btc_vol_value = btc_vol.value %}
+                <!-- Classify BTC volatility level (contrarian: high vol = fear = buy opportunity) -->
+                {% if btc_vol_value > 80 %}
+                {% set btc_vol_level = 0 %} <!-- Extreme fear - buy -->
+                {% elif btc_vol_value > 60 %}
+                {% set btc_vol_level = 1 %} <!-- High volatility -->
+                {% elif btc_vol_value < 20 %} {% set btc_vol_level=4 %} <!-- Complacency - sell -->
+                    {% elif btc_vol_value < 35 %} {% set btc_vol_level=3 %} <!-- Low volatility -->
+                        {% else %}
+                        {% set btc_vol_level = 2 %} <!-- Normal -->
+                        {% endif %}
+
+                        <div class="card-header level-{{ btc_vol_level }}-header">
+                            <i class="bi bi-graph-up me-2"></i>BTC Volatility
+                        </div>
+                        <div class="card-body">
+                            <div class="indicator-value level-{{ btc_vol_level }}-text">
+                                {{ "%.1f"|format(btc_vol_value) }}%
+                            </div>
+                            <div class="indicator-zone level-{{ btc_vol_level }}-text">
+                                {% if btc_vol_level == 0 %}{{ _('Extreme Fear') }}{% elif btc_vol_level == 1 %}{{
+                                _('High Volatility') }}{% elif btc_vol_level == 4 %}{{ _('Complacency') }}{% elif
+                                btc_vol_level == 3 %}{{ _('Low Volatility') }}{% else %}{{ _('Normal') }}{% endif %}
+                            </div>
+                            <p class="indicator-explanation">
+                                {{ _('30-day Bitcoin realized volatility (annualized).') }}
+                                {% if btc_vol_level == 0 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Extreme volatility indicates elevated
+                                market fear and uncertainty.') }}
+                                {% elif btc_vol_level == 1 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Elevated volatility reflects increased
+                                market uncertainty.') }}
+                                {% elif btc_vol_level == 4 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Very low volatility may indicate
+                                market complacency.') }}
+                                {% elif btc_vol_level == 3 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Low volatility indicates a relatively
+                                calm market environment.') }}
+                                {% else %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Normal Bitcoin volatility levels
+                                observed.') }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% else %}
+                        <div class="card-header level-error-header">
+                            <i class="bi bi-graph-up me-2"></i>BTC Volatility
+                        </div>
+                        <div class="card-body">
+                            <div class="indicator-value level-error-text">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="indicator-zone level-error-text">Data Unavailable</div>
+                            <p class="indicator-explanation text-danger">
+                                {{ crypto_analysis.indicators.btc_volatility.error_message }}
+                            </p>
+                        </div>
+                        {% endif %}
+            </div>
+        </div>
+
+        <!-- Ethereum Volatility Card -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card thermometer-card">
+                {% if crypto_analysis.indicators.eth_volatility.status == 'success' %}
+                {% set eth_vol = crypto_analysis.indicators.eth_volatility %}
+                {% set eth_vol_value = eth_vol.value %}
+                <!-- Classify ETH volatility level (contrarian: high vol = fear = buy opportunity) -->
+                {% if eth_vol_value > 100 %}
+                {% set eth_vol_level = 0 %} <!-- Extreme fear - buy -->
+                {% elif eth_vol_value > 75 %}
+                {% set eth_vol_level = 1 %} <!-- High volatility -->
+                {% elif eth_vol_value < 25 %} {% set eth_vol_level=4 %} <!-- Complacency - sell -->
+                    {% elif eth_vol_value < 40 %} {% set eth_vol_level=3 %} <!-- Low volatility -->
+                        {% else %}
+                        {% set eth_vol_level = 2 %} <!-- Normal -->
+                        {% endif %}
+
+                        <div class="card-header level-{{ eth_vol_level }}-header">
+                            <i class="bi bi-graph-up me-2"></i>ETH Volatility
+                        </div>
+                        <div class="card-body">
+                            <div class="indicator-value level-{{ eth_vol_level }}-text">
+                                {{ "%.1f"|format(eth_vol_value) }}%
+                            </div>
+                            <div class="indicator-zone level-{{ eth_vol_level }}-text">
+                                {% if eth_vol_level == 0 %}{{ _('Extreme Fear') }}{% elif eth_vol_level == 1 %}{{
+                                _('High Volatility') }}{%
+                                elif eth_vol_level == 4 %}{{ _('Complacency') }}{% elif eth_vol_level == 3 %}{{ _('Low
+                                Volatility') }}{% else
+                                %}{{ _('Normal') }}{% endif %}
+                            </div>
+                            <p class="indicator-explanation">
+                                {{ _('30-day Ethereum realized volatility (annualized).') }}
+                                {% if eth_vol_level == 0 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Extreme volatility indicates elevated
+                                market fear and
+                                uncertainty.') }}
+                                {% elif eth_vol_level == 1 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Elevated volatility reflects increased
+                                market
+                                uncertainty.') }}
+                                {% elif eth_vol_level == 4 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Very low volatility may indicate
+                                market complacency.') }}
+                                {% elif eth_vol_level == 3 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Low volatility indicates a relatively
+                                calm market
+                                environment.') }}
+                                {% else %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Normal Ethereum volatility levels
+                                observed.') }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% else %}
+                        <div class="card-header level-error-header">
+                            <i class="bi bi-graph-up me-2"></i>ETH Volatility
+                        </div>
+                        <div class="card-body">
+                            <div class="indicator-value level-error-text">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="indicator-zone level-error-text">Data Unavailable</div>
+                            <p class="indicator-explanation text-danger">
+                                {{ crypto_analysis.indicators.eth_volatility.error_message }}
+                            </p>
+                        </div>
+                        {% endif %}
+            </div>
+        </div>
+
+        <!-- BTC/ETH Ratio Card -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card thermometer-card">
+                {% if crypto_analysis.indicators.btc_eth_ratio.status == 'success' %}
+                {% set btc_eth = crypto_analysis.indicators.btc_eth_ratio %}
+                {% set btc_eth_value = btc_eth.value %}
+                <!-- Classify BTC/ETH ratio level -->
+                {% if btc_eth_value < 15 %} {% set btc_eth_level=0 %} <!-- BTC cheap -->
+                    {% elif btc_eth_value < 18 %} {% set btc_eth_level=1 %} <!-- BTC moderately cheap -->
+                        {% elif btc_eth_value > 25 %}
+                        {% set btc_eth_level = 4 %} <!-- BTC expensive -->
+                        {% elif btc_eth_value > 22 %}
+                        {% set btc_eth_level = 3 %} <!-- BTC moderately expensive -->
+                        {% else %}
+                        {% set btc_eth_level = 2 %} <!-- Normal -->
+                        {% endif %}
+
+                        <div class="card-header level-{{ btc_eth_level }}-header">
+                            <i class="bi bi-arrow-left-right me-2"></i>BTC/ETH Ratio
+                        </div>
+                        <div class="card-body">
+                            <div class="indicator-value level-{{ btc_eth_level }}-text">
+                                {{ "%.2f"|format(btc_eth_value) }}
+                            </div>
+                            <div class="indicator-zone level-{{ btc_eth_level }}-text">
+                                {% if btc_eth_level == 0 %}{{ _('BTC Cheap') }}{% elif btc_eth_level == 1 %}{{ _('BTC
+                                Fair Value') }}{% elif
+                                btc_eth_level == 4 %}{{ _('BTC Expensive') }}{% elif btc_eth_level == 3 %}{{ _('BTC
+                                Premium') }}{% else
+                                %}{{ _('Normal Range') }}{% endif %}
+                            </div>
+                            <p class="indicator-explanation">
+                                {{ _('Relative value of Bitcoin to Ethereum. Historical range: 10-35.') }}
+                                {% if btc_eth_level == 0 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('BTC is cheap relative to ETH -
+                                potential BTC buy
+                                opportunity.') }}
+                                {% elif btc_eth_level == 1 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('BTC moderately undervalued relative to
+                                ETH.') }}
+                                {% elif btc_eth_level == 4 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('BTC expensive relative to ETH -
+                                consider ETH over BTC.') }}
+                                {% elif btc_eth_level == 3 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('BTC moderately overvalued relative to
+                                ETH.') }}
+                                {% else %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('BTC and ETH in normal relative
+                                valuation.') }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% else %}
+                        <div class="card-header level-error-header">
+                            <i class="bi bi-arrow-left-right me-2"></i>BTC/ETH Ratio
+                        </div>
+                        <div class="card-body">
+                            <div class="indicator-value level-error-text">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="indicator-zone level-error-text">Data Unavailable</div>
+                            <p class="indicator-explanation text-danger">
+                                {{ crypto_analysis.indicators.btc_eth_ratio.error_message }}
+                            </p>
+                        </div>
+                        {% endif %}
+            </div>
+        </div>
+
+        <!-- BTC Dominance Card -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card thermometer-card">
+                {% if crypto_analysis.indicators.btc_dominance.status == 'success' %}
+                {% set btc_dom = crypto_analysis.indicators.btc_dominance %}
+                {% set btc_dom_value = btc_dom.value %}
+                <!-- Classify BTC dominance level -->
+                {% if btc_dom_value < 35 %} {% set btc_dom_level=0 %} <!-- BTC undervalued -->
+                    {% elif btc_dom_value < 42 %} {% set btc_dom_level=1 %} <!-- Low dominance -->
+                        {% elif btc_dom_value > 60 %}
+                        {% set btc_dom_level = 4 %} <!-- BTC overvalued -->
+                        {% elif btc_dom_value > 55 %}
+                        {% set btc_dom_level = 3 %} <!-- High dominance -->
+                        {% else %}
+                        {% set btc_dom_level = 2 %} <!-- Normal -->
+                        {% endif %}
+
+                        <div class="card-header level-{{ btc_dom_level }}-header">
+                            <i class="bi bi-pie-chart me-2"></i>BTC Dominance
+                        </div>
+                        <div class="card-body">
+                            <div class="indicator-value level-{{ btc_dom_level }}-text">
+                                {{ "%.1f"|format(btc_dom_value) }}%
+                            </div>
+                            <div class="indicator-zone level-{{ btc_dom_level }}-text">
+                                {% if btc_dom_level == 0 %}{{ _('BTC Undervalued') }}{% elif btc_dom_level == 1 %}{{
+                                _('Low Dominance') }}{%
+                                elif btc_dom_level == 4 %}{{ _('BTC Overvalued') }}{% elif btc_dom_level == 3 %}{{
+                                _('High Dominance') }}{%
+                                else %}{{ _('Normal Range') }}{% endif %}
+                            </div>
+                            <p class="indicator-explanation">
+                                {{ _('BTC market cap as % of total crypto market. Historical range: 30-70%.') }}
+                                {% if btc_dom_level == 0 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Low dominance - altcoin season, BTC
+                                may be undervalued.') }}
+                                {% elif btc_dom_level == 1 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Below average dominance - altcoins
+                                outperforming.') }}
+                                {% elif btc_dom_level == 4 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('High dominance - BTC overvalued,
+                                altcoins may offer
+                                value.') }}
+                                {% elif btc_dom_level == 3 %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Above average dominance - BTC flight
+                                to quality.') }}
+                                {% else %}
+                                <strong>{{ _('Interpretation:') }}</strong> {{ _('Normal market balance between BTC and
+                                altcoins.') }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% else %}
+                        <div class="card-header level-error-header">
+                            <i class="bi bi-pie-chart me-2"></i>BTC Dominance
+                        </div>
+                        <div class="card-body">
+                            <div class="indicator-value level-error-text">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="indicator-zone level-error-text">Data Unavailable</div>
+                            <p class="indicator-explanation text-danger">
+                                {{ crypto_analysis.indicators.btc_dominance.error_message }}
+                            </p>
+                        </div>
+                        {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Crypto Market Overview Summary -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h5><i class="bi bi-lightning-charge-fill me-2"></i><strong>{{ _('Crypto Market Overview') }}</strong>
+                </h5>
+                <p class="mb-2">
+                    {{ _('Based on the 6 indicators above (Phase 2 enhanced), the crypto market analysis now includes:')
+                    }}
+                    <strong>{{ _('BTC/QQQ ratio') }}</strong> {{ _('(crypto vs tech stocks performance) and') }}
+                    <strong>{{ _('Crypto Fear & Greed Index') }}</strong> {{ _('(sentiment extremes for contrarian
+                    signals),') }}
+                    {{ _('in addition to volatility, relative value (BTC vs ETH), and market dominance metrics.') }}
+                </p>
+                <p class="mb-0">
+                    <i class="bi bi-arrow-right-circle me-1"></i>
+                    <strong>{{ _('For detailed BTC/ETH buy/sell recommendations and action items, visit the') }} <a
+                            href="action_compass.html" class="alert-link">{{ _('Action Compass') }}</a> {{ _('tab.')
+                        }}</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Information Box -->
+    <div class="row">
+        <div class="col-12">
+            <div class="thermometer-info-box">
+                <h5><i class="bi bi-info-circle me-2"></i>{{ _('About Market Thermometer') }}</h5>
+                <p class="mb-2">
+                    {{ _('The Market Thermometer provides a snapshot of current market conditions using complementary
+                    indicators:') }}
+                </p>
+                <ul class="mb-3">
+                    <li><strong>{{ _('Shiller P/E Ratio:') }}</strong> {{ _('Long-term valuation metric smoothing
+                        short-term earnings
+                        volatility') }}</li>
+                    <li><strong>{{ _('Fear & Greed Index:') }}</strong> {{ _('Real-time sentiment gauge (CNN - may be
+                        rate limited)') }}</li>
+                    <li><strong>VIX:</strong> {{ _('Market volatility expectations (inverse sentiment indicator)') }}
+                    </li>
+                    <li><strong>{{ _('Buffett Indicator:') }}</strong> {{ _('Macro valuation comparing market size to
+                        GDP by region') }}</li>
+                    <li><strong>{{ _('Gold Indicators:') }}</strong> {{ _('GVZ volatility, Gold/Silver ratio, S&P
+                        500/Gold ratio') }}</li>
+                    <li><strong>{{ _('Crypto Indicators (Phase 2 Enhanced):') }}</strong> {{ _('BTC/ETH volatility
+                        (30-day annualized),
+                        price ratio, BTC dominance, BTC/QQQ ratio (crypto vs tech stocks), Crypto Fear & Greed Index
+                        (sentiment extremes)') }}</li>
+                </ul>
+
+                <h6 class="mt-4 mb-2"><i class="bi bi-link-45deg me-1"></i><strong>{{ _('Data Sources & Manual
+                        Verification:') }}</strong></h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>{{ _('Market Indicators:') }}</strong></p>
+                        <ul class="small mb-2">
+                            <li><a href="https://www.multpl.com/shiller-pe" target="_blank" rel="noopener">{{ _('Shiller
+                                    P/E
+                                    (multpl.com)') }} <i class="bi bi-box-arrow-up-right"></i></a></li>
+                            <li><a href="https://www.cnn.com/markets/fear-and-greed" target="_blank" rel="noopener">{{
+                                    _('CNN
+                                    Fear & Greed Index') }} <i class="bi bi-box-arrow-up-right"></i></a></li>
+                            <li><a href="https://fred.stlouisfed.org/series/VIXCLS" target="_blank" rel="noopener">{{
+                                    _('VIX
+                                    (FRED)') }} <i class="bi bi-box-arrow-up-right"></i></a></li>
+                            <li><a href="https://www.gurufocus.com/stock-market-valuations.php" target="_blank"
+                                    rel="noopener">{{ _('Buffett Indicators (GuruFocus)') }} <i
+                                        class="bi bi-box-arrow-up-right"></i></a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>{{ _('Gold & Crypto Data:') }}</strong></p>
+                        <ul class="small mb-2">
+                            <li><a href="https://www.google.com/finance/quote/GVZ:INDEXCBOE" target="_blank"
+                                    rel="noopener">{{ _('GVZ Gold Volatility (Google Finance)') }} <i
+                                        class="bi bi-box-arrow-up-right"></i></a></li>
+                            <li><a href="https://finance.yahoo.com/quote/GC%3DF/" target="_blank" rel="noopener">{{
+                                    _('Gold
+                                    Price (Yahoo Finance)') }} <i class="bi bi-box-arrow-up-right"></i></a></li>
+                            <li><a href="https://finance.yahoo.com/quote/SI%3DF/" target="_blank" rel="noopener">{{
+                                    _('Silver
+                                    Price (Yahoo Finance)') }} <i class="bi bi-box-arrow-up-right"></i></a></li>
+                            <li><a href="https://www.coingecko.com/en/coins/bitcoin" target="_blank" rel="noopener">{{
+                                    _('Bitcoin Data (CoinGecko)') }} <i class="bi bi-box-arrow-up-right"></i></a>
+                            </li>
+                            <li><a href="https://www.coingecko.com/en/coins/ethereum" target="_blank" rel="noopener">{{
+                                    _('Ethereum Data (CoinGecko)') }} <i class="bi bi-box-arrow-up-right"></i></a></li>
+                            <li><a href="https://www.coingecko.com/en/global-charts" target="_blank" rel="noopener">{{
+                                    _('Crypto Market Cap & Dominance (CoinGecko)') }} <i
+                                        class="bi bi-box-arrow-up-right"></i></a></li>
+                            <li><a href="https://finance.yahoo.com/quote/QQQ/" target="_blank" rel="noopener">{{ _('QQQ
+                                    Nasdaq-100 ETF (Yahoo Finance)') }} <i class="bi bi-box-arrow-up-right"></i></a>
+                            </li>
+                            <li><a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank"
+                                    rel="noopener">{{ _('Crypto Fear & Greed Index (Alternative.me)') }} <i
+                                        class="bi bi-box-arrow-up-right"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p class="mb-0 text-muted mt-3">
+                    <i class="bi bi-lightbulb me-1"></i>
+                    <strong>{{ _('Investment Tip:') }}</strong> {{ _('Use these indicators as context, not timing
+                    signals.
+                    Markets can remain overvalued or undervalued for extended periods. Consider dollar-cost averaging in
+                    extreme zones.') }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Market Thermometer has no interactive charts, only static indicators -->
+{% endblock %}

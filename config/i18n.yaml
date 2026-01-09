@@ -1,0 +1,17 @@
+# Internationalization Settings
+i18n:
+  default_locale: "en"
+  supported_locales:
+    - "en"
+    - "zh"
+  
+  # Fallback chain: if translation missing, try next
+  fallback_chain:
+    zh: ["en"]
+    en: []
+  
+  # Domain mappings
+  domains:
+    messages: "General UI text"
+    reports: "Report-specific text"
+    taxonomy: "Asset classification terms"

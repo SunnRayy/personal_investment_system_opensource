@@ -1,0 +1,399 @@
+asset_identification_keywords:
+- Asset_Cash
+- Asset_Deposit
+- Asset_Invest
+- Asset_Fixed
+- 投资资产
+- 固定资产
+- RMB
+- 美元
+- 存款
+- 现金
+- Private_Equity_Investment_A
+- 股票
+- 基金
+- 理财
+- 黄金
+- 保险
+- 房产
+top_level_classes:
+- 股票
+- 固定收益
+- 房地产
+- 商品
+- 现金
+- 另类投资
+- 保险
+sub_classes:
+  股票:
+  - CN Equity
+  - HK ETF
+  - US Equity
+  - 新兴市场股票
+  固定收益:
+  - 国内政府债券
+  - 美国政府债券
+  - 企业债券
+  - 货币市场
+  - 银行理财
+  房地产:
+  - 住宅地产
+  - 商业地产
+  - 房地产信托
+  商品:
+  - 黄金
+  - 其他贵金属
+  - 能源
+  - 农产品
+  现金:
+  - 现金
+  - 活期存款
+  - 定期存款
+  另类投资:
+  - 创业投资
+  - 加密货币
+  - 风险投资
+  保险:
+  - Insurance Products
+special_categories: []
+non_rebalanceable_classes:
+- 房地产
+- 保险
+non_rebalanceable_sub_classes:
+- Insurance Products
+risk_profiles:
+  保守型:
+    股票: 0.2
+    固定收益: 0.5
+    房地产: 0.1
+    商品: 0.05
+    现金: 0.15
+    另类投资: 0.0
+  均衡型:
+    股票: 0.4
+    固定收益: 0.3
+    房地产: 0.1
+    商品: 0.1
+    现金: 0.05
+    另类投资: 0.05
+  成长型:
+    股票: 0.75
+    固定收益: 0.1
+    商品: 0.05
+    另类投资: 0.05
+    房地产: 0.0
+    现金: 0.05
+    保险: 0.0
+  进取型:
+    股票: 0.85
+    固定收益: 0.0
+    房地产: 0.0
+    商品: 0.05
+    现金: 0.0
+    另类投资: 0.1
+    保险: 0.0
+sub_category_weights:
+  股票:
+    CN Equity: 0.5
+    HK ETF: 0.1
+    US Equity: 0.4
+    新兴市场股票: 0.0
+  固定收益:
+    美国政府债券: 0.9
+    国内政府债券: 0.1
+    企业债券: 0.0
+    货币市场: 0.0
+    银行理财: 0.0
+  房地产:
+    住宅地产: 1.0
+    商业地产: 0.0
+    房地产信托: 0.0
+  商品:
+    黄金: 1.0
+    其他贵金属: 0.0
+    能源: 0.0
+    农产品: 0.0
+  现金:
+    现金: 0.9
+    活期存款: 0.1
+    定期存款: 0.0
+  另类投资:
+    加密货币: 1.0
+    创业投资: 0.0
+    风险投资: 0.0
+default_expectations:
+  CN Equity:
+    return: 0.09
+    risk: 0.2
+  HK ETF:
+    return: 0.08
+    risk: 0.22
+  US Equity:
+    return: 0.08
+    risk: 0.20
+  新兴市场股票:
+    return: 0.1
+    risk: 0.25
+  国内政府债券:
+    return: 0.03
+    risk: 0.05
+  美国政府债券:
+    return: 0.04
+    risk: 0.07
+  企业债券:
+    return: 0.045
+    risk: 0.08
+  高收益债券:
+    return: 0.06
+    risk: 0.12
+  货币市场:
+    return: 0.025
+    risk: 0.02
+  银行理财:
+    return: 0.035
+    risk: 0.05
+  住宅地产:
+    return: 0.06
+    risk: 0.15
+  商业地产:
+    return: 0.07
+    risk: 0.16
+  房地产信托:
+    return: 0.07
+    risk: 0.17
+  黄金:
+    return: 0.04
+    risk: 0.15
+  其他贵金属:
+    return: 0.05
+    risk: 0.2
+  能源:
+    return: 0.07
+    risk: 0.25
+  农产品:
+    return: 0.05
+    risk: 0.18
+  现金:
+    return: 0.01
+    risk: 0.01
+  活期存款:
+    return: 0.02
+    risk: 0.01
+  定期存款:
+    return: 0.03
+    risk: 0.015
+  创业投资:
+    return: 0.12
+    risk: 0.3
+  加密货币:
+    return: 0.15
+    risk: 0.5
+  风险投资:
+    return: 0.15
+    risk: 0.35
+asset_mapping:
+  # Demo Data Mappings
+  Asset_Invest_FundA_Value: CN Equity
+  Asset_Invest_USFund_Value_USD: US Equity
+  Asset_Invest_USFund_Value_CNY: US Equity
+  Asset_Invest_RSU_Value_USD: US Equity
+  Asset_Invest_RSU_Value_CNY: US Equity
+  Cash_CNY: 现金
+  Bank_Account_A: 现金
+  Paper_Gold: 黄金
+  Property_Residential_A: 住宅地产
+  FBTC: 加密货币
+  ETHA: 加密货币
+  Employer_Stock_A: US Equity
+  
+  # ETF Mappings for Demo
+  VOO: US Equity
+  VTI: US Equity
+  QQQ: US Equity
+  SPY: US Equity
+  AAPL: US Equity
+  MSFT: US Equity
+  GOOGL: US Equity
+  META: US Equity
+  NVDA: US Equity
+  BND: 美国政府债券
+  AGG: 美国政府债券
+  VCSH: 企业债券
+  VCIT: 企业债券
+  HYG: 高收益债券
+  SHV: 货币市场
+  GLD: 黄金
+  VNQ: 房地产信托
+  VEA: US Equity
+  IEMG: 新兴市场股票
+  
+  # Generic Category Mappings
+  International ETF: US Equity
+  Emerging Markets ETF: 新兴市场股票
+  REIT: 房地产信托
+  US Stock ETF: US Equity
+  Bond ETF: 美国政府债券
+  Gold ETF: 黄金
+  Bitcoin ETF: 加密货币
+  Insurance Products: Insurance Products
+  Life Insurance: Insurance Products
+  Health Insurance: Insurance Products
+  Real Estate: 住宅地产
+  RSU: US Equity
+
+raw_type_mapping:
+  US Securities: US Equity
+  CN Funds: CN Equity
+  Stock: CN Equity
+  Bond: 固定收益
+  ETF: CN Equity
+  Mutual Fund: CN Equity
+  US Bond ETF: 美国政府债券
+  US Government Bonds: 美国政府债券
+  Crypto ETF: 加密货币
+  
+pattern_mapping:
+  股票: CN Equity
+  混合: CN Equity
+  指数: CN Equity
+  ETF联接: CN Equity
+  沪深300: CN Equity
+  上证50: CN Equity
+  中证500: CN Equity
+  红利: CN Equity
+  QDII: US Equity
+  纳斯达克: US Equity
+  标普500: US Equity
+  债券: 企业债券
+  货币: 货币市场
+  RSU: US Equity
+  Employer: US Equity
+  理财: 银行理财
+  黄金: 黄金
+  现金: 现金
+  Cash: 现金
+  Deposit: 现金
+  房产: 住宅地产
+  Property: 住宅地产
+  保险: 保险
+  Ins_: 保险
+  VOO|SPY|VTI|QQQ|IVV: US Equity
+  VB|IJR|IWM: US Equity
+  VEA|EFA|IEFA: US Equity
+  VWO|EEM|IEMG: 新兴市场股票
+  BND|AGG|GOVT|IEF|SHY|SHV: 美国政府债券
+  LQD|VCIT|VCSH: 企业债券
+  JNK|HYG: 高收益债券
+  BIL|SGOV: 货币市场
+  GLD|IAU: 黄金
+  VNQ|IYR: 房地产信托
+  BTC|ETH|COIN: 加密货币
+
+benchmark_mapping:
+  CN Equity: Global_Equity
+  港股ETF: Global_Equity
+  US Equity: Global_Equity
+  新兴市场股票: Global_Equity
+  国内政府债券: Global_Bonds
+  美国政府债券: Global_Bonds
+  企业债券: Global_Bonds
+  高收益债券: Global_Bonds
+  货币市场: Global_Bonds
+  银行理财: Global_Bonds
+  住宅地产: Real_Estate
+  商业地产: Real_Estate
+  房地产信托: Real_Estate
+  黄金: Commodities
+  其他贵金属: Commodities
+  能源: Commodities
+  农产品: Commodities
+  现金: Cash
+  活期存款: Cash
+  定期存款: Cash
+  创业投资: Global_Equity
+  加密货币: Alternative
+  风险投资: Global_Equity
+
+benchmark_categories:
+- Global_Equity
+- Global_Bonds
+- Real_Estate
+- Commodities
+- Alternative
+- Cash
+
+# ============================================================
+# ASSET TIER CLASSIFICATION SYSTEM
+# Strategic categorization for portfolio construction
+# ============================================================
+
+asset_tiers:
+  tier_1_core:
+    name: "第一梯队 (底仓/价值型)"
+    description: "高夏普比率，长期持有。纳指100、标普500、VYM、SPMO、黄金"
+    color: "blue"
+  tier_2_diversification:
+    name: "第二梯队 (辅助/分散)"
+    description: "分散风险。红利低波、中证红利、白银、日经225"
+    color: "green"
+  tier_3_trading:
+    name: "第三梯队 (交易/择时)"
+    description: "长期性价比低，需低吸高抛。A股宽基、中概互联"
+    color: "orange"
+
+# Asset-to-tier mapping
+asset_tier_mapping:
+  # === Tier 1: Core/Value (底仓/价值型) ===
+  QQQ: tier_1_core
+  VOO: tier_1_core
+  VTI: tier_1_core
+  SPY: tier_1_core
+  Employer_Stock_A: tier_1_core
+  BND: tier_1_core
+  AGG: tier_1_core
+  
+  # === Tier 2: Diversification (辅助/分散) ===
+  GLD: tier_2_diversification
+  Paper_Gold: tier_2_diversification
+  VNQ: tier_2_diversification
+  FBTC: tier_2_diversification
+  
+  # === Tier 3: Trading (交易/择时) ===
+  # (Empty for demo, relies on generic rules if needed)
+
+# Regex/Substring matching rules for Asset Tier
+asset_tier_mapping_rules:
+  # Tier 1 keywords
+  - pattern: "S&P 500|标普500"
+    tier: tier_1_core
+  - pattern: "Nasdaq|纳斯达克"
+    tier: tier_1_core
+  - pattern: "MSCI World|Developed Markets|Global|World|International"
+    tier: tier_1_core
+  - pattern: "Vanguard|Total Stock|Broad Market|Equity|Index Fund|ETF"
+    tier: tier_1_core
+  - pattern: "Treasury|Bond|国债|债券" # Broad bond matching
+    tier: tier_1_core
+  
+  # Tier 2 keywords
+  - pattern: "Dividend|红利"
+    tier: tier_2_diversification
+  - pattern: "Gold|黄金"
+    tier: tier_2_diversification
+  - pattern: "Real Estate|REIT|房地产"
+    tier: tier_2_diversification
+  - pattern: "Bitcoin|BTC|Ethereum|ETH|Crypto"
+    tier: tier_2_diversification
+  
+  # Tier 3 keywords
+  - pattern: "CSI 300|沪深300"
+    tier: tier_3_trading
+  - pattern: "CSI 500|中证500"
+    tier: tier_3_trading
+  - pattern: "Sector|Theme|行业|主题"
+    tier: tier_3_trading
+
+tier_target_allocations:
+  tier_1_core: 0.50
+  tier_2_diversification: 0.35
+  tier_3_trading: 0.15

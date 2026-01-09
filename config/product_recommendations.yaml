@@ -1,0 +1,283 @@
+# Product Recommendations Configuration
+# Maps asset classes to specific product recommendations with execution details
+
+# Fixed Income Products
+fixed_income:
+  existing_products:
+    - name: "招商双债增强债券(LOF)C"
+      code: "161128"
+      type: "混合债券基金"
+      yield_estimate: "4-6%"
+      risk_level: "中低风险"
+      liquidity: "T+1赎回"
+      min_investment: "¥100"
+      rationale: "双债配置（国债+信用债），增强收益策略，适合稳健投资"
+      current_allocation: true
+      
+    - name: "BND (Vanguard Total Bond Market ETF)"
+      ticker: "BND"
+      type: "美国债券ETF"
+      yield_estimate: "3.5-4.5%"
+      risk_level: "低风险"
+      liquidity: "美股交易时间实时"
+      min_investment: "$1股"
+      rationale: "美国投资级债券市场指数基金，分散化程度高，费率低廉"
+      current_allocation: true
+      
+  new_suggestions:
+    - name: "国泰上证5年期国债ETF"
+      code: "511010"
+      type: "国债ETF"
+      yield_estimate: "2.5-3.5%"
+      risk_level: "极低风险"
+      liquidity: "场内交易实时"
+      min_investment: "¥100"
+      rationale: "国债零风险，ETF场内交易灵活，5年期久期适中"
+      priority: "high"
+      execution_steps:
+        - "开通场内基金交易权限（如已有股票账户则已开通）"
+        - "在交易软件搜索代码511010"
+        - "以市价单买入，建议分批建仓"
+        
+    - name: "招商银行理财产品（稳健型）"
+      type: "银行理财"
+      yield_estimate: "3.5-4.5%"
+      risk_level: "低风险"
+      liquidity: "定期产品，到期赎回"
+      min_investment: "¥10,000"
+      rationale: "银行理财破刚兑后收益率有吸引力，招行信用评级高"
+      priority: "medium"
+      execution_steps:
+        - "登录招商银行App"
+        - "选择'理财'-'稳健型'筛选"
+        - "关注90天-180天期限产品，收益率3.5%以上"
+        - "投资前仔细阅读产品说明书，确认风险等级"
+
+# Commodities Products
+commodities:
+  existing_products:
+    - name: "纸黄金"
+      code: "Paper_Gold"
+      type: "银行贵金属账户"
+      yield_estimate: "跟随金价波动"
+      risk_level: "中风险"
+      liquidity: "实时交易"
+      min_investment: "¥1克"
+      rationale: "无杠杆黄金投资，对冲通胀和货币贬值风险"
+      current_allocation: true
+      
+  new_suggestions:
+    - name: "华安黄金ETF"
+      code: "518880"
+      type: "黄金ETF"
+      yield_estimate: "跟随金价"
+      risk_level: "中风险"
+      liquidity: "场内交易实时"
+      min_investment: "¥100"
+      rationale: "跟踪上海黄金交易所金价，费率低，交易灵活"
+      priority: "high"
+      execution_steps:
+        - "在股票账户搜索518880"
+        - "市价买入，建议金价回调时分批建仓"
+        - "可通过场内T+0回转交易套利（需有底仓）"
+        
+    - name: "博时黄金ETF联接C"
+      code: "002611"
+      type: "黄金ETF联接基金"
+      yield_estimate: "跟随金价"
+      risk_level: "中风险"
+      liquidity: "T+1赎回"
+      min_investment: "¥10"
+      rationale: "场外申购便捷，适合定投，免申购费"
+      priority: "medium"
+      execution_steps:
+        - "支付宝/天天基金搜索002611"
+        - "设置定投计划（如每月1号投入¥1000）"
+        - "长期持有对冲通胀"
+
+# Equity Products
+equities:
+  us_equity:
+    existing_products:
+      - name: "QQQ (Invesco QQQ Trust)"
+        ticker: "QQQ"
+        type: "纳斯达克100ETF"
+        yield_estimate: "10-15%年化（长期）"
+        risk_level: "中高风险"
+        liquidity: "美股交易时间实时"
+        min_investment: "$1股"
+        rationale: "科技股集中配置，涵盖苹果、微软、英伟达等龙头"
+        current_allocation: true
+        
+      - name: "VOO (Vanguard S&P 500 ETF)"
+        ticker: "VOO"
+        type: "标普500ETF"
+        yield_estimate: "8-12%年化（长期）"
+        risk_level: "中风险"
+        liquidity: "美股交易时间实时"
+        min_investment: "$1股"
+        rationale: "美国大盘股指数，分散化配置，费率极低0.03%"
+        current_allocation: true
+        
+    new_suggestions:
+      - name: "SCHD (Schwab US Dividend Equity ETF)"
+        ticker: "SCHD"
+        type: "美国高股息ETF"
+        yield_estimate: "3-4%股息+5-8%资本增值"
+        risk_level: "中低风险"
+        liquidity: "美股交易时间实时"
+        min_investment: "$1股"
+        rationale: "高质量股息股，连续增长股息10年以上，防御性强"
+        priority: "high"
+        execution_steps:
+          - "Schwab账户搜索SCHD"
+          - "市价单买入，适合长期持有"
+          - "季度分红自动再投资"
+          
+  china_equity:
+    existing_products:
+      - name: "易方达恒生科技ETF联接A"
+        code: "013308"
+        type: "港股科技指数基金"
+        yield_estimate: "高波动，长期看好"
+        risk_level: "高风险"
+        liquidity: "T+1赎回"
+        min_investment: "¥10"
+        rationale: "投资港股科技龙头（腾讯、阿里、美团），估值修复潜力"
+        current_allocation: true
+        
+      - name: "广发纳斯达克100指数A"
+        code: "270042"
+        type: "QDII指数基金"
+        yield_estimate: "跟随纳斯达克100"
+        risk_level: "中高风险"
+        liquidity: "T+1赎回"
+        min_investment: "¥10"
+        rationale: "场外申购美股科技指数，无需美股账户"
+        current_allocation: true
+        
+    new_suggestions:
+      - name: "沪深300ETF（华泰柏瑞）"
+        code: "510300"
+        type: "A股宽基ETF"
+        yield_estimate: "跟随A股大盘"
+        risk_level: "中高风险"
+        liquidity: "场内交易实时"
+        min_investment: "¥100"
+        rationale: "A股核心资产配置，覆盖各行业龙头，费率低"
+        priority: "high"
+        execution_steps:
+          - "股票账户搜索510300"
+          - "分批建仓，适合定投"
+          - "可设置网格交易策略，低买高卖"
+          
+      - name: "易方达中证500ETF"
+        code: "510580"
+        type: "A股中盘指数ETF"
+        yield_estimate: "高波动，成长性强"
+        risk_level: "高风险"
+        liquidity: "场内交易实时"
+        min_investment: "¥100"
+        rationale: "中证500代表中小盘成长股，与沪深300互补"
+        priority: "medium"
+        execution_steps:
+          - "股票账户搜索510580"
+          - "占比控制在10-15%，波动大"
+          - "估值低位可加仓，高位减仓"
+
+# Alternative Investments
+alternative:
+  existing_products:
+    - name: "Employer_Stock_A"
+      ticker: "EMPLOYER_TICKER"  # Replace with your employer's stock ticker
+      type: "员工股票期权"
+      yield_estimate: "取决于公司股价表现"
+      risk_level: "高风险（单一股票）"
+      liquidity: "Vest后可随时卖出"
+      rationale: "员工激励计划，关注归属时间和卖出时机"
+      current_allocation: true
+      
+    - name: "FBTC (Fidelity Wise Origin Bitcoin Fund)"
+      ticker: "FBTC"
+      type: "比特币现货ETF"
+      yield_estimate: "高波动"
+      risk_level: "极高风险"
+      liquidity: "美股交易时间实时"
+      min_investment: "$1股"
+      rationale: "比特币敞口，波动剧烈，小比例配置（<5%）"
+      current_allocation: true
+      
+  new_suggestions:
+    - name: "REITs (房地产信托基金)"
+      example_ticker: "VNQ"
+      type: "REITs ETF"
+      yield_estimate: "3-5%分红+资本增值"
+      risk_level: "中风险"
+      liquidity: "美股交易时间实时"
+      min_investment: "$1股"
+      rationale: "房地产敞口，不直接持有物业，流动性强，高分红"
+      priority: "medium"
+      execution_steps:
+        - "Schwab账户搜索VNQ（Vanguard REITs ETF）"
+        - "占比控制在5-10%"
+        - "适合作为另类投资分散化配置"
+
+# Allocation Strategy Guidelines
+allocation_strategy:
+  # When total allocation is small (<¥50,000)
+  small_allocation:
+    principle: "集中配置，优先高流动性"
+    suggestions:
+      - "单一产品即可，选择费率低、流动性好的ETF"
+      - "避免分散到多个产品导致管理复杂"
+    examples:
+      - "¥30,000固定收益 → 全部买入BND或国债ETF"
+      
+  # When allocation is medium (¥50,000-¥200,000)
+  medium_allocation:
+    principle: "适度分散，2-3个产品"
+    suggestions:
+      - "60%核心产品（低费率指数基金）+ 40%卫星产品（增强收益）"
+      - "场内+场外结合，兼顾流动性和收益"
+    examples:
+      - "¥100,000固定收益 → ¥60,000国债ETF + ¥40,000招行理财"
+      
+  # When allocation is large (>¥200,000)
+  large_allocation:
+    principle: "充分分散，3-5个产品"
+    suggestions:
+      - "核心-卫星策略：70%核心（被动指数）+ 30%卫星（主动增强）"
+      - "多维度分散：久期、信用、地区"
+    examples:
+      - "¥300,000固定收益 → ¥150,000国债ETF + ¥100,000招行理财 + ¥50,000高股息ETF"
+
+# Execution Priority
+execution_priority:
+  immediate:  # 优先执行（1周内）
+    - "高流动性产品：ETF、场内基金"
+    - "已有账户可直接操作的产品"
+    
+  short_term:  # 短期执行（1-4周）
+    - "需开户或审核的产品：银行理财、定期产品"
+    - "需分批建仓的产品：定投计划"
+    
+  long_term:  # 长期规划（1-3个月）
+    - "需开通新账户：如REITs需美股账户"
+    - "需学习了解的新品种：另类投资"
+
+# Risk Warnings
+risk_warnings:
+  general:
+    - "产品过往业绩不代表未来表现"
+    - "投资需谨慎，风险自负"
+    - "建议根据个人风险承受能力选择产品"
+    
+  specific:
+    high_risk_products:
+      - "单一股票（Employer_Stock_A）：建议及时分散"
+      - "加密货币ETF（FBTC）：波动极大，小比例配置"
+      - "港股科技（013308）：估值波动剧烈，长期投资"
+      
+    liquidity_risk:
+      - "定期理财产品：到期前不可赎回"
+      - "QDII基金：额度限制，赎回可能延迟"

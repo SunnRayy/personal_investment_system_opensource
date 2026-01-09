@@ -1,0 +1,91 @@
+Date,Action,Symbol,Description,Quantity,Price,Fees & Comm,Amount
+01/14/2024,Buy,VEA,Vanguard Developed Markets ETF,34.0,$49.85,$0.85,-$1694.82
+01/22/2024,Buy,VTI,Vanguard Total Stock Market ETF,36.0,$229.11,$4.12,-$8247.88
+01/23/2024,Buy,FBTC,Fidelity Wise Origin Bitcoin Fund,17.0,$41.61,$0.35,-$707.38
+01/24/2024,Buy,IEMG,iShares Emerging Markets ETF,26.0,$56.02,$0.73,-$1456.58
+01/26/2024,Buy,QQQ,Invesco QQQ Trust,26.0,$375.06,$4.88,-$9751.51
+01/29/2024,Buy,GLD,SPDR Gold Shares,21.0,$156.71,$1.65,-$3290.85
+01/29/2024,Buy,AGG,iShares Core US Aggregate Bond ETF,22.0,$97.49,$1.07,-$2144.89
+02/01/2024,Buy,VOO,Vanguard S&P 500 ETF,37.0,$408.75,$7.56,-$15123.62
+02/02/2024,Buy,BND,Vanguard Total Bond Market ETF,21.0,$73.33,$0.77,-$1539.93
+02/02/2024,Buy,VNQ,Vanguard Real Estate ETF,28.0,$86.85,$1.22,-$2431.89
+02/22/2024,Buy,GLD,SPDR Gold Shares,5.0,$145.92,$0.36,-$729.62
+02/28/2024,Buy,FBTC,Fidelity Wise Origin Bitcoin Fund,5.0,$45.09,$0.11,-$225.44
+03/05/2024,Sell,IEMG,iShares Emerging Markets ETF,9.0,$51.33,$0.23,$461.96
+03/08/2024,Qualified Dividend,VNQ,Vanguard Real Estate ETF,0.9546,$89.04,,$85.00
+03/31/2024,Qualified Dividend,IEMG,iShares Emerging Markets ETF,1.6943,$51.15,,$86.66
+04/01/2024,Buy,BND,Vanguard Total Bond Market ETF,6.0,$76.20,$0.23,-$457.19
+04/02/2024,Buy,QQQ,Invesco QQQ Trust,11.0,$443.60,$2.44,-$4879.65
+04/03/2024,Buy,GLD,SPDR Gold Shares,14.0,$133.03,$0.93,-$1862.42
+04/14/2024,Sell,AGG,iShares Core US Aggregate Bond ETF,5.0,$97.58,$0.24,$487.91
+04/21/2024,Buy,VOO,Vanguard S&P 500 ETF,8.0,$355.37,$1.42,-$2842.92
+05/06/2024,Qualified Dividend,IEMG,iShares Emerging Markets ETF,1.1097,$43.38,,$48.14
+06/04/2024,Qualified Dividend,QQQ,Invesco QQQ Trust,0.7702,$361.72,,$278.59
+07/13/2024,Buy,VEA,Vanguard Developed Markets ETF,9.0,$57.43,$0.26,-$516.83
+08/03/2024,Buy,GLD,SPDR Gold Shares,5.0,$154.83,$0.39,-$774.13
+08/05/2024,Sell,VNQ,Vanguard Real Estate ETF,6.0,$92.79,$0.28,$556.71
+08/15/2024,Buy,VEA,Vanguard Developed Markets ETF,10.0,$51.46,$0.26,-$514.58
+08/21/2024,Buy,VTI,Vanguard Total Stock Market ETF,9.0,$374.38,$1.68,-$3369.45
+08/23/2024,Buy,BND,Vanguard Total Bond Market ETF,10.0,$68.26,$0.34,-$682.60
+08/24/2024,Buy,IEMG,iShares Emerging Markets ETF,7.0,$41.20,$0.14,-$288.39
+08/30/2024,Reinvest Dividend,VOO,Vanguard S&P 500 ETF,4.3854,$428.70,,$1880.00
+09/11/2024,Buy,VNQ,Vanguard Real Estate ETF,13.0,$85.99,$0.56,-$1117.85
+09/11/2024,Reinvest Dividend,IEMG,iShares Emerging Markets ETF,3.5706,$34.23,,$122.22
+09/12/2024,Reinvest Dividend,BND,Vanguard Total Bond Market ETF,5.4034,$67.28,,$363.55
+09/21/2024,Reinvest Dividend,AGG,iShares Core US Aggregate Bond ETF,5.0621,$97.96,,$495.91
+09/29/2024,Sell,FBTC,Fidelity Wise Origin Bitcoin Fund,3.0,$18.30,$0.03,$54.91
+10/04/2024,Reinvest Dividend,IEMG,iShares Emerging Markets ETF,8.2506,$32.62,,$269.14
+10/23/2024,Sell,VTI,Vanguard Total Stock Market ETF,8.0,$431.14,$1.72,$3449.12
+10/27/2024,Buy,BND,Vanguard Total Bond Market ETF,11.0,$69.20,$0.38,-$761.22
+11/08/2024,Qualified Dividend,BND,Vanguard Total Bond Market ETF,2.5768,$69.10,,$178.05
+11/11/2024,Buy,IEMG,iShares Emerging Markets ETF,6.0,$35.50,$0.11,-$212.99
+11/18/2024,Qualified Dividend,QQQ,Invesco QQQ Trust,1.5897,$724.41,,$1151.60
+11/25/2024,Sell,VNQ,Vanguard Real Estate ETF,5.0,$63.92,$0.16,$319.59
+11/26/2024,Buy,VEA,Vanguard Developed Markets ETF,8.0,$57.45,$0.23,-$459.59
+11/29/2024,Reinvest Dividend,IEMG,iShares Emerging Markets ETF,6.5403,$36.88,,$241.18
+12/15/2024,Qualified Dividend,VTI,Vanguard Total Stock Market ETF,0.7961,$461.99,,$367.79
+12/15/2024,Qualified Dividend,AGG,iShares Core US Aggregate Bond ETF,1.7512,$101.01,,$176.89
+01/01/2025,Qualified Dividend,VTI,Vanguard Total Stock Market ETF,1.3245,$486.94,,$644.95
+02/02/2025,Reinvest Dividend,IEMG,iShares Emerging Markets ETF,10.5345,$41.63,,$438.53
+02/21/2025,Sell,VTI,Vanguard Total Stock Market ETF,5.0,$596.12,$1.49,$2980.59
+02/26/2025,Qualified Dividend,AGG,iShares Core US Aggregate Bond ETF,0.9958,$97.71,,$97.30
+03/02/2025,Reinvest Dividend,IEMG,iShares Emerging Markets ETF,10.3192,$42.74,,$441.00
+03/28/2025,Reinvest Dividend,QQQ,Invesco QQQ Trust,11.1954,$591.76,,$6624.97
+04/09/2025,Sell,FBTC,Fidelity Wise Origin Bitcoin Fund,7.0,$35.65,$0.12,$249.55
+04/12/2025,Reinvest Dividend,GLD,SPDR Gold Shares,7.4613,$171.57,,$1280.15
+04/13/2025,Qualified Dividend,AGG,iShares Core US Aggregate Bond ETF,1.9602,$94.67,,$185.58
+04/13/2025,Buy,VNQ,Vanguard Real Estate ETF,15.0,$69.71,$0.52,-$1045.72
+04/18/2025,Buy,GLD,SPDR Gold Shares,12.0,$168.12,$1.01,-$2017.46
+04/25/2025,Reinvest Dividend,BND,Vanguard Total Bond Market ETF,2.2586,$67.89,,$153.33
+05/14/2025,Sell,FBTC,Fidelity Wise Origin Bitcoin Fund,3.0,$29.23,$0.04,$87.70
+05/25/2025,Buy,QQQ,Invesco QQQ Trust,9.0,$609.49,$2.74,-$5485.39
+05/28/2025,Reinvest Dividend,FBTC,Fidelity Wise Origin Bitcoin Fund,5.7899,$28.03,,$162.30
+06/06/2025,Sell,VTI,Vanguard Total Stock Market ETF,5.0,$635.41,$1.59,$3177.05
+06/17/2025,Buy,VNQ,Vanguard Real Estate ETF,12.0,$68.03,$0.41,-$816.35
+06/19/2025,Buy,VOO,Vanguard S&P 500 ETF,12.0,$439.49,$2.64,-$5273.88
+06/24/2025,Reinvest Dividend,VNQ,Vanguard Real Estate ETF,2.9305,$70.04,,$205.26
+06/25/2025,Sell,VTI,Vanguard Total Stock Market ETF,6.0,$620.23,$1.86,$3721.39
+06/27/2025,Buy,VNQ,Vanguard Real Estate ETF,5.0,$69.26,$0.17,-$346.28
+07/26/2025,Reinvest Dividend,IEMG,iShares Emerging Markets ETF,11.1962,$43.69,,$489.16
+07/27/2025,Sell,AGG,iShares Core US Aggregate Bond ETF,4.0,$97.85,$0.20,$391.42
+08/14/2025,Buy,VTI,Vanguard Total Stock Market ETF,7.0,$667.35,$2.34,-$4671.48
+08/16/2025,Buy,VNQ,Vanguard Real Estate ETF,7.0,$67.72,$0.24,-$474.02
+08/29/2025,Reinvest Dividend,VEA,Vanguard Developed Markets ETF,8.459,$70.89,,$599.69
+09/07/2025,Buy,VOO,Vanguard S&P 500 ETF,9.0,$441.32,$1.99,-$3971.92
+09/09/2025,Buy,VOO,Vanguard S&P 500 ETF,9.0,$421.79,$1.90,-$3796.10
+09/12/2025,Buy,IEMG,iShares Emerging Markets ETF,10.0,$42.25,$0.21,-$422.53
+09/25/2025,Sell,BND,Vanguard Total Bond Market ETF,7.0,$64.33,$0.23,$450.29
+10/02/2025,Buy,AGG,iShares Core US Aggregate Bond ETF,11.0,$99.64,$0.55,-$1096.06
+10/03/2025,Sell,GLD,SPDR Gold Shares,10.0,$146.77,$0.73,$1467.75
+10/06/2025,Buy,VEA,Vanguard Developed Markets ETF,13.0,$70.79,$0.46,-$920.27
+10/10/2025,Sell,IEMG,iShares Emerging Markets ETF,7.0,$45.71,$0.16,$319.99
+10/17/2025,Sell,VEA,Vanguard Developed Markets ETF,5.0,$72.42,$0.18,$362.11
+10/24/2025,Qualified Dividend,VTI,Vanguard Total Stock Market ETF,1.0195,$586.89,,$598.34
+11/06/2025,Buy,GLD,SPDR Gold Shares,9.0,$148.08,$0.67,-$1332.74
+11/19/2025,Reinvest Dividend,VNQ,Vanguard Real Estate ETF,6.3549,$57.67,,$366.50
+11/22/2025,Buy,VNQ,Vanguard Real Estate ETF,5.0,$54.42,$0.14,-$272.12
+12/02/2025,Qualified Dividend,QQQ,Invesco QQQ Trust,2.5666,$553.77,,$1421.31
+12/06/2025,Reinvest Dividend,VOO,Vanguard S&P 500 ETF,11.4961,$443.84,,$5102.46
+12/16/2025,Buy,VEA,Vanguard Developed Markets ETF,10.0,$63.61,$0.32,-$636.15
+12/27/2025,Sell,IEMG,iShares Emerging Markets ETF,8.0,$49.70,$0.20,$397.57
+01/08/2026,Reinvest Dividend,FBTC,Fidelity Wise Origin Bitcoin Fund,9.9623,$24.78,,$246.84

@@ -1,0 +1,480 @@
+{% extends "base.html" %}
+
+{% block title %}Annual Financial Report{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div
+    class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-b-lg shadow-lg text-white p-6 mb-8 -mt-8 mx-4 rounded-t-none">
+    <div class="container mx-auto flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold mb-2"><i class="fas fa-chart-pie mr-2"></i> Annual Financial Report</h1>
+            <p class="opacity-90">Full-year cash flow overview with allocation breakdown</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <select id="yearSelect"
+                class="bg-white/20 border border-white/30 text-white rounded-lg px-4 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-white/50">
+                <option value="2025" class="text-gray-800">2025</option>
+                <option value="2024" class="text-gray-800">2024</option>
+                <option value="2023" class="text-gray-800">2023</option>
+                <option value="2022" class="text-gray-800">2022</option>
+                <option value="2021" class="text-gray-800">2021</option>
+                <option value="2020" class="text-gray-800">2020</option>
+                <option value="2019" class="text-gray-800">2019</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container mx-auto px-4">
+    <!-- Section Title -->
+    <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-indigo-500 pb-2 mb-6">
+        <span id="yearTitle">2025</span> Annual Overview
+    </h2>
+
+    <!-- KPI Cards - Row 1: Core Cash Flow -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <!-- Income Card -->
+        <div
+            class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32 border-t-4 border-green-500 group relative">
+            <div class="text-2xl font-bold text-gray-800 mb-1" id="kpi-income">--</div>
+            <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Total Income</div>
+            <div class="text-sm mt-1" id="kpi-income-yoy">--</div>
+            <div
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                Sum of all income sources (Salary + RSU + Redemptions + Other)
+            </div>
+        </div>
+
+        <!-- Expense Card -->
+        <div
+            class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32 border-t-4 border-red-500 group relative">
+            <div class="text-2xl font-bold text-gray-800 mb-1" id="kpi-expense">--</div>
+            <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Total Expenses</div>
+            <div class="text-sm mt-1" id="kpi-expense-yoy">--</div>
+            <div
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                Sum of all expense categories (Living + Housing + Travel + etc)
+            </div>
+        </div>
+
+        <!-- Investment Card -->
+        <div
+            class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32 border-t-4 border-blue-500 group relative">
+            <div class="text-2xl font-bold text-gray-800 mb-1" id="kpi-invest">--</div>
+            <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Gross Investment</div>
+            <div class="text-sm mt-1" id="kpi-invest-yoy">--</div>
+            <div
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                Total invested (includes reinvestments from redemptions)
+            </div>
+        </div>
+
+        <!-- Net Savings Card -->
+        <div
+            class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32 border-t-4 border-yellow-500 group relative">
+            <div class="text-2xl font-bold text-gray-800 mb-1" id="kpi-savings">--</div>
+            <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Net Savings</div>
+            <div class="text-sm mt-1" id="kpi-savings-yoy">--</div>
+            <div
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                Income - Expense - Investment (cash remaining)
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Cards - Row 2: Rates & Growth -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <!-- Savings Rate -->
+        <div
+            class="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-28 border-l-4 border-green-500 group relative">
+            <div class="text-xl font-bold text-gray-800 mb-1" id="kpi-savings-rate">--</div>
+            <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Savings Rate</div>
+            <div class="text-xs mt-1" id="kpi-savings-rate-yoy">--</div>
+            <div
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                (Income - Expense) / Income × 100%
+            </div>
+        </div>
+
+        <!-- Investment Rate (Gross) -->
+        <div
+            class="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-28 border-l-4 border-blue-300 group relative">
+            <div class="text-xl font-bold text-gray-800 mb-1" id="kpi-invest-rate">--</div>
+            <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Invest Rate</div>
+            <div class="text-xs mt-1" id="kpi-invest-rate-yoy">--</div>
+            <div
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                Gross Investment / Income × 100%
+            </div>
+        </div>
+
+        <!-- Net New Investment Rate -->
+        <div
+            class="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-28 border-l-4 border-blue-600 group relative">
+            <div class="text-xl font-bold text-gray-800 mb-1" id="kpi-net-invest-rate">--</div>
+            <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Net Invest Rate</div>
+            <div class="text-xs mt-1" id="kpi-net-invest-rate-yoy">--</div>
+            <div
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                (Investment - Redemptions) / Income × 100%
+            </div>
+        </div>
+
+        <!-- Passive Income % -->
+        <div
+            class="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-28 border-l-4 border-purple-500 group relative">
+            <div class="text-xl font-bold text-gray-800 mb-1" id="kpi-passive-pct">--</div>
+            <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Passive Inc %</div>
+            <div class="text-xs mt-1" id="kpi-passive-yoy">--</div>
+            <div
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                (RSU + Dividends + Redemption + Other) / Income × 100%
+            </div>
+        </div>
+
+        <!-- Net Worth Growth -->
+        <div
+            class="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-28 border-l-4 border-teal-500 group relative">
+            <div class="text-xl font-bold text-gray-800 mb-1" id="kpi-nw-growth">--</div>
+            <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">NW Growth</div>
+            <div class="text-xs mt-1 text-gray-400" id="kpi-liquid-nw">Liquid: --</div>
+            <div
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                (NW_End - NW_Start) / NW_Start × 100%<br>Liquid excludes Property & Insurance
+            </div>
+        </div>
+
+        <!-- Market Gain -->
+        <div
+            class="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-28 border-l-4 border-orange-500 group relative">
+            <div class="text-xl font-bold text-gray-800 mb-1" id="kpi-invest-gain">--</div>
+            <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Market Gain</div>
+            <div class="text-xs mt-1 text-gray-400">Appreciation</div>
+            <div
+                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                NW Change - Net New Investment<br>(Pure market appreciation)
+            </div>
+        </div>
+    </div>
+
+    <!-- Sankey Chart Section -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-project-diagram mr-2 text-indigo-500"></i> Cash Flow Breakdown
+        </h3>
+        <div class="flex gap-4 text-xs text-gray-500 mb-4">
+            <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-green-500"></span> Income</div>
+            <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-500"></span> Expenses</div>
+            <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-500"></span> Investments</div>
+            <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-yellow-500"></span> Savings</div>
+        </div>
+        <div id="sankey_chart" class="h-96 md:h-[500px]"></div>
+    </div>
+
+    <!-- Stress Test & Liquidity Alerts -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <!-- Controls -->
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
+            <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-exclamation-triangle mr-2 text-orange-500"></i> Liquidity Stress Test
+            </h3>
+
+            <div class="space-y-8">
+                <!-- Income Shock -->
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <label class="text-sm font-medium text-gray-700">Income Shock</label>
+                        <span id="income-shock-val" class="text-sm font-bold text-red-600">0%</span>
+                    </div>
+                    <input type="range" id="income-shock-slider" min="-0.5" max="0" step="0.05" value="0"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-500">
+                    <p class="text-[10px] text-gray-400 mt-1">Simulate income reduction (e.g. unemployment, zero bonus)
+                    </p>
+                </div>
+
+                <!-- Expense Shock -->
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <label class="text-sm font-medium text-gray-700">Expense Shock</label>
+                        <span id="expense-shock-val" class="text-sm font-bold text-orange-600">0%</span>
+                    </div>
+                    <input type="range" id="expense-shock-slider" min="0" max="1" step="0.05" value="0"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-orange-500">
+                    <p class="text-[10px] text-gray-400 mt-1">Simulate expense increase (e.g. medical emergency,
+                        inflation)</p>
+                </div>
+
+                <div id="liquidity-alert-box" class="hidden p-4 rounded-lg bg-red-50 border border-red-200">
+                    <h4 class="text-red-800 font-bold text-sm mb-1"><i class="fas fa-radiation"></i> Liquidity Warning!
+                    </h4>
+                    <p class="text-red-700 text-xs">Simulated shocks result in negative net cash flow. Immediate
+                        liquidity buffer check recommended.</p>
+                </div>
+
+                <div id="liquidity-safe-box" class="p-4 rounded-lg bg-green-50 border border-green-200">
+                    <h4 class="text-green-800 font-bold text-sm mb-1"><i class="fas fa-shield-alt"></i> Resilience
+                        Confirmed</h4>
+                    <p class="text-green-700 text-xs">Portfolio remains cash-flow positive under current stress
+                        assumptions.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stress Chart -->
+        <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Stressed Forecast (Next 12 Months)</h3>
+            <div class="h-64 md:h-80">
+                <canvas id="stressChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+    google.charts.load('current', { 'packages': ['sankey'] });
+    google.charts.setOnLoadCallback(initPage);
+
+    let sankeyChart = null;
+    let stressChart = null;
+    let currentSankeyData = null;
+
+    function initPage() {
+        loadSankeyData();
+        loadStressData();
+
+        document.getElementById('yearSelect').addEventListener('change', loadSankeyData);
+
+        // Stress sliders
+        const incSlider = document.getElementById('income-shock-slider');
+        const expSlider = document.getElementById('expense-shock-slider');
+
+        incSlider.addEventListener('input', (e) => {
+            document.getElementById('income-shock-val').innerText = Math.round(e.target.value * 100) + '%';
+            debounce(loadStressData, 300)();
+        });
+
+        expSlider.addEventListener('input', (e) => {
+            document.getElementById('expense-shock-val').innerText = '+' + Math.round(e.target.value * 100) + '%';
+            debounce(loadStressData, 300)();
+        });
+    }
+
+    let timeout = null;
+    function debounce(func, delay) {
+        return function () {
+            clearTimeout(timeout);
+            timeout = setTimeout(func, delay);
+        };
+    }
+
+    async function loadSankeyData() {
+        const year = document.getElementById('yearSelect').value;
+        document.getElementById('yearTitle').textContent = year;
+
+        try {
+            const res = await fetch(`/reports/api/annual/sankey?year=${year}`);
+            if (!res.ok) throw new Error('Failed to load data');
+
+            const data = await res.json();
+            currentSankeyData = data;
+
+            updateKPIs(data.totals);
+            renderSankey(data.links);
+        } catch (e) {
+            console.error(e);
+            document.getElementById('sankey_chart').innerHTML =
+                `<div class="flex justify-center items-center h-full text-red-500">Error: ${e.message}</div>`;
+        }
+    }
+
+    async function loadStressData() {
+        const incShock = document.getElementById('income-shock-slider').value;
+        const expShock = document.getElementById('expense-shock-slider').value;
+
+        try {
+            const res = await fetch(`/reports/api/annual/stress?income_shock=${incShock}&expense_shock=${expShock}`);
+            const data = await res.json();
+
+            if (data.error) throw new Error(data.error);
+
+            updateStressUI(data);
+        } catch (e) {
+            console.error('Stress API error:', e);
+        }
+    }
+
+    function updateStressUI(data) {
+        const alertBox = document.getElementById('liquidity-alert-box');
+        const safeBox = document.getElementById('liquidity-safe-box');
+
+        if (data.has_liquidity_issue) {
+            alertBox.classList.remove('hidden');
+            safeBox.classList.add('hidden');
+        } else {
+            alertBox.classList.add('hidden');
+            safeBox.classList.remove('hidden');
+        }
+
+        renderStressChart(data);
+    }
+
+    function renderStressChart(data) {
+        const ctx = document.getElementById('stressChart').getContext('2d');
+        if (stressChart) stressChart.destroy();
+
+        stressChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.labels,
+                datasets: [
+                    {
+                        label: 'Stressed Income',
+                        data: data.income,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Stressed Expense',
+                        data: data.expense,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Net Cash Flow',
+                        data: data.net_cf,
+                        backgroundColor: data.net_cf.map(v => v < 0 ? 'rgba(239, 68, 68, 0.5)' : 'rgba(59, 130, 246, 0.5)'),
+                        borderColor: '#3b82f6',
+                        type: 'bar',
+                        order: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: v => '¥' + (v / 1000).toFixed(0) + 'K'
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return context.dataset.label + ': ¥' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function updateKPIs(t) {
+        if (!t) return;
+
+        const fmtMoney = (v) => '¥' + Math.round(v / 1000).toLocaleString() + 'K';
+        const fmtPct = (v) => v != null ? v.toFixed(1) + '%' : '--';
+
+        const colorYoY = (elId, yoy) => {
+            const el = document.getElementById(elId);
+            if (yoy == null) { el.textContent = '--'; return; }
+            const pct = (yoy * 100).toFixed(1);
+            const isUp = yoy >= 0;
+            el.innerHTML = `<span class="${isUp ? 'text-green-600' : 'text-red-600'}">${isUp ? '+' : ''}${pct}% YoY</span>`;
+        };
+
+        const colorPctYoY = (elId, yoyPts) => {
+            const el = document.getElementById(elId);
+            if (yoyPts == null) { el.textContent = '--'; return; }
+            const isUp = yoyPts >= 0;
+            el.innerHTML = `<span class="${isUp ? 'text-green-600' : 'text-red-600'}">${isUp ? '+' : ''}${yoyPts.toFixed(1)} pts</span>`;
+        };
+
+        // Row 1: Core Metrics
+        document.getElementById('kpi-income').textContent = fmtMoney(t.income.value);
+        colorYoY('kpi-income-yoy', t.income.yoy_pct);
+
+        document.getElementById('kpi-expense').textContent = fmtMoney(t.expense.value);
+        colorYoY('kpi-expense-yoy', t.expense.yoy_pct);
+
+        document.getElementById('kpi-invest').textContent = fmtMoney(t.investment.value);
+        colorYoY('kpi-invest-yoy', t.investment.yoy_pct);
+
+        document.getElementById('kpi-savings').textContent = fmtMoney(t.savings.value);
+        colorYoY('kpi-savings-yoy', t.savings.yoy_pct);
+
+        // Row 2: Rates & Growth
+        document.getElementById('kpi-savings-rate').textContent = fmtPct(t.savings_rate_pct);
+        colorPctYoY('kpi-savings-rate-yoy', t.savings_rate_pct_yoy);
+
+        document.getElementById('kpi-invest-rate').textContent = fmtPct(t.invest_rate_pct);
+        colorPctYoY('kpi-invest-rate-yoy', t.invest_rate_pct_yoy);
+
+        document.getElementById('kpi-net-invest-rate').textContent = fmtPct(t.net_new_invest_rate);
+        colorPctYoY('kpi-net-invest-rate-yoy', t.net_new_invest_rate_yoy);
+
+        document.getElementById('kpi-passive-pct').textContent = fmtPct(t.passive_income_pct);
+        colorPctYoY('kpi-passive-yoy', t.passive_income_pct_yoy);
+
+        document.getElementById('kpi-nw-growth').textContent = t.nw_growth_pct != null ? (t.nw_growth_pct >= 0 ? '+' : '') + t.nw_growth_pct.toFixed(1) + '%' : '--';
+        document.getElementById('kpi-liquid-nw').textContent = t.liquid_nw_growth_pct != null ? 'Liquid: ' + (t.liquid_nw_growth_pct >= 0 ? '+' : '') + t.liquid_nw_growth_pct.toFixed(1) + '%' : 'Liquid: --';
+
+        document.getElementById('kpi-invest-gain').textContent = t.invest_gain != null ? fmtMoney(t.invest_gain) : '--';
+    }
+
+    function renderSankey(links) {
+        if (!links || links.length === 0) {
+            document.getElementById('sankey_chart').innerHTML =
+                '<div class="flex justify-center items-center h-full text-gray-400">No data available</div>';
+            return;
+        }
+
+        const container = document.getElementById('sankey_chart');
+        container.innerHTML = '';
+
+        const data = new google.visualization.DataTable();
+        data.addColumn('string', 'From');
+        data.addColumn('string', 'To');
+        data.addColumn('number', 'Value');
+        data.addColumn({ type: 'string', role: 'tooltip' });
+        data.addRows(links);
+
+        const options = {
+            sankey: {
+                node: {
+                    label: { fontName: 'system-ui', fontSize: 12, bold: true, color: '#374151' },
+                    nodePadding: 25,
+                    width: 15,
+                    interactivity: true
+                },
+                link: {
+                    colorMode: 'gradient',
+                    fillOpacity: 0.5
+                }
+            }
+        };
+
+        sankeyChart = new google.visualization.Sankey(container);
+        sankeyChart.draw(data, options);
+    }
+
+    window.addEventListener('resize', () => {
+        if (sankeyChart && currentSankeyData) renderSankey(currentSankeyData.links);
+    });
+</script>
+{% endblock %}

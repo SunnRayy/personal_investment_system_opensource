@@ -1,0 +1,346 @@
+{% extends "base_template.html" %}
+
+{% block title %}{{ _('Investment Hub - Home') }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="container">
+        <h1><i class="bi bi-wallet2"></i> {{ _('Personal Investment Hub') }}</h1>
+        <p>{{ _('Your comprehensive financial overview and actionable insights') }}</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Portfolio Summary Card -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="card-title mb-0">
+                            <i class="bi bi-briefcase"></i> {{ _('Portfolio Summary') }}
+                        </h3>
+                        <small class="text-muted">
+                            <i class="bi bi-clock"></i> {{ _('Last Updated:') }} {{ generation_time }}
+                        </small>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 text-center mb-3 mb-md-0">
+                            <div class="kpi-value">¥{{ "{:,.0f}".format(total_value) }}</div>
+                            <div class="kpi-label">{{ _('Total Value') }}</div>
+                        </div>
+                        <div class="col-md-3 text-center mb-3 mb-md-0">
+                            <div class="kpi-value {% if overall_xirr > 0 %}positive{% else %}negative{% endif %}">
+                                {{ "{:.2f}".format(overall_xirr) }}%
+                            </div>
+                            <div class="kpi-label">{{ _('Overall XIRR') }}</div>
+                        </div>
+                        <div class="col-md-3 text-center mb-3 mb-md-0">
+                            <div class="kpi-value {% if last_month_change > 0 %}positive{% else %}negative{% endif %}">
+                                {{ "{:+.2f}".format(last_month_change) }}%
+                            </div>
+                            <div class="kpi-label">{{ _('Last Month') }}</div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="kpi-value">{{ num_holdings }}</div>
+                            <div class="kpi-label">{{ _('Holdings') }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Mini Allocation Chart -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5 class="text-center text-muted mb-3">{{ _('Asset Allocation Overview') }}</h5>
+                            <div style="max-width: 400px; margin: 0 auto;">
+                                <canvas id="miniAllocationChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Access Grid -->
+    <div class="row mb-5">
+        <div class="col-12 mb-4">
+            <h2 class="section-title">
+                <i class="bi bi-grid-3x3-gap"></i> {{ _('Report Navigator') }}
+            </h2>
+        </div>
+
+        <!-- Portfolio Report Card -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="report-nav-card">
+                <i class="bi bi-graph-up-arrow text-primary"></i>
+                <h3>{{ _('Portfolio & Performance') }}</h3>
+                <p>{{ _('View detailed holdings, historical performance, asset allocation, and comprehensive portfolio
+                    analytics') }}</p>
+                <div class="d-grid gap-2">
+                    <a href="portfolio_report.html" class="btn">
+                        <i class="bi bi-arrow-right-circle"></i> {{ _('View Report') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Market Thermometer Card -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="report-nav-card">
+                <i class="bi bi-thermometer-half text-warning"></i>
+                <h3>{{ _('Market Thermometer') }}</h3>
+                <p>{{ _('Check real-time market sentiment indicators, valuation metrics, and global market conditions')
+                    }}</p>
+                <div class="d-grid gap-2">
+                    <a href="market_thermometer.html" class="btn">
+                        <i class="bi bi-arrow-right-circle"></i> {{ _('View Report') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Compass Card -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="report-nav-card">
+                <i class="bi bi-compass text-success"></i>
+                <h3>{{ _('Action Compass') }}</h3>
+                <p>{{ _('Get personalized recommendations, rebalancing suggestions, and actionable investment tactics')
+                    }}</p>
+                <div class="d-grid gap-2">
+                    <a href="action_compass.html" class="btn">
+                        <i class="bi bi-arrow-right-circle"></i> {{ _('View Report') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h5 class="mb-2">
+                                <i class="bi bi-info-circle text-primary"></i> {{ _('System Status') }}
+                            </h5>
+                            <p class="mb-0 text-muted">
+                                {{ _('All reports are generated from your latest financial data.') }}
+                                {{ _('Data sources include balance sheets, transaction records, and market indicators.')
+                                }}
+                            </p>
+                        </div>
+                        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                            <div class="text-muted small">
+                                <i class="bi bi-check-circle text-success"></i> {{ _('Data Current') }}<br>
+                                <i class="bi bi-clock"></i> {{ _('Last Updated:') }} {{ generation_time }}<br>
+                                <i class="bi bi-server"></i> {{ _('Source: Financial Summary & Transaction Records')
+                                }}<br>
+                                {% if usd_cny_rate %}
+                                <i class="bi bi-currency-exchange"></i> USD/CNY: {{ "%.4f"|format(usd_cny_rate) }}<br>
+                                {% endif %}
+                                {% if amzn_price_usd %}
+                                <i class="bi bi-graph-up"></i> AMZN: ${{ "%.2f"|format(amzn_price_usd) }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Validation Report (Moved from individual report pages) -->
+    {% if validation_report %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="validation-panel"
+                style="padding: 20px; border-radius: 8px; background: {% if validation_report.overall_status == 'PASS' %}#d1f2d1{% elif validation_report.overall_status == 'WARN' %}#fff3cd{% else %}#f8d7da{% endif %};">
+                <div class="card-body">
+                    <h4 class="mb-3">
+                        <i class="bi bi-check-circle-fill"></i> {{ _('Data Validation Report') }}
+                    </h4>
+
+                    {% if validation_report.overall_status == 'PASS' %}
+                    <div class="alert alert-success" role="alert" style="margin-bottom: 15px;">
+                        ✅ {{ _('All %(total)s consistency checks passed', total=validation_report.summary.total_checks)
+                        }}
+                    </div>
+                    {% elif validation_report.overall_status == 'WARN' %}
+                    <div class="alert alert-warning" role="alert" style="margin-bottom: 15px;">
+                        ⚠️ {{ _('%(warnings)s warning(s) detected - Review recommended',
+                        warnings=validation_report.summary.warnings) }}
+                    </div>
+                    {% elif validation_report.overall_status == 'FAIL' %}
+                    <div class="alert alert-danger" role="alert" style="margin-bottom: 15px;">
+                        ❌ {{ _('%(failures)s critical issue(s) detected - Action required',
+                        failures=validation_report.summary.failures) }}
+                    </div>
+                    {% elif validation_report.overall_status == 'ERROR' %}
+                    <div class="alert alert-secondary" role="alert" style="margin-bottom: 15px;">
+                        ⚠️ {{ _('Validation system error:') }} {{ validation_report.error_message }}
+                    </div>
+                    {% endif %}
+
+                    <details style="margin-top: 10px;">
+                        <summary
+                            style="cursor: pointer; font-weight: 500; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 4px;">
+                            {{ _('View Validation Details') }}
+                        </summary>
+                        <div style="margin-top: 15px;">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>{{ _('Check') }}</th>
+                                        <th>{{ _('Status') }}</th>
+                                        <th>{{ _('Result') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for check in validation_report.checks %}
+                                    <tr
+                                        class="{% if check.status == 'PASS' %}table-success{% elif check.status == 'WARN' %}table-warning{% elif check.status == 'FAIL' %}table-danger{% else %}table-secondary{% endif %}">
+                                        <td>{{ check.check }}</td>
+                                        <td>
+                                            {% if check.status == 'PASS' %}
+                                            <span class="badge bg-success">{{ _('PASS') }}</span>
+                                            {% elif check.status == 'WARN' %}
+                                            <span class="badge bg-warning text-dark">{{ _('WARN') }}</span>
+                                            {% elif check.status == 'FAIL' %}
+                                            <span class="badge bg-danger">{{ _('FAIL') }}</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">{{ _('SKIP') }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ check.message }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+
+                    {% if checksums %}
+                    <details style="margin-top: 10px;">
+                        <summary
+                            style="cursor: pointer; font-weight: 500; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 4px;">
+                            {{ _('Data Checksums (for debugging)') }}
+                        </summary>
+                        <div style="margin-top: 15px;">
+                            <pre style="background: white; padding: 10px; border-radius: 4px; font-size: 12px;">{{ _('Total Portfolio Value:') }} ¥{{ checksums.total_portfolio_value | format_number }}
+{{ _('Rebalanceable Value:') }}   ¥{{ checksums.rebalanceable_value | format_number }}
+{{ _('Non-Rebalanceable:') }}     ¥{{ checksums.non_rebalanceable_value | format_number }}
+{{ _('Holdings Count:') }}        {{ checksums.holdings_count }}
+{{ _('Data Hash:') }}             {{ checksums.data_hash[:16] }}...</pre>
+                        </div>
+                    </details>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Tips -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                <h5 class="alert-heading"><i class="bi bi-lightbulb"></i> {{ _('Quick Navigation Tips') }}</h5>
+                <hr>
+                <ul class="mb-0">
+                    <li><strong>{{ _('Portfolio Report:') }}</strong> {{ _('Start here for a complete view of your
+                        investments, performance metrics, and holdings breakdown') }}</li>
+                    <li><strong>{{ _('Market Thermometer:') }}</strong> {{ _('Check current market conditions before
+                        making investment decisions') }}</li>
+                    <li><strong>{{ _('Action Compass:') }}</strong> {{ _('Get specific recommendations and use the
+                        capital allocation calculator for new investments') }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Register Chart.js datalabels plugin
+    Chart.register(ChartDataLabels);
+
+    // Parse mini allocation data
+    const allocationData = {{ top_level_allocation_json | safe }};
+
+    // Color palette
+    const colors = [
+        '#2E86AB',  // Ocean Blue
+        '#A23B72',  // Deep Rose
+        '#F18F01',  // Vibrant Orange
+        '#C73E1D',  // Brick Red
+        '#4A90E2',  // Sky Blue
+        '#7ED321',  // Fresh Green
+        '#50C878',  // Emerald Green
+        '#6C757D',  // Professional Grey
+        '#17A2B8',  // Teal
+        '#6F42C1'   // Purple
+    ];
+
+    // Create mini allocation pie chart
+    const ctx = document.getElementById('miniAllocationChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: allocationData.labels,
+            datasets: [{
+                data: allocationData.values,
+                backgroundColor: colors.slice(0, allocationData.labels.length),
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        usePointStyle: true,
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            const label = context.label || '';
+                            const value = context.formattedValue;
+                            const percentage = ((context.raw / context.dataset.data.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
+                            return `${label}: ¥${value} (${percentage}%)`;
+                        }
+                    }
+                },
+                datalabels: {
+                    display: function (context) {
+                        const percentage = (context.parsed / context.dataset.data.reduce((a, b) => a + b, 0)) * 100;
+                        return percentage > 5;  // Only show labels > 5%
+                    },
+                    formatter: function (value, context) {
+                        const percentage = ((value / context.dataset.data.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
+                        return percentage + '%';
+                    },
+                    color: '#ffffff',
+                    font: {
+                        weight: 'bold',
+                        size: 11
+                    },
+                    textStrokeColor: '#000000',
+                    textStrokeWidth: 1
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

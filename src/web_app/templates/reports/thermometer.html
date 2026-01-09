@@ -1,0 +1,644 @@
+{% extends "base.html" %}
+
+{% block title %}Market Thermometer - Sentiment Indicators{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div
+    class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-b-lg shadow-lg text-white p-6 mb-8 -mt-8 mx-4 rounded-t-none">
+    <div class="container mx-auto">
+        <h1 class="text-3xl font-bold mb-2"><i class="fas fa-thermometer-half mr-2"></i> Market Thermometer</h1>
+        <p class="opacity-90">Real-time market sentiment and valuation indicators</p>
+    </div>
+</div>
+
+<div class="container mx-auto px-4">
+    <!-- MARKET REGIME CARD -->
+    {% if market_regime %}
+    <div class="mb-8">
+        <div
+            class="bg-white rounded-xl shadow-md border-l-4 {% if market_regime.priority == 1 %}border-red-500{% elif market_regime.priority == 2 %}border-yellow-500{% elif market_regime.priority == 3 %}border-green-500{% else %}border-gray-500{% endif %} p-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                <div class="mb-4 md:mb-0 md:mr-6">
+                    <h4 class="text-xl font-bold text-gray-800 mb-2 flex items-center">
+                        <i class="fas fa-tachometer-alt mr-2"></i>
+                        Current Market Regime:
+                        <span
+                            class="ml-2 px-3 py-1 rounded-full text-sm font-semibold {% if market_regime.priority == 1 %}bg-red-100 text-red-800{% elif market_regime.priority == 2 %}bg-yellow-100 text-yellow-800{% elif market_regime.priority == 3 %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ market_regime.regime_name_cn }} ({{ market_regime.regime_name }})
+                        </span>
+                    </h4>
+                    <p class="text-gray-600 mb-3">
+                        {{ market_regime.description_cn|default(market_regime.description) }}
+                    </p>
+
+                    {% if market_regime.matched_conditions %}
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <small class="text-gray-500 font-semibold block mb-1">Trigger Conditions:</small>
+                        <ul class="text-sm text-gray-700 space-y-1">
+                            {% if market_regime.matched_conditions.valuation_or %}
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-yellow-500 mr-2"></i>
+                                <span>
+                                    Valuation:
+                                    {% if market_regime.matched_conditions.valuation_or.shiller_pe.met %}
+                                    Shiller PE {{ market_regime.matched_conditions.valuation_or.shiller_pe.value }}
+                                    {% endif %}
+                                    {% if market_regime.matched_conditions.valuation_or.buffett_us.met %}
+                                    {% if market_regime.matched_conditions.valuation_or.shiller_pe.met %} OR {% endif %}
+                                    Buffett US {{ market_regime.matched_conditions.valuation_or.buffett_us.value }}%
+                                    {% endif %}
+                                </span>
+                            </li>
+                            {% endif %}
+                            {% if market_regime.matched_conditions.fear_greed %}
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-yellow-500 mr-2"></i>
+                                Fear & Greed: {{ market_regime.matched_conditions.fear_greed.value }}
+                            </li>
+                            {% endif %}
+                            {% if market_regime.matched_conditions.regional_divergence %}
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-yellow-500 mr-2"></i>
+                                Regional Divergence: US {{
+                                market_regime.matched_conditions.regional_divergence.buffett_us.value }}% vs China {{
+                                market_regime.matched_conditions.regional_divergence.buffett_china.value }}%
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="flex flex-col items-end min-w-[200px]">
+                    {% if market_regime.dynamic_targets %}
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3 text-right w-full">
+                        <div class="font-bold text-blue-800 text-sm">Dynamic Targets Active</div>
+                        <div class="text-xs text-blue-600">Allocation adjusted for regime</div>
+                    </div>
+                    {% else %}
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-3 text-right w-full">
+                        <div class="font-bold text-gray-800 text-sm">Baseline Targets</div>
+                        <div class="text-xs text-gray-600">Standard allocation</div>
+                    </div>
+                    {% endif %}
+
+                    <div class="text-xs text-gray-500 mb-3 flex items-center">
+                        <i class="far fa-clock mr-1"></i>
+                        Detected: {{ market_regime.detection_timestamp|default('Now') }}
+                    </div>
+
+                    <a href="{{ url_for('reports.compass') }}"
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded text-sm transition duration-300 flex items-center">
+                        <i class="far fa-compass mr-2"></i>View Action Compass &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Suggested Allocation Adjustments (Advisory) -->
+    {% if market_regime and market_regime.target_modifiers %}
+    <div class="mb-8">
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-amber-500">
+            <h3 class="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+                <i class="fas fa-lightbulb text-amber-500 mr-2"></i>Suggested Allocation Adjustments
+            </h3>
+            <p class="text-gray-600 text-sm mb-4">
+                Based on current market conditions ({{ market_regime.regime_name_cn }}), consider adjusting your Risk
+                Profile:
+            </p>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-4">
+                {% for asset_class, modifier in market_regime.target_modifiers.top_level.items() %}
+                {% if modifier != 0 %}
+                <div
+                    class="bg-gray-50 rounded-lg p-3 text-center border {% if modifier > 0 %}border-green-200{% else %}border-red-200{% endif %}">
+                    <div class="text-sm font-medium text-gray-700 mb-1">{{ asset_class }}</div>
+                    <div class="text-xl font-bold {% if modifier > 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                        {{ "%+.0f%%"|format(modifier * 100) }}
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="flex items-center justify-between">
+                <p class="text-xs text-gray-500">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    These are suggestions only. Action Compass uses your Logic Studio settings.
+                </p>
+                <a href="{{ url_for('logic_studio.allocations') }}"
+                    class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded text-sm transition duration-300 flex items-center">
+                    <i class="fas fa-sliders-h mr-2"></i>Adjust in Logic Studio
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Market Sentiment Indicators Header -->
+    <div class="mb-6">
+        <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-blue-500 pb-2 mb-2">
+            <i class="fas fa-thermometer-half mr-2"></i>Market Sentiment Indicators
+        </h2>
+        <p class="text-gray-600 text-sm">
+            Real-time macroeconomic indicators providing a quick assessment of current market conditions.
+            Data updated: {{ market_thermometer.last_updated[:10] if market_thermometer.last_updated else 'N/A' }}
+        </p>
+    </div>
+
+    <!-- Row 1: Shiller P/E, Fear & Greed, VIX -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Macro for Thermometer Card -->
+        {% macro thermometer_card(title, icon, data, levels, interpretations) %}
+        <div
+            class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col h-full hover:shadow-lg transition-shadow duration-300">
+            {% if data.status == 'success' %}
+            {% set level = data.level %}
+            {% set header_bg = '' %}
+            {% set text_color = '' %}
+
+            {% if level == 0 %}
+            {% set header_bg = 'bg-green-600' %}
+            {% set text_color = 'text-green-600' %}
+            {% elif level == 1 %}
+            {% set header_bg = 'bg-cyan-600' %}
+            {% set text_color = 'text-cyan-600' %}
+            {% elif level == 2 %}
+            {% set header_bg = 'bg-yellow-500' %}
+            {% set text_color = 'text-yellow-600' %}
+            {% elif level == 3 %}
+            {% set header_bg = 'bg-orange-500' %}
+            {% set text_color = 'text-orange-600' %}
+            {% elif level == 4 %}
+            {% set header_bg = 'bg-red-600' %}
+            {% set text_color = 'text-red-600' %}
+            {% else %}
+            {% set header_bg = 'bg-gray-500' %}
+            {% set text_color = 'text-gray-600' %}
+            {% endif %}
+
+            <div class="{{ header_bg }} text-white p-4 font-semibold flex items-center">
+                <i class="{{ icon }} mr-2"></i>{{ title }}
+            </div>
+            <div class="p-6 flex-grow flex flex-col items-center text-center">
+                <div class="text-4xl font-bold {{ text_color }} mb-2">
+                    {% if title == 'Fear & Greed Index' %}
+                    {{ "%.0f"|format(data.value) }}
+                    {% else %}
+                    {{ "%.2f"|format(data.value) }}
+                    {% endif %}
+                </div>
+                <div class="text-lg font-semibold {{ text_color }} mb-4">
+                    {{ data.zone }}
+                </div>
+
+                {% if data.data_age_warning %}
+                <div class="bg-yellow-50 text-yellow-800 text-xs p-2 rounded mb-3 w-full">
+                    <i class="fas fa-exclamation-triangle mr-1"></i>{{ data.data_age_warning }}
+                </div>
+                {% endif %}
+
+                <p class="text-sm text-gray-600 mt-auto">
+                    {{ interpretations.desc }}
+                    <br>
+                    <strong class="block mt-2">Interpretation:</strong>
+                    {{ interpretations[level] }}
+                </p>
+            </div>
+            {% else %}
+            <div class="bg-gray-400 text-white p-4 font-semibold flex items-center">
+                <i class="{{ icon }} mr-2"></i>{{ title }}
+            </div>
+            <div class="p-6 flex-grow flex flex-col items-center text-center justify-center">
+                <div class="text-4xl text-gray-400 mb-2">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="text-lg font-semibold text-gray-500 mb-2">Data Unavailable</div>
+                <p class="text-sm text-red-500">
+                    {{ data.error_message }}
+                </p>
+            </div>
+            {% endif %}
+        </div>
+        {% endmacro %}
+
+        <!-- Shiller P/E -->
+        {{ thermometer_card(
+        'Shiller P/E Ratio',
+        'fas fa-chart-line',
+        market_thermometer.shiller_pe,
+        {},
+        {
+        'desc': 'The Cyclically Adjusted P/E ratio measures market valuation by comparing stock prices to 10-year
+        average earnings.',
+        0: 'Market is extremely undervalued.',
+        1: 'Market is undervalued.',
+        2: 'Market is fairly valued.',
+        3: 'Market is overvalued.',
+        4: 'Market is extremely overvalued.'
+        }
+        ) }}
+
+        <!-- Fear & Greed -->
+        {{ thermometer_card(
+        'Fear & Greed Index',
+        'fas fa-chart-bar',
+        market_thermometer.fear_greed,
+        {},
+        {
+        'desc': "CNN's Fear & Greed Index measures investor sentiment on a 0-100 scale.",
+        0: 'Extreme fear - contrarian opportunity.',
+        1: 'Fearful sentiment.',
+        2: 'Neutral sentiment.',
+        3: 'Greedy sentiment.',
+        4: 'Extreme greed - high risk.'
+        }
+        ) }}
+
+        <!-- VIX -->
+        {{ thermometer_card(
+        'VIX (Volatility Index)',
+        'fas fa-heartbeat',
+        market_thermometer.vix,
+        {},
+        {
+        'desc': 'CBOE Volatility Index measures expected market volatility. Higher VIX = higher fear.',
+        0: 'Extreme fear - potential opportunity.',
+        1: 'Elevated fear - caution warranted.',
+        2: 'Normal volatility.',
+        3: 'Low fear - complacency risk.',
+        4: 'Extreme complacency - high risk.'
+        }
+        ) }}
+    </div>
+
+    <!-- Row 2: International Buffett Indicators -->
+    <div class="mb-4">
+        <h4 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
+            <i class="fas fa-globe mr-2"></i>Buffett Indicator - Global View
+        </h4>
+        <p class="text-sm text-gray-500 mb-4">Total market capitalization to GDP ratio by region</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {% macro buffett_card(title, icon, data) %}
+        <div
+            class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col h-full hover:shadow-lg transition-shadow duration-300">
+            {% if data.status == 'success' %}
+            {% set level = data.level %}
+            {% set header_bg = '' %}
+            {% set text_color = '' %}
+
+            {% if level == 0 %}
+            {% set header_bg = 'bg-green-600' %}
+            {% set text_color = 'text-green-600' %}
+            {% elif level == 1 %}
+            {% set header_bg = 'bg-cyan-600' %}
+            {% set text_color = 'text-cyan-600' %}
+            {% elif level == 2 %}
+            {% set header_bg = 'bg-yellow-500' %}
+            {% set text_color = 'text-yellow-600' %}
+            {% elif level == 3 %}
+            {% set header_bg = 'bg-orange-500' %}
+            {% set text_color = 'text-orange-600' %}
+            {% elif level == 4 %}
+            {% set header_bg = 'bg-red-600' %}
+            {% set text_color = 'text-red-600' %}
+            {% else %}
+            {% set header_bg = 'bg-gray-500' %}
+            {% set text_color = 'text-gray-600' %}
+            {% endif %}
+
+            <div class="{{ header_bg }} text-white p-3 font-semibold flex items-center text-sm">
+                <i class="{{ icon }} mr-2"></i>{{ title }}
+            </div>
+            <div class="p-4 flex-grow flex flex-col items-center text-center">
+                <div class="text-2xl font-bold {{ text_color }} mb-1">
+                    {{ "%.1f%%"|format(data.value) }}
+                </div>
+                <div class="text-sm font-semibold {{ text_color }} mb-2">
+                    {{ data.zone }}
+                </div>
+                <p class="text-xs text-gray-500 mt-auto">
+                    Data as of {{ data.date if data.date else 'N/A' }}
+                </p>
+            </div>
+            {% else %}
+            <div class="bg-gray-400 text-white p-3 font-semibold flex items-center text-sm">
+                <i class="{{ icon }} mr-2"></i>{{ title }}
+            </div>
+            <div class="p-4 flex-grow flex flex-col items-center text-center justify-center">
+                <div class="text-sm text-gray-500">Data Unavailable</div>
+            </div>
+            {% endif %}
+        </div>
+        {% endmacro %}
+
+        {{ buffett_card('United States', 'fas fa-flag-usa', market_thermometer.buffett_us) }}
+        {{ buffett_card('China', 'fas fa-globe-asia', market_thermometer.buffett_china) }}
+        {{ buffett_card('Japan', 'fas fa-globe-asia', market_thermometer.buffett_japan) }}
+        {{ buffett_card('Europe (UK)', 'fas fa-globe-europe', market_thermometer.buffett_europe) }}
+    </div>
+
+    <!-- Gold Market Indicators -->
+    {% if gold_analysis and gold_analysis.status == 'success' %}
+    <div class="mb-6">
+        <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-blue-500 pb-2 mb-2">
+            <i class="fas fa-coins mr-2"></i>Gold Market Indicators
+        </h2>
+        <p class="text-gray-600 text-sm">
+            Real-time gold market indicators providing insights into volatility, relative value, and market positioning.
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <!-- GVZ -->
+        {% set gvz = gold_analysis.indicators.gvz %}
+        {% set gvz_val = gvz.value %}
+        {% set gvz_level = 2 %}
+        {% if gvz_val > 35 %}{% set gvz_level = 0 %}{% elif gvz_val > 28 %}{% set gvz_level = 1 %}{% elif gvz_val < 15
+            %}{% set gvz_level=4 %}{% elif gvz_val < 20 %}{% set gvz_level=3 %}{% endif %} {{
+            thermometer_card( 'GVZ (Gold Volatility)' , 'fas fa-chart-line' , gvz, {}, { 'desc'
+            : 'Cboe Gold ETF Volatility Index measures market expectation of 30-day gold price volatility.' ,
+            0: 'Extreme volatility indicates elevated market fear and uncertainty.' ,
+            1: 'Elevated volatility suggests market uncertainty and increased risk.' ,
+            2: 'Normal gold market volatility levels observed.' ,
+            3: 'Low volatility indicates a relatively calm market environment.' ,
+            4: 'Very low volatility suggests market complacency.' } ) }} <!-- Gold/Silver Ratio -->
+            {% set gs = gold_analysis.indicators.gold_silver_ratio %}
+            {% set gs_val = gs.value %}
+            {% set gs_level = 2 %}
+            {% if gs_val < 55 %}{% set gs_level=0 %}{% elif gs_val < 65 %}{% set gs_level=1 %}{% elif gs_val> 95 %}{%
+                set gs_level = 4 %}{% elif gs_val > 85 %}{% set gs_level = 3 %}{% endif %}
+
+                {{ thermometer_card(
+                'Gold/Silver Ratio',
+                'fas fa-coins',
+                gs,
+                {},
+                {
+                'desc': 'Measures relative value of gold to silver. Historical range: 40-95.',
+                0: 'Gold is historically cheap relative to silver - potential buy opportunity.',
+                1: 'Gold moderately undervalued relative to silver.',
+                2: 'Gold and silver in normal relative valuation range.',
+                3: 'Gold moderately overvalued relative to silver.',
+                4: 'Gold is very expensive relative to silver - consider taking profits.'
+                }
+                ) }}
+
+                <!-- S&P 500/Gold Ratio -->
+                {% set spg = gold_analysis.indicators.sp500_gold_ratio %}
+                {% set spg_val = spg.value %}
+                {% set spg_level = 2 %}
+                {% if spg_val > 2.8 %}{% set spg_level = 0 %}{% elif spg_val > 2.4 %}{% set spg_level = 1 %}{% elif
+                spg_val < 1.2 %}{% set spg_level=4 %}{% elif spg_val < 1.5 %}{% set spg_level=3 %}{% endif %} {{
+                    thermometer_card( 'S&P 500/Gold Ratio' , 'fas fa-chart-area' , spg, {}, { 'desc'
+                    : 'Measures relative performance of stocks vs gold. Historical range: 0.5-3.5.' ,
+                    0: 'Stocks very expensive relative to gold - gold may be undervalued.' ,
+                    1: 'Stocks moderately expensive - gold relatively attractive.' ,
+                    2: 'Balanced relative valuation between stocks and gold.' ,
+                    3: 'Stocks moderately cheap - equities relatively attractive.' ,
+                    4: 'Stocks very cheap relative to gold - equities more attractive.' } ) }} </div>
+                    {% endif %}
+
+                    <!-- Crypto Market Indicators -->
+                    {% if crypto_analysis and crypto_analysis.status == 'success' %}
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-blue-500 pb-2 mb-2">
+                            <i class="fab fa-bitcoin mr-2"></i>Crypto Market Indicators
+                        </h2>
+                        <p class="text-gray-600 text-sm">
+                            Real-time cryptocurrency market indicators tracking volatility, relative value, and market
+                            dominance.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                        <!-- Crypto Fear & Greed -->
+                        {% set cfng = crypto_analysis.indicators.crypto_fear_greed %}
+                        <div
+                            class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col h-full hover:shadow-lg transition-shadow duration-300">
+                            {% if cfng.status == 'success' %}
+                            {% set level = cfng.zone_level %}
+                            {% set header_bg = '' %}
+                            {% set text_color = '' %}
+
+                            {% if level == 0 %}{% set header_bg = 'bg-green-600' %}{% set text_color = 'text-green-600'
+                            %}
+                            {% elif level == 1 %}{% set header_bg = 'bg-cyan-600' %}{% set text_color = 'text-cyan-600'
+                            %}
+                            {% elif level == 2 %}{% set header_bg = 'bg-yellow-500' %}{% set text_color =
+                            'text-yellow-600' %}
+                            {% elif level == 3 %}{% set header_bg = 'bg-orange-500' %}{% set text_color =
+                            'text-orange-600' %}
+                            {% elif level == 4 %}{% set header_bg = 'bg-red-600' %}{% set text_color = 'text-red-600' %}
+                            {% endif %}
+
+                            <div class="{{ header_bg }} text-white p-4 font-semibold flex items-center">
+                                <i class="far fa-smile mr-2"></i>Crypto Fear & Greed
+                            </div>
+                            <div class="p-6 flex-grow flex flex-col items-center text-center">
+                                <div class="text-4xl font-bold {{ text_color }} mb-2">
+                                    {{ cfng.value }}
+                                </div>
+                                <div class="text-lg font-semibold {{ text_color }} mb-4">
+                                    {{ cfng.zone }}
+                                </div>
+                                <p class="text-sm text-gray-600 mt-auto">
+                                    {{ cfng.interpretation }}
+                                </p>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- BTC/QQQ Ratio -->
+                        {% set btcqqq = crypto_analysis.indicators.btc_qqq_ratio %}
+                        <div
+                            class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col h-full hover:shadow-lg transition-shadow duration-300">
+                            {% if btcqqq.status == 'success' %}
+                            {% set level = btcqqq.zone_level %}
+                            {% set header_bg = '' %}
+                            {% set text_color = '' %}
+
+                            {% if level == 0 %}{% set header_bg = 'bg-green-600' %}{% set text_color = 'text-green-600'
+                            %}
+                            {% elif level == 1 %}{% set header_bg = 'bg-cyan-600' %}{% set text_color = 'text-cyan-600'
+                            %}
+                            {% elif level == 2 %}{% set header_bg = 'bg-yellow-500' %}{% set text_color =
+                            'text-yellow-600' %}
+                            {% elif level == 3 %}{% set header_bg = 'bg-orange-500' %}{% set text_color =
+                            'text-orange-600' %}
+                            {% elif level == 4 %}{% set header_bg = 'bg-red-600' %}{% set text_color = 'text-red-600' %}
+                            {% endif %}
+
+                            <div class="{{ header_bg }} text-white p-4 font-semibold flex items-center">
+                                <i class="fas fa-chart-line mr-2"></i>BTC/QQQ Ratio
+                            </div>
+                            <div class="p-6 flex-grow flex flex-col items-center text-center">
+                                <div class="text-4xl font-bold {{ text_color }} mb-2">
+                                    {{ "%.4f"|format(btcqqq.value) }}
+                                </div>
+                                <div class="text-lg font-semibold {{ text_color }} mb-4">
+                                    {{ btcqqq.zone }}
+                                </div>
+                                <p class="text-sm text-gray-600 mt-auto">
+                                    {{ btcqqq.interpretation }}
+                                </p>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- BTC Volatility -->
+                        {% set btcvol = crypto_analysis.indicators.btc_volatility %}
+                        {% set btcvol_val = btcvol.value %}
+                        {% set btcvol_level = 2 %}
+                        {% if btcvol_val > 80 %}{% set btcvol_level = 0 %}{% elif btcvol_val > 60 %}{% set btcvol_level
+                        = 1 %}{% elif btcvol_val < 20 %}{% set btcvol_level=4 %}{% elif btcvol_val < 35 %}{% set
+                            btcvol_level=3 %}{% endif %} <div
+                            class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col h-full hover:shadow-lg transition-shadow duration-300">
+                            {% if btcvol.status == 'success' %}
+                            {% set level = btcvol_level %}
+                            {% set header_bg = '' %}
+                            {% set text_color = '' %}
+
+                            {% if level == 0 %}{% set header_bg = 'bg-green-600' %}{% set text_color = 'text-green-600'
+                            %}
+                            {% elif level == 1 %}{% set header_bg = 'bg-cyan-600' %}{% set text_color = 'text-cyan-600'
+                            %}
+                            {% elif level == 2 %}{% set header_bg = 'bg-yellow-500' %}{% set text_color =
+                            'text-yellow-600' %}
+                            {% elif level == 3 %}{% set header_bg = 'bg-orange-500' %}{% set text_color =
+                            'text-orange-600' %}
+                            {% elif level == 4 %}{% set header_bg = 'bg-red-600' %}{% set text_color = 'text-red-600' %}
+                            {% endif %}
+
+                            <div class="{{ header_bg }} text-white p-4 font-semibold flex items-center">
+                                <i class="fas fa-bolt mr-2"></i>BTC Volatility
+                            </div>
+                            <div class="p-6 flex-grow flex flex-col items-center text-center">
+                                <div class="text-4xl font-bold {{ text_color }} mb-2">
+                                    {{ "%.1f%%"|format(btcvol.value) }}
+                                </div>
+                                <div class="text-lg font-semibold {{ text_color }} mb-4">
+                                    {% if level == 0 %}Extreme Fear{% elif level == 1 %}High Volatility{% elif level ==
+                                    4 %}Complacency{% elif level == 3 %}Low Volatility{% else %}Normal{% endif %}
+                                </div>
+                                <p class="text-sm text-gray-600 mt-auto">
+                                    30-day Bitcoin realized volatility (annualized).
+                                </p>
+                            </div>
+                            {% endif %}
+                    </div>
+    </div>
+    {% endif %}
+
+    <!-- Alternative Assets Recommendations (Gold & Crypto) -->
+    {% if alt_assets_recommendations %}
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-yellow-500 pb-2 mb-6">
+            <i class="fas fa-coins mr-2"></i>Asset Recommendations - Gold & Crypto
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for asset_rec in alt_assets_recommendations %}
+            {% set rec = asset_rec.recommendation %}
+            {% set weighted_data = asset_rec.weighted_data|default({}) %}
+
+            {% if weighted_data.recommendation %}
+            {% set recommendation = weighted_data.recommendation %}
+            {% elif rec.recommendation is string %}
+            {% set recommendation = rec.recommendation|default('Hold') %}
+            {% elif rec.recommendation is iterable and rec.recommendation is not mapping %}
+            {% set recommendation = rec.recommendation[0]|default('Hold') %}
+            {% else %}
+            {% set recommendation = 'Hold' %}
+            {% endif %}
+
+            {% set rec_color = 'gray' %}
+            {% set rec_emoji = '⚪' %}
+
+            {% if recommendation == 'Strong Buy' %}
+            {% set rec_color = 'green' %}
+            {% set rec_emoji = '🟢🟢' %}
+            {% elif recommendation == 'Buy' %}
+            {% set rec_color = 'green' %}
+            {% set rec_emoji = '🟢' %}
+            {% elif recommendation == 'Hold' %}
+            {% set rec_color = 'yellow' %}
+            {% set rec_emoji = '🟡' %}
+            {% elif recommendation == 'Sell' %}
+            {% set rec_color = 'red' %}
+            {% set rec_emoji = '🔴' %}
+            {% elif recommendation == 'Strong Sell' %}
+            {% set rec_color = 'red' %}
+            {% set rec_emoji = '🔴🔴' %}
+            {% endif %}
+
+            <div
+                class="bg-white rounded-xl shadow-md overflow-hidden border-t-4 border-{{ rec_color }}-500 h-full flex flex-col">
+                <div
+                    class="bg-{{ rec_color }}-50 p-4 border-b border-{{ rec_color }}-100 flex justify-between items-center">
+                    <h5 class="font-bold text-gray-800 flex items-center">
+                        <span class="mr-2">{{ rec_emoji }}</span>
+                        {{ asset_rec.asset_name }}
+                    </h5>
+                    <span
+                        class="bg-{{ rec_color }}-100 text-{{ rec_color }}-800 text-xs font-bold px-2 py-1 rounded uppercase">
+                        {{ recommendation }}
+                    </span>
+                </div>
+
+                <div class="p-5 flex-grow">
+                    <!-- Weighted Score -->
+                    <div class="bg-gray-50 rounded-lg p-4 text-center mb-4">
+                        <div class="text-xs text-gray-500 uppercase tracking-wide mb-1">Phase 3 Weighted Score</div>
+                        {% set score = weighted_data.total_score|default(0) %}
+                        <div
+                            class="text-3xl font-bold {% if score <= -3 %}text-green-600{% elif score >= 3 %}text-red-600{% else %}text-yellow-600{% endif %}">
+                            {{ "%+.1f"|format(score) }}
+                        </div>
+                        <div class="text-xs text-gray-400 mt-1">Scale: -10 (Buy) to +10 (Sell)</div>
+                    </div>
+
+                    <p class="text-gray-600 text-sm mb-4">
+                        {{ rec.description|default('Based on Phase 3 weighted multi-indicator analysis.') }}
+                    </p>
+
+                    <!-- Breakdown Table -->
+                    {% if weighted_data.breakdown %}
+                    <div class="mb-4">
+                        <h6 class="text-xs font-bold text-gray-700 uppercase mb-2 border-b pb-1">Score Breakdown</h6>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs">
+                                <thead>
+                                    <tr class="text-gray-500 border-b">
+                                        <th class="text-left py-1">Indicator</th>
+                                        <th class="text-right py-1">Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    {% for indicator, data in weighted_data.breakdown.items() %}
+                                    <tr>
+                                        <td class="py-1 text-gray-700">{{ indicator.replace('_', ' ').title() }}</td>
+                                        <td
+                                            class="py-1 text-right font-mono {% if data.weighted_score < 0 %}text-green-600{% elif data.weighted_score > 0 %}text-red-600{% else %}text-yellow-600{% endif %}">
+                                            {{ "%+.2f"|format(data.weighted_score) }}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

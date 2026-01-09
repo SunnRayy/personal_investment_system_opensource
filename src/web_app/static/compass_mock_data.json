@@ -1,0 +1,298 @@
+{
+    "status": "success",
+    "portfolio_snapshot": {
+        "total_value": 5036594.3421330005,
+        "holdings_count": 37,
+        "last_updated": "2025-09-08T10:24:10.969863",
+        "single_asset_risk": {
+            "ticker": "Property_蓝郡",
+            "percentage": 51.6,
+            "level": "风险极高"
+        }
+    },
+    "portfolio_values": {
+        "total_portfolio_value": 5036594.3421330005,
+        "liquid_portfolio_value": 2436594.3421330005,
+        "non_rebalanceable_value": 2600000.0
+    },
+    "top_level_allocation": [
+        {
+            "asset_class": "股票",
+            "target_weight": 0.75,
+            "current_weight": 0.8994,
+            "deviation": 0.1494,
+            "market_value": 2191503.95,
+            "is_rebalanceable": true,
+            "calculation_base": "liquid"
+        },
+        {
+            "asset_class": "现金",
+            "target_weight": 0.0,
+            "current_weight": 0.0233,
+            "deviation": 0.0233,
+            "market_value": 56879.84,
+            "is_rebalanceable": true,
+            "calculation_base": "liquid"
+        },
+        {
+            "asset_class": "商品",
+            "target_weight": 0.05,
+            "current_weight": 0.0121,
+            "deviation": -0.0379,
+            "market_value": 29541.89,
+            "is_rebalanceable": true,
+            "calculation_base": "liquid"
+        },
+        {
+            "asset_class": "固定收益",
+            "target_weight": 0.15,
+            "current_weight": 0.01,
+            "deviation": -0.14,
+            "market_value": 24486.0,
+            "is_rebalanceable": true,
+            "calculation_base": "liquid"
+        },
+        {
+            "asset_class": "房地产",
+            "target_weight": 0.0,
+            "current_weight": 0.5162,
+            "deviation": 0.0,
+            "market_value": 2600000.0,
+            "is_rebalanceable": false,
+            "calculation_base": "total"
+        }
+    ],
+    "sub_class_allocation": [
+        {
+            "sub_class_name": "国内股票ETF",
+            "top_level_class": "股票",
+            "current_weight": 0.6729,
+            "target_weight": 0.6,
+            "adjustment_pct": 0.0729,
+            "calculation_base": "liquid"
+        },
+        {
+            "sub_class_name": "美国股票ETF",
+            "top_level_class": "股票",
+            "current_weight": 0.084,
+            "target_weight": 0.3,
+            "adjustment_pct": -0.21600000000000003,
+            "calculation_base": "liquid"
+        },
+        {
+            "sub_class_name": "现金",
+            "top_level_class": "现金",
+            "current_weight": 0.0004,
+            "target_weight": 0.1,
+            "adjustment_pct": -0.09960000000000001,
+            "calculation_base": "liquid"
+        },
+        {
+            "sub_class_name": "活期存款",
+            "top_level_class": "现金",
+            "current_weight": 0.0229,
+            "target_weight": 0.9,
+            "adjustment_pct": -0.8771,
+            "calculation_base": "liquid"
+        },
+        {
+            "sub_class_name": "黄金",
+            "top_level_class": "商品",
+            "current_weight": 0.0121,
+            "target_weight": 1.0,
+            "adjustment_pct": -0.9879000000000001,
+            "calculation_base": "liquid"
+        },
+        {
+            "sub_class_name": "国内政府债券",
+            "top_level_class": "固定收益",
+            "current_weight": 0.01,
+            "target_weight": 0.1,
+            "adjustment_pct": -0.09,
+            "calculation_base": "liquid"
+        },
+        {
+            "sub_class_name": "住宅地产",
+            "top_level_class": "房地产",
+            "current_weight": 0.5162,
+            "target_weight": 1.0,
+            "adjustment_pct": 0.0,
+            "calculation_base": "total"
+        },
+        {
+            "sub_class_name": "公司美股RSU",
+            "top_level_class": "股票",
+            "current_weight": 0.1425,
+            "target_weight": 0.1,
+            "adjustment_pct": 0.0425,
+            "calculation_base": "liquid"
+        }
+    ],
+    "asset_allocation_details": [
+        {
+            "level": "top_level",
+            "category": "股票",
+            "sub_category": "股票",
+            "target_pct": 75.0,
+            "actual_pct": 89.94,
+            "deviation_pct": 14.94,
+            "market_value": 2191503.95,
+            "is_rebalanceable": true,
+            "calculation_base": "liquid"
+        },
+        {
+            "level": "top_level",
+            "category": "现金",
+            "sub_category": "现金",
+            "target_pct": 0.0,
+            "actual_pct": 2.33,
+            "deviation_pct": 2.33,
+            "market_value": 56879.84,
+            "is_rebalanceable": true,
+            "calculation_base": "liquid"
+        },
+        {
+            "level": "top_level",
+            "category": "商品",
+            "sub_category": "商品",
+            "target_pct": 5.0,
+            "actual_pct": 1.21,
+            "deviation_pct": -3.79,
+            "market_value": 29541.89,
+            "is_rebalanceable": true,
+            "calculation_base": "liquid"
+        },
+        {
+            "level": "top_level",
+            "category": "固定收益",
+            "sub_category": "固定收益",
+            "target_pct": 15.0,
+            "actual_pct": 1.0,
+            "deviation_pct": -14.0,
+            "market_value": 24486.0,
+            "is_rebalanceable": true,
+            "calculation_base": "liquid"
+        },
+        {
+            "level": "top_level",
+            "category": "房地产",
+            "sub_category": "房地产",
+            "target_pct": 0.0,
+            "actual_pct": 51.62,
+            "deviation_pct": 0.0,
+            "market_value": 2600000.0,
+            "is_rebalanceable": false,
+            "calculation_base": "total"
+        },
+        {
+            "level": "sub_level",
+            "category": "股票",
+            "sub_category": "国内股票ETF",
+            "target_pct": 60.0,
+            "actual_pct": 67.29,
+            "deviation_pct": 7.29,
+            "market_value": 1639640.09,
+            "calculation_base": "liquid"
+        },
+        {
+            "level": "sub_level",
+            "category": "股票",
+            "sub_category": "美国股票ETF",
+            "target_pct": 30.0,
+            "actual_pct": 8.4,
+            "deviation_pct": -21.6,
+            "market_value": 204695.58,
+            "calculation_base": "liquid"
+        },
+        {
+            "level": "sub_level",
+            "category": "现金",
+            "sub_category": "现金",
+            "target_pct": 10.0,
+            "actual_pct": 0.04,
+            "deviation_pct": -9.96,
+            "market_value": 1000.0,
+            "calculation_base": "liquid"
+        },
+        {
+            "level": "sub_level",
+            "category": "现金",
+            "sub_category": "活期存款",
+            "target_pct": 90.0,
+            "actual_pct": 2.29,
+            "deviation_pct": -87.71,
+            "market_value": 55879.84,
+            "calculation_base": "liquid"
+        },
+        {
+            "level": "sub_level",
+            "category": "商品",
+            "sub_category": "黄金",
+            "target_pct": 100.0,
+            "actual_pct": 1.21,
+            "deviation_pct": -98.79,
+            "market_value": 29541.89,
+            "calculation_base": "liquid"
+        },
+        {
+            "level": "sub_level",
+            "category": "固定收益",
+            "sub_category": "国内政府债券",
+            "target_pct": 10.0,
+            "actual_pct": 1.0,
+            "deviation_pct": -9.0,
+            "market_value": 24486.0,
+            "calculation_base": "liquid"
+        },
+        {
+            "level": "sub_level",
+            "category": "房地产",
+            "sub_category": "住宅地产",
+            "target_pct": 100.0,
+            "actual_pct": 51.62,
+            "deviation_pct": 0.0,
+            "market_value": 2600000.0,
+            "calculation_base": "total"
+        },
+        {
+            "level": "sub_level",
+            "category": "股票",
+            "sub_category": "公司美股RSU",
+            "target_pct": 10.0,
+            "actual_pct": 14.25,
+            "deviation_pct": 4.25,
+            "market_value": 347168.28,
+            "calculation_base": "liquid"
+        },
+        {
+            "level": "metadata",
+            "total_portfolio_value": 5036594.3421330005,
+            "liquid_portfolio_value": 2436594.3421330005,
+            "non_rebalanceable_value": 2600000.0
+        }
+    ],
+    "rebalancing_advice": {
+        "needs_rebalancing": true,
+        "trigger_reason": "Portfolio has 8 asset categories with >5% allocation deviations",
+        "total_deviation_impact": 263.29,
+        "affected_categories": [
+            "股票",
+            "固定收益",
+            "股票",
+            "股票",
+            "现金",
+            "现金",
+            "商品",
+            "固定收益"
+        ],
+        "operational_steps": [
+            "Review current portfolio allocation vs targets",
+            "Identify specific holdings to adjust in over/under-weighted categories",
+            "Execute rebalancing trades to bring allocations within 5% of targets",
+            "Monitor portfolio allocation and schedule next rebalancing review"
+        ],
+        "recommendation_summary": "Rebalance 8 asset categories to reduce allocation drift",
+        "urgency": "high"
+    },
+    "validation_timestamp": "2025-09-08T10:24:11.022661"
+}

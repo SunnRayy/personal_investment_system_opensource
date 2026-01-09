@@ -1,0 +1,547 @@
+{% extends "base.html" %}
+
+{% block title %}Risk Simulation - WealthOS{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-800">Monte Carlo Risk Simulation</h1>
+        <p class="text-gray-600">Project portfolio growth with market volatility and uncertainty</p>
+    </div>
+    <div class="flex space-x-3">
+        <button id="run-simulation-btn"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition flex items-center shadow-lg">
+            <i class="fas fa-play mr-2"></i> Run Simulation
+        </button>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Configuration Panel -->
+    <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-md border border-gray-100">
+        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-sliders-h mr-2 text-blue-600"></i> Assumptions
+        </h3>
+
+        <div class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Expected Annual Return</label>
+                <input type="range" id="return-slider" min="0" max="0.2" step="0.01" value="0.07"
+                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0%</span>
+                    <span id="return-display" class="font-bold text-blue-600">7%</span>
+                    <span>20%</span>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Market Volatility (Std Dev)</label>
+                <input type="range" id="vol-slider" min="0" max="0.4" step="0.01" value="0.15"
+                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0%</span>
+                    <span id="vol-display" class="font-bold text-purple-600">15%</span>
+                    <span>40%</span>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Annual Contribution</label>
+                <input type="number" id="contribution-input" value="0" step="10000"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                <p class="text-xs text-gray-400 mt-1">Yearly savings added to portfolio</p>
+            </div>
+
+            <hr class="border-gray-100">
+
+            <div>
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Simulated Target Goals</h4>
+                    <button onclick="openAddGoalModal()"
+                        class="text-blue-600 hover:text-blue-800 text-xs font-bold transition">
+                        <i class="fas fa-plus mr-1"></i> Add Goal
+                    </button>
+                </div>
+                <div class="space-y-2" id="goal-config-list">
+                    {% for goal in goals %}
+                    <div class="group relative flex justify-between items-center p-2 bg-gray-50 rounded-lg border border-gray-100 hover:border-blue-200 transition"
+                        id="goal-card-{{ goal.id }}">
+                        <div class="truncate mr-2">
+                            <span class="block text-xs font-medium text-gray-700 truncate">{{ goal.name }}</span>
+                            <span class="block text-[10px] text-gray-400">{{ goal.target_date }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-xs font-bold text-blue-700 mr-2">¥{{ (goal.target_amount / 1000000) |
+                                round(1) }}M</span>
+                            <div class="hidden group-hover:flex items-center space-x-1">
+                                <button onclick="openEditGoalModal('{{ goal.id }}')"
+                                    class="p-1 text-gray-400 hover:text-blue-600 transition">
+                                    <i class="fas fa-edit text-[10px]"></i>
+                                </button>
+                                <button onclick="deleteGoal('{{ goal.id }}')"
+                                    class="p-1 text-gray-400 hover:text-red-600 transition">
+                                    <i class="fas fa-trash text-[10px]"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Chart Area -->
+    <div class="lg:col-span-3">
+        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">Portfolio Growth Probabilities</h3>
+                <div class="flex space-x-2">
+                    <span class="flex items-center text-xs text-gray-500">
+                        <span class="w-3 h-3 bg-blue-100 border border-blue-200 rounded-sm mr-1"></span> 90% Range
+                    </span>
+                    <span class="flex items-center text-xs text-gray-500">
+                        <span class="w-3 h-3 bg-blue-200 border border-blue-300 rounded-sm mr-1"></span> 50% Range
+                    </span>
+                    <span class="flex items-center text-xs text-gray-500">
+                        <span class="w-3 h-1 bg-blue-600 rounded-sm mr-1"></span> Median
+                    </span>
+                </div>
+            </div>
+            <div class="h-[400px] w-full">
+                <canvas id="simulationChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Result Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="results-cards" style="display: none;">
+            <div class="bg-gradient-to-br from-blue-50 to-white p-5 rounded-xl border border-blue-100 shadow-sm">
+                <p class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Median Outcome (P50)</p>
+                <p class="text-2xl font-bold text-gray-800" id="median-final-value">¥0</p>
+                <p class="text-xs text-gray-500 mt-1">Most likely scenario</p>
+            </div>
+            <div class="bg-gradient-to-br from-red-50 to-white p-5 rounded-xl border border-red-100 shadow-sm">
+                <p class="text-xs font-bold text-red-600 uppercase tracking-wider mb-1">Bear Outcome (P5)</p>
+                <p class="text-2xl font-bold text-gray-800" id="p5-final-value">¥0</p>
+                <p class="text-xs text-gray-500 mt-1">5% probability of being lower</p>
+            </div>
+            <div class="bg-gradient-to-br from-green-50 to-white p-5 rounded-xl border border-green-100 shadow-sm">
+                <p class="text-xs font-bold text-green-600 uppercase tracking-wider mb-1">Goal Success Rate</p>
+                <p class="text-2xl font-bold text-gray-800" id="success-rate">0%</p>
+                <p class="text-xs text-gray-500 mt-1" id="primary-goal-target">Target: ¥20M by 2030</p>
+            </div>
+        </div>
+
+        <div id="no-results-placeholder"
+            class="bg-blue-50 border-2 border-dashed border-blue-200 rounded-xl p-12 text-center">
+            <i class="fas fa-chart-line text-4xl text-blue-200 mb-4"></i>
+            <h3 class="text-blue-800 font-bold">No simulation data shown</h3>
+            <p class="text-blue-600">Adjust assumptions and click "Run Simulation" to see projections</p>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="secondary-results" style="display: none;">
+    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+        <h3 class="text-lg font-bold text-gray-800 mb-4">Goal Achievements Probability</h3>
+        <div class="space-y-4" id="goal-success-list">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+        <h3 class="text-lg font-bold text-gray-800 mb-4">Simulation Insights</h3>
+        <div class="text-gray-700 text-sm space-y-3">
+            <p id="simulation-insight-text">Running 1,000 simulations using randomized annual returns based on a normal
+                distribution. Adjust volatility to see how market shocks affect long-term wealth stability.</p>
+            <div class="p-3 bg-blue-50 rounded-lg text-blue-800 border-l-4 border-blue-400">
+                <i class="fas fa-info-circle mr-1"></i> <strong>Tip:</strong> In a high-volatility regime, even with
+                high expected returns, the "sequence of returns" risk increases the probability of goal failure.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Goal Modal -->
+<div id="add-goal-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Add New Goal</h3>
+            <form id="add-goal-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Goal Name</label>
+                    <input type="text" name="name" required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Target Amount (¥)</label>
+                    <input type="number" name="target_amount" required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Target Date</label>
+                    <input type="date" name="target_date" required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Priority</label>
+                    <select name="priority" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                        <option value="high">High</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-3 mt-5">
+                    <button type="button" onclick="closeModal('add-goal-modal')"
+                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Save
+                        Goal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Goal Modal -->
+<div id="edit-goal-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Edit Goal</h3>
+            <form id="edit-goal-form" class="space-y-4">
+                <input type="hidden" name="id">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Goal Name</label>
+                    <input type="text" name="name" required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Target Amount (¥)</label>
+                    <input type="number" name="target_amount" required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Target Date</label>
+                    <input type="date" name="target_date" required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Priority</label>
+                    <select name="priority" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-3 mt-5">
+                    <button type="button" onclick="closeModal('edit-goal-modal')"
+                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Update
+                        Goal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let simulationChart = null;
+    let goalsMetadata = {{ goals | tojson }};
+
+    // UI Elements
+    const returnSlider = document.getElementById('return-slider');
+    const returnDisplay = document.getElementById('return-display');
+    const volSlider = document.getElementById('vol-slider');
+    const volDisplay = document.getElementById('vol-display');
+    const runBtn = document.getElementById('run-simulation-btn');
+
+    // Update displays
+    returnSlider.oninput = function () {
+        returnDisplay.innerHTML = Math.round(this.value * 100) + '%';
+    }
+    volSlider.oninput = function () {
+        volDisplay.innerHTML = Math.round(this.value * 100) + '%';
+    }
+
+    runBtn.onclick = runSimulation;
+
+    async function runSimulation() {
+        runBtn.disabled = true;
+        const originalText = runBtn.innerHTML;
+        runBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Calculating...';
+
+        const params = {
+            initial_value: 5000000, // TODO: Fetch actual current value
+            expected_return: parseFloat(returnSlider.value),
+            volatility: parseFloat(volSlider.value),
+            annual_contribution: parseFloat(document.getElementById('contribution-input').value),
+            num_simulations: 1000
+        };
+
+        try {
+            const response = await fetch('{{ url_for("simulation.run_simulation") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(params)
+            });
+            const data = await response.json();
+
+            if (data.error) throw new Error(data.error);
+
+            updateUI(data);
+        } catch (error) {
+            console.error('Simulation failed:', error);
+            alert('Simulation error: ' + error.message);
+        } finally {
+            runBtn.disabled = false;
+            runBtn.innerHTML = originalText;
+        }
+    }
+
+    function updateUI(data) {
+        document.getElementById('no-results-placeholder').style.display = 'none';
+        document.getElementById('results-cards').style.display = 'grid';
+        document.getElementById('secondary-results').style.display = 'grid';
+
+        // Update cards
+        const formatYen = (val) => '¥' + (val / 1000000).toFixed(2) + 'M';
+        document.getElementById('median-final-value').innerText = formatYen(data.summary.median_final_value);
+        document.getElementById('p5-final-value').innerText = formatYen(data.summary.p5_final_value);
+
+        // Probability cards
+        const goalsDiv = document.getElementById('goal-success-list');
+        goalsDiv.innerHTML = '';
+
+        let primaryProb = 0;
+        let primaryGoalInfo = "";
+
+        Object.entries(data.goal_probabilities).forEach(([id, prob]) => {
+            primaryProb = prob; // For the summary card
+
+            const goalInfo = goalsMetadata.find(g => g.id === id) || { name: id, target_amount: 0, target_date: '' };
+            const pct = Math.round(prob * 100);
+            const color = pct > 75 ? 'green' : (pct > 40 ? 'yellow' : 'red');
+
+            if (!primaryGoalInfo) {
+                const targetM = (goalInfo.target_amount / 1000000).toFixed(1);
+                const year = goalInfo.target_date ? new Date(goalInfo.target_date).getFullYear() : '';
+                primaryGoalInfo = `Target: ¥${targetM}M by ${year}`;
+            }
+
+            goalsDiv.innerHTML += `
+                <div class="mb-4">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-medium text-gray-700">${goalInfo.name}</span>
+                        <span class="text-sm font-bold text-${color}-600">${pct}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-${color}-500 h-2 rounded-full" style="width: ${pct}%"></div>
+                    </div>
+                </div>
+            `;
+        }); // Close forEach
+
+        // Aggregate Success Rate Display (OUTSIDE the loop)
+        const aggregateRate = data.aggregate_success_rate !== undefined ? data.aggregate_success_rate : 0;
+        document.getElementById('success-rate').innerText = Math.round(aggregateRate * 100) + '%';
+
+        const targetEl = document.getElementById('primary-goal-target');
+        if (targetEl) {
+            const totalGoals = Object.keys(data.goal_probabilities).length;
+            const goalsMet = Math.round(aggregateRate * totalGoals);
+            targetEl.innerText = `${goalsMet} of ${totalGoals} Goals on Track (>75%)`;
+        }
+
+        renderChart(data);
+    } // Close updateUI function
+
+    function renderChart(data) {
+        const ctx = document.getElementById('simulationChart').getContext('2d');
+
+        if (simulationChart) {
+            simulationChart.destroy();
+        }
+
+        const labels = data.years.map(y => 'Year ' + y);
+
+        simulationChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Median (P50)',
+                        data: data.percentiles.p50,
+                        borderColor: '#2563eb',
+                        backgroundColor: '#2563eb',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: false,
+                        zIndex: 10
+                    },
+                    {
+                        label: '25th-75th Percentile',
+                        data: data.percentiles.p75,
+                        borderColor: 'transparent',
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                        fill: '+1',
+                        pointRadius: 0,
+                        zIndex: 5
+                    },
+                    {
+                        label: 'P25',
+                        data: data.percentiles.p25,
+                        borderColor: 'transparent',
+                        pointRadius: 0,
+                        fill: false
+                    },
+                    {
+                        label: '5th-95th Percentile',
+                        data: data.percentiles.p95,
+                        borderColor: 'transparent',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: '+1',
+                        pointRadius: 0,
+                        zIndex: 1
+                    },
+                    {
+                        label: 'P5',
+                        data: data.percentiles.p5,
+                        borderColor: 'transparent',
+                        pointRadius: 0,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: function (value) {
+                                return '¥' + (value / 1000000).toFixed(0) + 'M';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('zh-CN', { style: 'currency', currency: 'CNY', maximumFractionDigits: 0 }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // --- Goal Management Functions ---
+
+    function openAddGoalModal() {
+        document.getElementById('add-goal-form').reset();
+        document.getElementById('add-goal-modal').classList.remove('hidden');
+    }
+
+    function openEditGoalModal(goalId) {
+        const goal = goalsMetadata.find(g => g.id === goalId);
+        if (!goal) return;
+
+        const form = document.getElementById('edit-goal-form');
+        form.elements['id'].value = goal.id;
+        form.elements['name'].value = goal.name;
+        form.elements['target_amount'].value = goal.target_amount;
+        form.elements['target_date'].value = goal.target_date;
+        form.elements['priority'].value = goal.priority;
+
+        document.getElementById('edit-goal-modal').classList.remove('hidden');
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+    }
+
+    // Handle form submissions
+    document.getElementById('add-goal-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch('{{ url_for("simulation.add_goal") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            if (result.status === 'success') {
+                location.reload(); // Simplest way to refresh goal list
+            } else {
+                alert('Error: ' + result.error);
+            }
+        } catch (error) {
+            console.error('Failed to add goal:', error);
+            alert('Failed to add goal. Check console for details.');
+        }
+    };
+
+    document.getElementById('edit-goal-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+        const goalId = data.id;
+
+        try {
+            const response = await fetch(`{{ url_for("simulation.index") }}api/goals/${goalId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            if (result.status === 'success') {
+                location.reload();
+            } else {
+                alert('Error: ' + result.error);
+            }
+        } catch (error) {
+            console.error('Failed to update goal:', error);
+            alert('Failed to update goal. Check console for details.');
+        }
+    };
+
+    async function deleteGoal(goalId) {
+        if (!confirm('Are you sure you want to delete this goal?')) return;
+
+        try {
+            const response = await fetch(`{{ url_for("simulation.index") }}api/goals/${goalId}`, {
+                method: 'DELETE'
+            });
+            const result = await response.json();
+            if (result.status === 'success') {
+                location.reload();
+            } else {
+                alert('Error: ' + result.error);
+            }
+        } catch (error) {
+            console.error('Failed to delete goal:', error);
+            alert('Failed to delete goal. Check console for details.');
+        }
+    }
+</script>
+{% endblock %}

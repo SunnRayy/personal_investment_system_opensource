@@ -1,0 +1,130 @@
+# Performance Attribution Benchmark Configuration
+# This file defines the strategic asset allocation benchmark and market indices
+# for performance attribution analysis using the Brinson-Fachler model.
+
+# ============================================================================
+# Strategic Asset Allocation Benchmark
+# ============================================================================
+# The benchmark represents a strategic asset allocation that serves as the 
+# performance comparison baseline. Weights should sum to 1.0 (100%).
+
+strategic_benchmark:
+  name: "Balanced Portfolio Benchmark"
+  description: "60/40 Global Equity/Bond strategic benchmark allocation"
+  
+  # Asset class weights (must sum to 1.0)
+  weights:
+    Global_Equity: 0.60     # 60% Global Equity allocation
+    Global_Bonds: 0.30      # 30% Global Bond allocation 
+    Real_Estate: 0.05       # 5% Real Estate allocation
+    Commodities: 0.03       # 3% Commodities allocation
+    Cash: 0.02              # 2% Cash allocation
+
+# ============================================================================
+# Market Index Definitions
+# ============================================================================
+# For each asset class, specify the market index/ETF to use as the benchmark
+# return source. These should represent broad, investable market indices.
+
+market_indices:
+  Global_Equity:
+    primary_index: "VT"     # Vanguard Total World Stock ETF
+    description: "Global equity markets benchmark"
+    
+  Global_Bonds:
+    primary_index: "BNDW"   # Vanguard Total World Bond ETF  
+    description: "Global bond markets benchmark"
+    
+  Real_Estate:
+    primary_index: "VNQ"    # Vanguard Real Estate ETF
+    description: "Real estate investment trusts benchmark"
+    
+  Commodities:
+    primary_index: "DJP"    # iPath Bloomberg Commodity ETF
+    description: "Broad commodities benchmark"
+    
+  Cash:
+    primary_index: "SHY"    # iShares 1-3 Year Treasury Bond ETF
+    description: "Short-term treasury/cash equivalent benchmark"
+
+# ============================================================================
+# Alternative Benchmark Configurations
+# ============================================================================
+# Additional benchmark configurations for different investment strategies
+
+alternative_benchmarks:
+  
+  conservative:
+    name: "Conservative Portfolio Benchmark"
+    description: "40/60 Equity/Bond conservative allocation"
+    weights:
+      Global_Equity: 0.40
+      Global_Bonds: 0.50
+      Real_Estate: 0.05
+      Cash: 0.05
+      
+  aggressive:
+    name: "Aggressive Portfolio Benchmark" 
+    description: "80/20 Equity/Bond aggressive allocation"
+    weights:
+      Global_Equity: 0.80
+      Global_Bonds: 0.15
+      Real_Estate: 0.03
+      Commodities: 0.02
+      
+  equity_focused:
+    name: "Equity-Focused Benchmark"
+    description: "90/10 Equity/Other allocation for growth-oriented portfolios"
+    weights:
+      Global_Equity: 0.90
+      Global_Bonds: 0.05
+      Real_Estate: 0.03
+      Cash: 0.02
+
+# ============================================================================
+# Attribution Analysis Configuration
+# ============================================================================
+
+attribution_settings:
+  # Default analysis periods
+  default_periods:
+    - "1M"    # 1 Month
+    - "3M"    # 3 Months  
+    - "6M"    # 6 Months
+    - "1Y"    # 1 Year
+    - "3Y"    # 3 Years
+    
+  # Minimum data requirements
+  min_data_points: 12  # Minimum monthly data points for reliable attribution
+  
+  # Tolerance settings
+  weight_tolerance: 0.01      # 1% tolerance for weight normalization
+  calculation_tolerance: 0.0001  # 1 basis point tolerance for attribution math
+  
+  # Extreme value thresholds for data validation
+  max_asset_weight: 0.95      # Maximum single asset class weight (95%)
+  max_return_threshold: 2.0   # Maximum single period return (200%)
+  min_return_threshold: -0.90 # Minimum single period return (-90%)
+
+# ============================================================================
+# Reporting Configuration
+# ============================================================================
+
+reporting:
+  # Output format preferences
+  decimal_places: 4
+  percentage_format: true  # Display as percentages vs decimals
+  
+  # Chart settings for waterfall and attribution visualizations
+  chart_settings:
+    figure_size: [12, 8]
+    color_scheme:
+      allocation: "#1f77b4"      # Blue for allocation effects
+      selection: "#ff7f0e"       # Orange for selection effects  
+      interaction: "#2ca02c"     # Green for interaction effects
+      excess_return: "#d62728"   # Red for total excess return
+      
+  # Attribution effect significance thresholds
+  significance_thresholds:
+    material_effect: 0.005     # 50 basis points - material attribution effect
+    major_effect: 0.02         # 200 basis points - major attribution effect

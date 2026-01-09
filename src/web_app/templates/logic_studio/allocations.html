@@ -1,0 +1,409 @@
+{% extends "base.html" %}
+
+{% block title %}Target Allocations - WealthOS{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Target Allocations</h1>
+        <p class="text-gray-600 mt-2">Manage risk profiles and asset allocation targets.</p>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Risk Profile</label>
+                    <div class="flex items-center space-x-2">
+                        <select id="profileSelect" onchange="loadAllocations()"
+                            class="block w-64 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md border">
+                            <option value="">Loading...</option>
+                        </select>
+                        <button onclick="openCreateProfileModal()" class="text-blue-600 hover:text-blue-800"
+                            title="New Profile">
+                            <i class="fas fa-plus-circle text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="activeBadge" class="hidden">
+                    <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Active Profile
+                    </span>
+                </div>
+            </div>
+            <div class="space-x-3">
+                <button onclick="setActiveProfile()" id="activateBtn"
+                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium hidden">
+                    Set as Active
+                </button>
+                <button onclick="saveAllocations()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Allocations Editor -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                    <h2 class="text-lg font-medium text-gray-900">Allocation Targets</h2>
+                    <span id="totalWeight" class="text-sm font-bold text-gray-500">Total: 0%</span>
+                </div>
+                <div class="p-6">
+                    <div id="allocationsContainer" class="space-y-4">
+                        <div class="text-center py-8 text-gray-500">Select a profile to start editing.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visualization -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-lg shadow-md p-6 sticky top-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Allocation Mix</h3>
+                <div class="relative h-64">
+                    <canvas id="allocationChart"></canvas>
+                </div>
+                <div class="mt-4 text-sm text-gray-500">
+                    <p class="mb-2"><i class="fas fa-info-circle mr-1"></i> Targets define how your portfolio is
+                        rebalanced.</p>
+                    <p>Ensure targets sum to 100%.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Profile Modal -->
+<div id="createProfileModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Create Risk Profile</h3>
+            <div class="mt-2 text-left">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <input type="text" id="newProfileName" placeholder="e.g. Aggressive Growth"
+                    class="mb-3 px-3 py-2 border rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <input type="text" id="newProfileDesc" placeholder="Optional description"
+                    class="mb-3 px-3 py-2 border rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="flex justify-end space-x-3 mt-4">
+                <button onclick="closeCreateProfileModal()"
+                    class="px-4 py-2 bg-gray-100 text-gray-700 text-base font-medium rounded-md hover:bg-gray-200">
+                    Cancel
+                </button>
+                <button onclick="createProfile()"
+                    class="px-4 py-2 bg-blue-600 text-white text-base font-medium rounded-md hover:bg-blue-700">
+                    Create
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let currentProfileId = null;
+    let availableTags = [];
+    let currentAllocations = [];
+    let chartInstance = null;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadProfiles();
+        loadTags(); // We need tags to populate the dropdowns/list
+    });
+
+    // --- Data Loading ---
+
+    function loadProfiles() {
+        fetch('/logic-studio/api/risk-profiles')
+            .then(r => r.json())
+            .then(profiles => {
+                const select = document.getElementById('profileSelect');
+                select.innerHTML = '<option value="">Select a Profile...</option>';
+                profiles.forEach(p => {
+                    const option = document.createElement('option');
+                    option.value = p.id;
+                    option.textContent = p.name;
+                    option.dataset.isActive = p.is_active;
+                    select.appendChild(option);
+
+                    if (p.is_active) {
+                        option.textContent += ' (Active)';
+                    }
+                });
+            });
+    }
+
+    function loadTags() {
+        // Fetch all taxes/tags to build the editor structure
+        // ideally we filter for "Asset Class" taxonomy, but for now getting all is okay
+        // We'll organize by Top Level -> Sub Class if possible
+        fetch('/logic-studio/api/taxonomies/1/tags') // Assuming ID 1 is Asset Class based on typical setup
+            .then(r => r.json())
+            .then(tags => {
+                availableTags = tags;
+            })
+            .catch(e => console.error("Could not load tags (Asset Class taxonomy ID might vary)", e));
+    }
+
+    function loadAllocations() {
+        const select = document.getElementById('profileSelect');
+        currentProfileId = select.value;
+
+        if (!currentProfileId) {
+            document.getElementById('allocationsContainer').innerHTML = '<div class="text-center py-8 text-gray-500">Select a profile to start editing.</div>';
+            document.getElementById('activeBadge').classList.add('hidden');
+            document.getElementById('activateBtn').classList.add('hidden');
+            renderChart([]);
+            return;
+        }
+
+        // Check active status
+        const option = select.options[select.selectedIndex];
+        const isActive = option.dataset.isActive === 'true';
+
+        if (isActive) {
+            document.getElementById('activeBadge').classList.remove('hidden');
+            document.getElementById('activateBtn').classList.add('hidden');
+        } else {
+            document.getElementById('activeBadge').classList.add('hidden');
+            document.getElementById('activateBtn').classList.remove('hidden');
+        }
+
+        fetch(`/logic-studio/api/risk-profiles/${currentProfileId}/allocations`)
+            .then(r => r.json())
+            .then(allocations => {
+                currentAllocations = allocations;
+                renderEditor();
+                updateTotal();
+            });
+    }
+
+    // --- Rendering ---
+
+    function renderEditor() {
+        const container = document.getElementById('allocationsContainer');
+        container.innerHTML = '';
+
+        // Group availableTags by Parent (Top Level)
+        const hierarchy = {};
+
+        // Find top level tags
+        availableTags.filter(t => t.is_top_level).forEach(parent => {
+            hierarchy[parent.id] = {
+                ...parent,
+                children: []
+            };
+        });
+
+        // Find children
+        availableTags.filter(t => !t.is_top_level && t.parent_id).forEach(child => {
+            if (hierarchy[child.parent_id]) {
+                hierarchy[child.parent_id].children.push(child);
+            }
+        });
+
+        // Loop through hierarchy to build UI
+        Object.values(hierarchy).forEach(parent => {
+            const parentAlloc = currentAllocations.find(a => a.tag_id === parent.id);
+            // Wait, usually we allocate to leaf nodes (sub-classes), but sometimes parents.
+            // Let's list children.
+
+            const section = document.createElement('div');
+            section.className = 'border rounded-lg p-4 bg-gray-50';
+
+            let childrenHtml = '';
+
+            parent.children.forEach(child => {
+                const alloc = currentAllocations.find(a => a.tag_id === child.id);
+                const weight = alloc ? (alloc.target_weight * 100).toFixed(1) : '0';
+
+                childrenHtml += `
+                    <div class="flex justify-between items-center py-2 border-b border-gray-200 last:border-0">
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 rounded-full bg-${child.color}-500 mr-2"></div>
+                            <span class="text-sm font-medium text-gray-700">${child.name}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="number" step="0.1" min="0" max="100" 
+                                value="${weight}"
+                                data-tag-id="${child.id}"
+                                onchange="onWeightChange(this)"
+                                class="w-20 px-2 py-1 text-right border rounded focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <span class="ml-1 text-gray-500 text-sm">%</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            section.innerHTML = `
+                <h4 class="font-bold text-gray-800 mb-3">${parent.name}</h4>
+                <div class="bg-white rounded border border-gray-200 px-3">
+                    ${childrenHtml || '<p class="text-sm text-gray-400 py-2">No sub-classes defined.</p>'}
+                </div>
+            `;
+
+            container.appendChild(section);
+        });
+
+        updateTotal();
+    }
+
+    function onWeightChange(input) {
+        updateTotal();
+    }
+
+    function updateTotal() {
+        const inputs = document.querySelectorAll('input[data-tag-id]');
+        let total = 0;
+        const dataForChart = [];
+
+        inputs.forEach(input => {
+            const val = parseFloat(input.value) || 0;
+            total += val;
+
+            if (val > 0) {
+                // Find tag name
+                const tagId = parseInt(input.dataset.tagId);
+                const tag = availableTags.find(t => t.id === tagId);
+                dataForChart.push({
+                    name: tag ? tag.name : 'Unknown',
+                    value: val,
+                    color: tag ? tag.color : 'gray'
+                });
+            }
+        });
+
+        const totalEl = document.getElementById('totalWeight');
+        totalEl.textContent = `Total: ${total.toFixed(1)}%`;
+
+        if (Math.abs(total - 100) > 0.1) {
+            totalEl.classList.remove('text-green-600');
+            totalEl.classList.add('text-red-600');
+        } else {
+            totalEl.classList.remove('text-red-600');
+            totalEl.classList.add('text-green-600');
+        }
+
+        renderChart(dataForChart);
+    }
+
+    // --- Actions ---
+
+    function saveAllocations() {
+        if (!currentProfileId) return;
+
+        const inputs = document.querySelectorAll('input[data-tag-id]');
+        const updates = [];
+
+        inputs.forEach(input => {
+            updates.push({
+                tag_id: parseInt(input.dataset.tagId),
+                weight: (parseFloat(input.value) || 0) / 100
+            });
+        });
+
+        fetch(`/logic-studio/api/risk-profiles/${currentProfileId}/allocations`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ allocations: updates })
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) alert(data.error);
+                else alert('Allocations saved successfully!');
+            });
+    }
+
+    function createProfile() {
+        const name = document.getElementById('newProfileName').value;
+        if (!name) return alert('Name required');
+
+        fetch('/logic-studio/api/risk-profiles', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: name,
+                description: document.getElementById('newProfileDesc').value
+            })
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.id) {
+                    closeCreateProfileModal();
+                    loadProfiles();
+                } else {
+                    alert(data.error);
+                }
+            });
+    }
+
+    function setActiveProfile() {
+        if (!currentProfileId) return;
+
+        if (!confirm('Set this profile as ACTIVE? This will change rebalancing targets.')) return;
+
+        fetch(`/logic-studio/api/risk-profiles/${currentProfileId}/activate`, { method: 'POST' })
+            .then(r => r.json())
+            .then(res => {
+                if (res.error) alert(res.error);
+                else {
+                    alert(res.message);
+                    loadProfiles(); // Refresh to update badges
+                }
+            });
+    }
+
+    // --- Modal Utils ---
+    function openCreateProfileModal() {
+        document.getElementById('createProfileModal').classList.remove('hidden');
+    }
+    function closeCreateProfileModal() {
+        document.getElementById('createProfileModal').classList.add('hidden');
+    }
+
+    // --- Chart ---
+    function renderChart(data) {
+        const ctx = document.getElementById('allocationChart').getContext('2d');
+
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+
+        const colors = {
+            'blue': '#3B82F6', 'green': '#10B981', 'red': '#EF4444',
+            'yellow': '#F59E0B', 'purple': '#8B5CF6', 'gray': '#6B7280'
+        };
+
+        chartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: data.map(d => d.name),
+                datasets: [{
+                    data: data.map(d => d.value),
+                    backgroundColor: data.map(d => colors[d.color] || '#cbd5e1'),
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+
+</script>
+{% endblock %}

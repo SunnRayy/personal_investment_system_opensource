@@ -1,0 +1,1640 @@
+{% extends "base_template.html" %}
+
+{% block title %}{{ _('Portfolio & Performance Report') }}{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">{{ _('Portfolio Report') }}</li>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="container">
+        <h1><i class="bi bi-graph-up-arrow"></i> {{ _('Portfolio & Performance Report') }}</h1>
+        <p>{{ _('Detailed analysis of your investment portfolio and historical performance') }}</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Portfolio At-a-Glance Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="section-title">{{ _('Portfolio At-a-Glance') }}</h2>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="kpi-card">
+                <div class="kpi-value">¥{{ total_portfolio_value }}</div>
+                <div class="kpi-label">{{ _('Total Portfolio Value') }}</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="kpi-card">
+                <div class="kpi-value">¥{{ total_liability }}</div>
+                <div class="kpi-label">{{ _('Total Liability') }}</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="kpi-card">
+                <div class="kpi-value">¥{{ total_net_assets }}</div>
+                <div class="kpi-label">{{ _('Total Net Assets') }}</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="kpi-card">
+                <div class="kpi-value">¥{{ total_liquid_portfolio }}</div>
+                <div class="kpi-label">{{ _('Total Liquid Portfolio') }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lifetime Performance Metrics (Since Inception) -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <h3 class="section-subtitle mb-3">
+                <i class="bi bi-pie-chart me-2"></i>{{ _('Asset Allocation Overview') }}
+            </h3>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="kpi-card">
+                <div class="kpi-value">
+                    {{ dual_metrics.lifetime.xirr }}%
+                    {% if xirr_metadata.show_warning %}
+                    <i class="bi bi-exclamation-triangle-fill xirr-warning" data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="This XIRR calculation is approximated using {{ xirr_metadata.method_used }} method. Confidence: {{ xirr_metadata.confidence }}."></i>
+                    {% endif %}
+                </div>
+                <div class="kpi-label-with-warning">
+                    <span>{{ _('Overall XIRR') }}</span>
+                    {% if xirr_metadata.show_warning %}
+                    <small class="text-muted">({{ _('approximated') }})</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="kpi-card">
+                <div class="kpi-value">{{ dual_metrics.lifetime.portfolio_growth }}%</div>
+                <div class="kpi-label">{{ _('Portfolio Growth') }}</div>
+                <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">{{ _('Includes cash flows')
+                    }}</small>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="kpi-card">
+                <div class="kpi-value">{{ dual_metrics.lifetime.twr }}%</div>
+                <div class="kpi-label">{{ _('True TWR') }}</div>
+                <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">{{ _('Cash flow adjusted') }}</small>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="kpi-card">
+                <div class="kpi-value">{{ dual_metrics.lifetime.sharpe }}</div>
+                <div class="kpi-label">{{ _('Sharpe Ratio') }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trailing 12-Month Performance -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <h3 class="section-subtitle mb-3">
+                <i class="bi bi-calendar-check me-2"></i>{{ _('6-Month Cash Flow Forecast') }}
+            </h3>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="kpi-card kpi-card-secondary">
+                <div class="kpi-value text-muted">
+                    {{ dual_metrics.trailing_12m.xirr }}
+                    {% if dual_metrics.trailing_12m.xirr == "N/A" %}
+                    <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="top"
+                        title="12-month XIRR requires balance sheet integration. Currently showing Sharpe Ratio and TWR only."></i>
+                    {% else %}
+                    %
+                    {% endif %}
+                </div>
+                <div class="kpi-label">{{ _('12-Month XIRR') }}</div>
+                {% if dual_metrics.trailing_12m.xirr == "N/A" %}
+                <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">{{ _('Phase 4 enhancement') }}</small>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="kpi-card kpi-card-secondary">
+                <div class="kpi-value">
+                    {{ dual_metrics.trailing_12m.portfolio_growth }}
+                    {% if dual_metrics.trailing_12m.portfolio_growth != "N/A" %}%{% endif %}
+                </div>
+                <div class="kpi-label">{{ _('12-Month Growth') }}</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="kpi-card kpi-card-secondary">
+                <div class="kpi-value">
+                    {{ dual_metrics.trailing_12m.twr }}
+                    {% if dual_metrics.trailing_12m.twr != "N/A" %}%{% endif %}
+                </div>
+                <div class="kpi-label">{{ _('12-Month TWR') }}</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="kpi-card kpi-card-secondary">
+                <div class="kpi-value">{{ dual_metrics.trailing_12m.sharpe }}</div>
+                <div class="kpi-label">{{ _('12-Month Sharpe') }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Asset Allocation Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="section-title">{{ _('Current Asset Allocation') }}</h2>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h5 class="text-center mb-4">{{ _('Allocation by Top-Level Class') }}</h5>
+                <canvas id="topLevelChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h5 class="text-center mb-4">{{ _('Allocation by Strategic Tier') }}</h5>
+                <canvas id="subClassChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historical Performance Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="section-title">{{ _('Historical Performance') }}</h2>
+
+            <!-- Portfolio Growth Chart -->
+            <div class="col-12 mb-4">
+                <div class="chart-container">
+                    <h4 class="chart-title">{{ _('Portfolio Growth Over Time') }}</h4>
+                    <p class="text-muted mb-3">{{ _('Total portfolio value progression over historical periods') }}</p>
+                    <div style="position: relative; height: 400px;">
+                        <canvas id="portfolioGrowthChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cash Flow Analysis Chart -->
+            <div class="col-12 mb-4">
+                <div class="chart-container">
+                    <h4 class="chart-title">{{ _('Monthly Cash Flow Analysis') }}</h4>
+                    <p class="text-muted mb-3">{{ _('Income, expenses, and investments breakdown over time') }}</p>
+                    <div style="position: relative; height: 400px;">
+                        <canvas id="cashFlowChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Time-Weighted Return (TWR) Chart -->
+            <div class="col-12 mb-4">
+                <div class="chart-container">
+                    <h4 class="chart-title">{{ _('Time-Weighted Return (TWR)') }}</h4>
+                    <p class="text-muted mb-3">{{ _('Pure investment performance excluding the impact of cash flows') }}
+                    </p>
+                    <div style="position: relative; height: 400px;">
+                        <canvas id="twrChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Drawdown History Chart -->
+            <div class="col-12 mb-4">
+                <div class="chart-container">
+                    <h4 class="chart-title">{{ _('Portfolio Drawdown History') }}</h4>
+                    <p class="text-muted mb-3">{{ _('Historical peak-to-trough decline analysis showing portfolio
+                        volatility') }}
+                    </p>
+                    <div style="position: relative; height: 400px;">
+                        <canvas id="drawdownChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance by Asset Class Tables -->
+            <div class="col-12">
+                <div class="table-container">
+                    <h4 class="section-title">{{ _('Performance by Asset Class') }}</h4>
+
+                    <!-- Top-Level Performance Table -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="mb-3">{{ _('Top-Level Classes') }}</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ _('Asset Class') }}</th>
+                                            <th class="text-end">{{ _('Market Value (CNY)') }}</th>
+                                            <th class="text-end">{{ _('% of Portfolio') }}</th>
+                                            <th class="text-end">{{ _('Weighted Avg. XIRR (%)') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in top_level_performance %}
+                                        <tr>
+                                            <td>{{ item.class_name }}</td>
+                                            <td class="text-end">¥{{ "{:,.0f}".format(item.market_value) }}</td>
+                                            <td class="text-end">{{ "{:.1f}".format(item.portfolio_percentage) }}%</td>
+                                            <td
+                                                class="text-end {% if item.xirr and item.xirr > 0 %}positive{% elif item.xirr and item.xirr < 0 %}negative{% else %}text-muted{% endif %}">
+                                                {% if item.xirr is not none %}
+                                                {{ "{:.2f}".format(item.xirr) }}%
+                                                {% if item.metadata and item.metadata.show_warning %}
+                                                <i class="bi bi-exclamation-triangle-fill xirr-warning"
+                                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                                    title="{{ item.metadata.approximated_count }}/{{ item.metadata.total_count }} assets approximated ({{ '{:.0f}'.format(item.metadata.approximation_percentage) }}%)"></i>
+                                                {% endif %}
+                                                {% else %}
+                                                N/A
+                                                <i class="bi bi-exclamation-triangle-fill xirr-warning"
+                                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                                    title="No XIRR data available for this asset class"></i>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Sub-Class Performance Table -->
+                        <div class="col-md-6">
+                            <h5 class="mb-3">{{ _('Sub-Classes') }}</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ _('Sub-Class') }}</th>
+                                            <th class="text-end">{{ _('Market Value (CNY)') }}</th>
+                                            <th class="text-end">{{ _('% of Portfolio') }}</th>
+                                            <th class="text-end">{{ _('Weighted Avg. XIRR (%)') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in sub_class_performance %}
+                                        <tr>
+                                            <td>{{ item.class_name }}</td>
+                                            <td class="text-end">¥{{ "{:,.0f}".format(item.market_value) }}</td>
+                                            <td class="text-end">{{ "{:.1f}".format(item.portfolio_percentage) }}%</td>
+                                            <td
+                                                class="text-end {% if item.xirr and item.xirr > 0 %}positive{% elif item.xirr and item.xirr < 0 %}negative{% else %}text-muted{% endif %}">
+                                                {% if item.xirr is not none %}
+                                                {{ "{:.2f}".format(item.xirr) }}%
+                                                {% if item.metadata and item.metadata.show_warning %}
+                                                <i class="bi bi-exclamation-triangle-fill xirr-warning"
+                                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                                    title="{{ item.metadata.approximated_count }}/{{ item.metadata.total_count }} assets approximated ({{ '{:.0f}'.format(item.metadata.approximation_percentage) }}%)"></i>
+                                                {% endif %}
+                                                {% else %}
+                                                N/A
+                                                <i class="bi bi-exclamation-triangle-fill xirr-warning"
+                                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                                    title="No XIRR data available for this sub-class"></i>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 12-Month Financial Forecast Section -->
+        <div class="row">
+            <div class="col-12">
+                <h2 class="section-title">{{ _('12-Month Financial Forecast') }}</h2>
+                <p class="section-description">
+                    {{ _('SARIMA-based forecasting for the next 12 months of income, expenses, and investments.') }}
+                    {{ _('Projections are based on historical patterns and trends in your financial data.') }}
+                </p>
+            </div>
+
+            <!-- Forecast Chart -->
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h4 class="chart-title">{{ _('Cash Flow Forecast (Next 12 Months)') }}</h4>
+                        <div style="position: relative; height: 400px;">
+                            <canvas id="forecastChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Forecast Summary Table -->
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-4">{{ _('Forecast Summary') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>{{ _('Metric') }}</th>
+                                        <th class="text-end">{{ _('Monthly Average') }}</th>
+                                        <th class="text-end">{{ _('12-Month Total') }}</th>
+                                        <th>{{ _('Trend') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>{{ _('Income') }}</strong></td>
+                                        <td class="text-end text-success" id="avgIncome">¥--</td>
+                                        <td class="text-end text-success" id="totalIncome">¥--</td>
+                                        <td><span id="incomeTrend" class="badge bg-info">Stable</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>{{ _('Expenses') }}</strong></td>
+                                        <td class="text-end text-danger" id="avgExpenses">¥--</td>
+                                        <td class="text-end text-danger" id="totalExpenses">¥--</td>
+                                        <td><span id="expensesTrend" class="badge bg-info">Stable</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>{{ _('Investments') }}</strong></td>
+                                        <td class="text-end text-primary" id="avgInvestments">¥--</td>
+                                        <td class="text-end text-primary" id="totalInvestments">¥--</td>
+                                        <td><span id="investmentsTrend" class="badge bg-info">Stable</span></td>
+                                    </tr>
+                                    <tr class="table-light">
+                                        <td><strong>{{ _('Net Cash Flow') }}</strong></td>
+                                        <td class="text-end" id="avgNetFlow">¥--</td>
+                                        <td class="text-end" id="totalNetFlow">¥--</td>
+                                        <td><span id="netFlowTrend" class="badge bg-success">Positive</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle"></i>
+                                {{ _('Forecasts are generated using SARIMA (Seasonal AutoRegressive Integrated Moving
+                                Average) models based on historical data patterns.') }}
+                                {{ _('Actual results may vary due to market conditions and personal financial
+                                decisions.') }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Realized vs. Unrealized Gains Analysis Section -->
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="section-title">{{ _('Realized vs. Unrealized Gains Analysis') }}</h2>
+
+                    <!-- KPI Cards Row -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="kpi-card gains-card realized-gains">
+                                <div class="kpi-value">¥{{ "{:,.0f}".format(gains_analysis_data.realized_gains) }}</div>
+                                <div class="kpi-label">{{ _('Total Realized Gains') }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="kpi-card gains-card unrealized-gains">
+                                <div class="kpi-value">¥{{ "{:,.0f}".format(gains_analysis_data.unrealized_gains) }}
+                                </div>
+                                <div class="kpi-label">{{ _('Total Unrealized Gains') }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="kpi-card gains-card total-gains">
+                                <div class="h3 mb-0">¥{{ '{:,.0f}'.format(kpis.total_portfolio_value) }}</div>
+                                <small class="text-muted">{{ _('Total Portfolio Value') }}</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gains Comparison Chart -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <h5>{{ _('Gains Breakdown') }}</h5>
+                                <div style="position: relative; height: 300px;">
+                                    <canvas id="gainsComparisonChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        {% if gains_analysis_data.subclass_breakdown %}
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <h5>{{ _('Sub-Class Level Realized vs Unrealized') }}</h5>
+                                <div style="position: relative; height: 300px;">
+                                    <canvas id="subclassGainsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PHASE 7.2.1: Detailed Holdings Section - Moved here for better information flow -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="table-container">
+                    <h2 class="section-title">{{ _('Detailed Holdings') }}</h2>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{{ _('Top Class') }}</th>
+                                    <th>{{ _('Sub-class') }}</th>
+                                    <th style="width: 250px;">{{ _('Asset Name') }}</th>
+                                    <th class="text-end">{{ _('Weight') }}</th>
+                                    <th class="text-end" style="width: 140px;">{{ _('Market Value') }}</th>
+                                    <th class="text-end">{{ _('Price') }}</th>
+                                    <th class="text-end" style="min-width: 120px;">{{ _('Total Gain') }}</th>
+                                    <th class="text-end">{{ _('Gain %') }}</th>
+                                    <th class="text-end">{{ _('Holding Duration') }}</th>
+                                    <th class="text-end">{{ _('XIRR') }}</th>
+                                    <th class="text-center">{{ _('Status') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for holding in holdings %}
+                                {% if holding.is_subtotal %}
+                                {% if holding.subtotal_type == 'top_class' %}
+                                <!-- Top Class Subtotal Row -->
+                                <tr class="subtotal-row top-class-subtotal">
+                                    <td colspan="3"><strong>{{ holding.top_class }}</strong></td>
+                                    <td></td>
+                                    <td class="text-end"><strong>¥{{ holding.market_value }}</strong></td>
+                                    <td class="text-end"><strong>{{ holding.portfolio_percentage }}%</strong></td>
+                                    <!-- Phase 5 Task 5.3: Add P/L columns -->
+                                    <td class="text-end">
+                                        {% if holding.total_pnl %}
+                                        {% set pnl_value = holding.total_pnl | replace(',', '') | float %}
+                                        <strong
+                                            class="{% if pnl_value > 0 %}text-success{% elif pnl_value < 0 %}text-danger{% endif %}">
+                                            ¥{{ holding.total_pnl }}
+                                        </strong>
+                                        {% else %}
+                                        <strong>-</strong>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if holding.pnl_percentage %}
+                                        {% set pnl_pct = holding.pnl_percentage | replace('%', '') | replace('+', '') |
+                                        float %}
+                                        <strong
+                                            class="{% if pnl_pct > 0 %}text-success{% elif pnl_pct < 0 %}text-danger{% endif %}">
+                                            {{ holding.pnl_percentage }}
+                                        </strong>
+                                        {% else %}
+                                        <strong>-</strong>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end"></td>
+                                    <td class="text-center"></td>
+                                </tr>
+                                {% elif holding.subtotal_type == 'sub_class' %}
+                                <!-- Sub-class Subtotal Row -->
+                                <tr class="subtotal-row sub-class-subtotal">
+                                    <td></td>
+                                    <td colspan="2"><strong>{{ holding.sub_class }}</strong></td>
+                                    <td></td>
+                                    <td class="text-end"><strong>¥{{ holding.market_value }}</strong></td>
+                                    <td class="text-end"><strong>{{ holding.portfolio_percentage }}%</strong></td>
+                                    <!-- Phase 5 Task 5.3: Add P/L columns -->
+                                    <td class="text-end">
+                                        {% if holding.total_pnl %}
+                                        {% set pnl_value = holding.total_pnl | replace(',', '') | float %}
+                                        <strong
+                                            class="{% if pnl_value > 0 %}text-success{% elif pnl_value < 0 %}text-danger{% endif %}">
+                                            ¥{{ holding.total_pnl }}
+                                        </strong>
+                                        {% else %}
+                                        <strong>-</strong>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if holding.pnl_percentage %}
+                                        {% set pnl_pct = holding.pnl_percentage | replace('%', '') | replace('+', '') |
+                                        float %}
+                                        <strong
+                                            class="{% if pnl_pct > 0 %}text-success{% elif pnl_pct < 0 %}text-danger{% endif %}">
+                                            {{ holding.pnl_percentage }}
+                                        </strong>
+                                        {% else %}
+                                        <strong>-</strong>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end"></td>
+                                    <td class="text-center"></td>
+                                </tr>
+                                {% endif %}
+                                {% else %}
+                                <!-- Individual Asset Row -->
+                                <tr
+                                    class="asset-row {% if holding.status == 'Unmapped' %}status-unmapped{% elif holding.status == 'Non-Rebalanceable' %}status-non-rebalanceable{% endif %}">
+                                    <td>{% if holding.top_class %}<span class="badge bg-primary">{{ holding.top_class
+                                            }}</span>{% endif %}</td>
+                                    <td>{% if holding.sub_class %}<span class="badge bg-secondary">{{ holding.sub_class
+                                            }}</span>{% endif %}</td>
+                                    <td>
+                                        <span class="badge bg-secondary mb-1" style="font-size: 0.75rem;">
+                                            {{ _(holding.tier) }} / {{ _(holding.asset_class) }}
+                                        </span>
+                                        <div class="fw-bold">{{ _(holding.name) }}</div>
+                                        <small class="text-muted">{{ holding.id }}</small>
+                                    </td>
+                                    <td class="text-end">¥{{ holding.market_value }}</td>
+                                    <td class="text-end">{{ holding.portfolio_percentage }}%</td>
+                                    <!-- Phase 5 Task 5.3: Add P/L columns -->
+                                    <td class="text-end">
+                                        {% if holding.total_pnl and holding.total_pnl != '0' %}
+                                        {% set pnl_value = holding.total_pnl | replace(',', '') | float %}
+                                        <span
+                                            class="{% if pnl_value > 0 %}text-success{% elif pnl_value < 0 %}text-danger{% endif %}">
+                                            ¥{{ holding.total_pnl }}
+                                        </span>
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if holding.pnl_percentage and holding.pnl_percentage != '+0.00%' %}
+                                        {% set pnl_pct = holding.pnl_percentage | replace('%', '') | replace('+', '') |
+                                        float %}
+                                        <span
+                                            class="{% if pnl_pct > 0 %}text-success{% elif pnl_pct < 0 %}text-danger{% endif %}">
+                                            {{ holding.pnl_percentage }}
+                                        </span>
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if holding.xirr is not none %}
+                                        {{ "{:.2f}".format(holding.xirr) }}%
+                                        {% else %}
+                                        N/A
+                                        {% endif %}
+                                    </td>
+                                    <td class="fw-bold">
+                                        {{ _(xirr.category) }}
+                                        <span class="badge bg-secondary ms-1 fw-normal" style="font-size: 0.7rem;">{{
+                                            _(xirr.tier) }}</span>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lifetime Asset Performance Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="section-title d-flex align-items-center">
+                    <span>{{ _('Lifetime Asset Performance') }}</span>
+                    <button id="toggleLifetimeBtn" class="btn btn-sm btn-outline-secondary ms-3" type="button"
+                        onclick="toggleLifetimePerf()">{{ _('Show Table') }}</button>
+                </h2>
+                <div id="lifetimePerformancePanel" class="table-container" style="display: none;">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped" id="lifetimePerformanceTable">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortLifetimeTable(0)">{{ _('Asset Name') }} <i class="fas fa-sort"></i>
+                                    </th>
+                                    <th onclick="sortLifetimeTable(1)">{{ _('Asset Class') }} <i
+                                            class="fas fa-sort"></i></th>
+                                    <th onclick="sortLifetimeTable(2)">{{ _('Holding Period') }} <i
+                                            class="fas fa-sort"></i></th>
+                                    <th onclick="sortLifetimeTable(3)">{{ _('Status') }} <i class="fas fa-sort"></i>
+                                    </th>
+                                    <th onclick="sortLifetimeTable(4)">{{ _('Total Invested') }} <i
+                                            class="fas fa-sort"></i></th>
+                                    <th onclick="sortLifetimeTable(5)">{{ _('Current Value') }} <i
+                                            class="fas fa-sort"></i></th>
+                                    <th onclick="sortLifetimeTable(6)">{{ _('Profit/Loss') }} <i
+                                            class="fas fa-sort"></i></th>
+                                    <th onclick="sortLifetimeTable(7)">{{ _('Return %') }} <i class="fas fa-sort"></i>
+                                    </th>
+                                    <th onclick="sortLifetimeTable(8)">{{ _('XIRR') }} <i class="fas fa-sort"></i></th>
+                                    <th onclick="sortLifetimeTable(9)">{{ _('Performance Status') }} <i
+                                            class="fas fa-sort"></i>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for asset in lifetime_performance %}
+                                <tr>
+                                    <td><strong>{{ asset.asset_name }}</strong></td>
+                                    <td>{{ asset.asset_class }}</td>
+                                    <td>{{ asset.holding_period }}</td>
+                                    <td>
+                                        {% if asset.status == 'Active' %}
+                                        <span class="badge bg-success">{{ asset.status }}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ asset.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>¥{{ asset.total_invested }}</td>
+                                    <td>¥{{ asset.current_value }}</td>
+                                    <td
+                                        class="{% if asset.profit_loss_float >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                        ¥{{ asset.profit_loss }}
+                                    </td>
+                                    <td
+                                        class="{% if asset.return_percent_float >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                        {{ asset.return_percent }}%
+                                    </td>
+                                    <td
+                                        class="{% if asset.xirr_float and asset.xirr_float >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                        {% if asset.xirr %}{{ asset.xirr }}%{% else %}N/A{% endif %}
+                                    </td>
+                                    <td>
+                                        {% if asset.performance_status == _('Excellent') %}
+                                        <span class="badge bg-success">{{ asset.performance_status }}</span>
+                                        {% elif asset.performance_status == _('Good') %}
+                                        <span class="badge bg-info">{{ asset.performance_status }}</span>
+                                        {% elif asset.performance_status == _('Average') %}
+                                        <span class="badge bg-warning">{{ asset.performance_status }}</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">{{ asset.performance_status }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- XIRR Diagnostics Section -->
+        <div class="row mb-5 mt-5">
+            <div class="col-12">
+                <h2 class="section-title d-flex align-items-center">
+                    <span>{{ _('XIRR Diagnostics') }}</span>
+                    <button id="toggleXirrBtn" class="btn btn-sm btn-outline-secondary ms-3" type="button"
+                        onclick="toggleXirrDiag()">{{ _('Show Diagnostics') }}</button>
+                </h2>
+            </div>
+            <div class="col-12">
+                <div id="xirrDiagnosticsPanel" class="table-container" style="display:none;">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <strong><i class="bi bi-info-circle"></i> {{ _('XIRR Calculation Details:')
+                                    }}</strong><br>
+                                {{ _('XIRR (Extended Internal Rate of Return) calculations include all cash flows:
+                                purchases, sales, dividends, and current market value.') }}
+                                {{ _('A robust Newton-Raphson method with multiple fallback approaches ensures accurate
+                                calculations even for complex cash flow patterns.') }}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if xirr_diagnostics and xirr_diagnostics.calculations %}
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped" id="xirrDiagnosticsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ _('Asset Name') }}</th>
+                                            <th>{{ _('XIRR Result') }}</th>
+                                            <th>{{ _('Calculation Method') }}</th>
+                                            <th>{{ _('Status') }}</th>
+                                            <th>{{ _('Reason/Notes') }}</th>
+                                            <th>{{ _('Cash Flows Count') }}</th>
+                                            <th>{{ _('Period (Days)') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for diag in xirr_diagnostics.calculations %}
+                                        <tr
+                                            class="{% if diag.status == 'success' %}table-success{% elif diag.status == 'warning' %}table-warning{% else %}table-danger{% endif %}">
+                                            <td><strong>{{ diag.asset_name }}</strong></td>
+                                            <td>
+                                                {% if diag.xirr %}
+                                                <span
+                                                    class="{% if diag.xirr >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                                    {% if xirr.xirr > 0.15 %}{{ _('Excellent') }}{% elif xirr.xirr >
+                                                    0.08 %}{{ _('Good') }}{% elif xirr.xirr > 0.04 %}{{ _('Average')
+                                                    }}{% else %}{{ _('Underperforming') }}{% endif %}
+                                                </span>
+                                                {% else %}
+                                                <span class="text-muted">N/A</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <span class="badge 
+                                                    {% if diag.method == 'newton_raphson' %}bg-success
+                                                    {% elif diag.method == 'scipy_optimization' %}bg-info
+                                                    {% elif diag.method == 'simple_irr' %}bg-warning
+                                                    {% else %}bg-secondary{% endif %}">
+                                                    {{ diag.method|title|replace('_', ' ') }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge 
+                                                        {% if diag.status == 'success' %}bg-success
+                                                        {% elif diag.status == 'warning' %}bg-warning
+                                                        {% else %}bg-danger{% endif %}">
+                                                    {{ _(diag.status)|title }}
+                                                </span>
+                                            </td>
+                                            <td><small class="text-muted">{{ diag.reason }}</small></td>
+                                            <td class="text-center">{{ diag.cash_flows_count }}</td>
+                                            <td class="text-center">{{ diag.period_days }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Statistics -->
+                    <div class="row mt-4">
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title text-success">{{ xirr_diagnostics.summary.successful }}</h5>
+                                    <p class="card-text">{{ _('Successful') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title text-warning">{{ xirr_diagnostics.summary.warnings }}</h5>
+                                    <p class="card-text">{{ _('Warnings') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title text-danger">{{ xirr_diagnostics.summary.failures }}</h5>
+                                    <p class="card-text">{{ _('Failures') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary">{{ xirr_diagnostics.summary.total }}</h5>
+                                    <p class="card-text">{{ _('Total Assets') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        {{ _('No XIRR diagnostic data available. This may occur if no assets have sufficient transaction
+                        history for XIRR calculation.') }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Portfolio Dashboard Chart Initialization -->
+<script>
+    // Parse allocation data for charts
+    const topLevelData = JSON.parse('{{ top_level_allocation_json | safe }}');
+    const subClassData = JSON.parse('{{ sub_class_allocation_json | safe }}');
+
+    // Color palettes
+    const topLevelColors = [
+        '#FF6384',  // Pink/Red
+        '#36A2EB',  // Blue
+        '#FFCE56',  // Yellow
+        '#4BC0C0',  // Teal
+        '#9966FF',  // Purple
+        '#FF9F40',  // Orange
+        '#C9CBCF'   // Grey
+    ];
+
+    const subClassColors = [
+        '#667eea',  // Primary Blue
+        '#764ba2',  // Purple
+        '#f093fb',  // Pink
+        '#4facfe',  // Light Blue
+        '#43e97b',  // Green
+        '#38f9d7',  // Cyan
+        '#fa709a',  // Rose
+        '#fee140',  // Yellow
+        '#30cfd0',  // Turquoise
+        '#F06292',  // Pink Rose
+        '#BA68C8',  // Light Purple
+        '#FFB74D',  // Amber
+        '#4DD0E1',  // Cyan Light
+        '#81C784',  // Light Green
+        '#50C878',  // Emerald Green
+        '#73D398',  // Light Emerald
+        '#6C757D',  // Professional Grey
+        '#8A9196',  // Light Grey
+        '#17A2B8',  // Teal
+        '#41B5C6',  // Light Teal
+        '#6F42C1',  // Purple
+        '#8A5FCF'   // Light Purple
+    ];
+
+    // Register Chart.js datalabels plugin
+    Chart.register(ChartDataLabels);
+
+    // Common chart options for donut charts
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 20,
+                    usePointStyle: true,
+                    font: {
+                        size: 12
+                    }
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function (context) {
+                        const label = context.label || '';
+                        const value = context.formattedValue;
+                        const percentage = ((context.raw / context.dataset.data.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
+                        return `${label}: ${value} (${percentage}%)`;
+                    }
+                }
+            },
+            datalabels: {
+                display: function (context) {
+                    // Only show labels for slices > 3% to avoid clutter
+                    const percentage = (context.parsed / context.dataset.data.reduce((a, b) => a + b, 0)) * 100;
+                    return percentage > 3;
+                },
+                formatter: function (value, context) {
+                    const percentage = ((value / context.dataset.data.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
+                    return percentage + '%';
+                },
+                color: '#ffffff',
+                font: {
+                    weight: 'bold',
+                    size: 11
+                },
+                textStrokeColor: '#000000',
+                textStrokeWidth: 1
+            }
+        }
+    };
+
+    // Top-Level Allocation Chart
+    const topLevelCtx = document.getElementById('topLevelChart').getContext('2d');
+    new Chart(topLevelCtx, {
+        type: 'doughnut',
+        data: {
+            labels: topLevelData.labels,
+            datasets: [{
+                data: topLevelData.values,
+                backgroundColor: topLevelColors.slice(0, topLevelData.labels.length),
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: chartOptions
+    });
+
+    // Sub-Class Allocation Chart
+    const subClassCtx = document.getElementById('subClassChart').getContext('2d');
+    new Chart(subClassCtx, {
+        type: 'doughnut',
+        data: {
+            labels: subClassData.labels,
+            datasets: [{
+                data: subClassData.values,
+                backgroundColor: subClassColors.slice(0, subClassData.labels.length),
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: chartOptions
+    });
+
+    // Portfolio Growth Chart
+    const portfolioGrowthData = JSON.parse('{{ portfolio_growth_json | safe }}');
+    const portfolioGrowthCtx = document.getElementById('portfolioGrowthChart').getContext('2d');
+    new Chart(portfolioGrowthCtx, {
+        type: 'line',
+        data: {
+            labels: portfolioGrowthData.dates,
+            datasets: [{
+                label: '{{ _('Portfolio Growth(%)') }}',
+                    data: portfolioGrowthData.growth_values,
+                        borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                borderWidth: 3,
+                                    fill: true,
+                                        tension: 0.4,
+                                            pointBackgroundColor: '#667eea',
+                                                pointBorderColor: '#ffffff',
+                                                    pointBorderWidth: 2,
+                                                        pointRadius: 4,
+                                                            pointHoverRadius: 6
+            }]
+        },
+    options: {
+        responsive: true,
+            maintainAspectRatio: false,
+                interaction: {
+            intersect: false,
+                mode: 'index'
+        },
+        plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                        bodyColor: '#ffffff',
+                            borderColor: '#667eea',
+                                borderWidth: 1,
+                                    cornerRadius: 8,
+                                        displayColors: false,
+                                            callbacks: {
+                    label: function (context) {
+                        const value = context.parsed.y;
+                        return (value >= 0 ? '+' : '') + value.toFixed(2) + '%';
+                    }
+                }
+            },
+            datalabels: {
+                display: false
+            }
+        },
+        scales: {
+            x: {
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    color: '#6c757d'
+                }
+            },
+            y: {
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.1)'
+                },
+                ticks: {
+                    color: '#6c757d',
+                        callback: function (value) {
+                            return (value >= 0 ? '+' : '') + value.toFixed(1) + '%';
+                        }
+                }
+            }
+        }
+    }
+    });
+
+    // Cash Flow Stacked Chart
+    const cashFlowData = JSON.parse('{{ cash_flow_json | safe }}');
+    const cashFlowCtx = document.getElementById('cashFlowChart').getContext('2d');
+    new Chart(cashFlowCtx, {
+        type: 'bar',
+        data: {
+            labels: cashFlowData.dates,
+            datasets: [
+                {
+                    label: '{{ _('Income') }}',
+                    data: cashFlowData.income,
+                    backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: '{{ _('Expenses') }}',
+                    data: cashFlowData.expenses,
+                    backgroundColor: 'rgba(220, 53, 69, 0.8)',
+                    borderColor: 'rgba(220, 53, 69, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: '{{ _('Investments') }}',
+                    data: cashFlowData.investments,
+                    backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: '#667eea',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function (context) {
+                            const value = Math.abs(context.parsed.y);
+                            return context.dataset.label + ': ¥' + value.toLocaleString();
+                        },
+                        footer: function (tooltipItems) {
+                            let income = 0, expense = 0, investment = 0;
+                            tooltipItems.forEach(function (item) {
+                                if (item.dataset.label === 'Income') income = item.parsed.y;
+                                else if (item.dataset.label === 'Expenses') expense = Math.abs(item.parsed.y);
+                                else if (item.dataset.label === 'Investments') investment = Math.abs(item.parsed.y);
+                            });
+                            const netFlow = income - expense - investment;
+                            return '{{ _('Net Cash Flow: ') }} ¥' + netFlow.toLocaleString();
+                        }
+                    }
+                },
+                datalabels: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#6c757d'
+                    }
+                },
+                y: {
+                    stacked: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    ticks: {
+                        color: '#6c757d',
+                        callback: function (value) {
+                            return '¥' + (value / 1000).toFixed(0) + 'K';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Time-Weighted Return Chart
+    const twrData = JSON.parse('{{ twr_json | safe }}');
+    const twrCtx = document.getElementById('twrChart').getContext('2d');
+    new Chart(twrCtx, {
+        type: 'line',
+        data: {
+            labels: twrData.dates,
+            datasets: [{
+                label: '{{ _('Time- Weighted Return(%)') }}',
+                data: twrData.twr_values,
+                borderColor: 'rgba(102, 126, 234, 1)',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.1,
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2
+            }]
+    },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+            intersect: false,
+            mode: 'index'
+        },
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                    usePointStyle: true,
+                    padding: 20
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                titleColor: '#ffffff',
+                bodyColor: '#ffffff',
+                borderColor: '#667eea',
+                borderWidth: 1,
+                cornerRadius: 8,
+                callbacks: {
+                    label: function (context) {
+                        const value = context.parsed.y;
+                        return '{{ _('TWR: ') }} ' + (value >= 0 ? '+' : '') + value.toFixed(2) + '%';
+                    }
+                }
+            },
+            datalabels: {
+                display: false
+            }
+        },
+        scales: {
+            x: {
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    color: '#6c757d'
+                }
+            },
+            y: {
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.1)'
+                },
+                ticks: {
+                    color: '#6c757d',
+                    callback: function (value) {
+                        return (value >= 0 ? '+' : '') + value.toFixed(1) + '%';
+                    }
+                }
+            }
+        }
+    }
+    });
+
+    // Portfolio Drawdown History Chart
+    const drawdownData = JSON.parse('{{ drawdown_json | safe }}');
+    const drawdownCtx = document.getElementById('drawdownChart').getContext('2d');
+    new Chart(drawdownCtx, {
+        type: 'line',
+        data: {
+            labels: drawdownData.dates,
+            datasets: [{
+                label: '{{ _('Drawdown(%)') }}',
+                    data: drawdownData.drawdown_values,
+                        borderColor: 'rgba(220, 53, 69, 1)',
+                            backgroundColor: 'rgba(220, 53, 69, 0.2)',
+                                borderWidth: 2,
+                                    fill: true,
+                                        tension: 0.1,
+                                            pointRadius: 2,
+                                                pointHoverRadius: 4,
+                                                    pointBackgroundColor: 'rgba(220, 53, 69, 1)',
+                                                        pointBorderColor: '#ffffff',
+                                                            pointBorderWidth: 2
+            }]
+        },
+    options: {
+        responsive: true,
+            maintainAspectRatio: false,
+                interaction: {
+            intersect: false,
+                mode: 'index'
+        },
+        plugins: {
+            legend: {
+                display: true,
+                    position: 'top',
+                        labels: {
+                    usePointStyle: true,
+                        padding: 20
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                        bodyColor: '#ffffff',
+                            borderColor: '#dc3545',
+                                borderWidth: 1,
+                                    cornerRadius: 8,
+                                        callbacks: {
+                    label: function (context) {
+                        const value = context.parsed.y;
+                        return '{{ _('Drawdown: ') }} -' + value.toFixed(2) + '%';
+                    },
+                    afterLabel: function (context) {
+                        if (drawdownData.max_drawdown_pct && context.dataIndex === drawdownData.dates.length - 1) {
+                            return ['{{ _('Max Drawdown: ') }} -' + drawdownData.max_drawdown_pct.toFixed(2) + '%'];
+                        }
+                        return [];
+                    }
+                }
+            },
+            datalabels: {
+                display: false
+            }
+        },
+        scales: {
+            x: {
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    color: '#6c757d'
+                }
+            },
+            y: {
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.1)'
+                },
+                ticks: {
+                    color: '#6c757d',
+                        callback: function (value) {
+                            return '-' + value.toFixed(1) + '%';
+                        }
+                },
+                reverse: false
+            }
+        }
+    }
+    });
+
+    // 12-Month Forecast Chart
+    const forecastData = JSON.parse('{{ forecast_json|safe }}');
+    const forecastCtx = document.getElementById('forecastChart').getContext('2d');
+    new Chart(forecastCtx, {
+        type: 'line',
+        data: {
+            labels: forecastData.dates,
+            datasets: [
+                {
+                    label: '{{ _('Income Forecast') }}',
+                    data: forecastData.income_forecast,
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    borderWidth: 3,
+                    fill: false,
+                    tension: 0.4,
+                    pointBackgroundColor: 'rgba(40, 167, 69, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6
+                },
+                {
+                    label: '{{ _('Expenses Forecast') }}',
+                    data: forecastData.expenses_forecast,
+                    borderColor: 'rgba(220, 53, 69, 1)',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    borderWidth: 3,
+                    fill: false,
+                    tension: 0.4,
+                    pointBackgroundColor: 'rgba(220, 53, 69, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6
+                },
+                {
+                    label: '{{ _('Investments Forecast') }}',
+                    data: forecastData.investments_forecast,
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 3,
+                    fill: false,
+                    tension: 0.4,
+                    pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 12
+                        },
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    titleColor: '#333',
+                    bodyColor: '#333',
+                    borderColor: '#dee2e6',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    displayColors: true,
+                    callbacks: {
+                        label: function (context) {
+                            const value = Math.abs(context.parsed.y);
+                            return context.dataset.label + ': ¥' + value.toLocaleString();
+                        },
+                        afterBody: function (tooltipItems) {
+                            if (tooltipItems.length > 0) {
+                                let income = 0, expense = 0, investment = 0;
+                                tooltipItems.forEach(function (item) {
+                                    if (item.dataset.label === 'Income Forecast') income = item.parsed.y;
+                                    else if (item.dataset.label === 'Expenses Forecast') expense = Math.abs(item.parsed.y);
+                                    else if (item.dataset.label === 'Investments Forecast') investment = Math.abs(item.parsed.y);
+                                });
+                                const netFlow = income - expense - investment;
+                                return '{{ _('Projected Net Flow: ') }} ¥' + netFlow.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                datalabels: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#6c757d'
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    ticks: {
+                        color: '#6c757d',
+                        callback: function (value) {
+                            return '¥' + (value / 1000).toFixed(0) + 'K';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Update Forecast Summary Table
+    function calculateForecastSummary(data) {
+        const income = data.income_forecast;
+        const expenses = data.expenses_forecast.map(x => Math.abs(x));
+        const investments = data.investments_forecast.map(x => Math.abs(x));
+
+        return {
+            avgIncome: income.reduce((a, b) => a + b, 0) / income.length,
+            totalIncome: income.reduce((a, b) => a + b, 0),
+            avgExpenses: expenses.reduce((a, b) => a + b, 0) / expenses.length,
+            totalExpenses: expenses.reduce((a, b) => a + b, 0),
+            avgInvestments: investments.reduce((a, b) => a + b, 0) / investments.length,
+            totalInvestments: investments.reduce((a, b) => a + b, 0)
+        };
+    }
+
+    function updateForecastSummaryTable(summary) {
+        document.getElementById('avgIncome').textContent = '¥' + summary.avgIncome.toLocaleString('en-US', { maximumFractionDigits: 0 });
+        document.getElementById('totalIncome').textContent = '¥' + summary.totalIncome.toLocaleString('en-US', { maximumFractionDigits: 0 });
+        document.getElementById('avgExpenses').textContent = '¥' + summary.avgExpenses.toLocaleString('en-US', { maximumFractionDigits: 0 });
+        document.getElementById('totalExpenses').textContent = '¥' + summary.totalExpenses.toLocaleString('en-US', { maximumFractionDigits: 0 });
+        document.getElementById('avgInvestments').textContent = '¥' + summary.avgInvestments.toLocaleString('en-US', { maximumFractionDigits: 0 });
+        document.getElementById('totalInvestments').textContent = '¥' + summary.totalInvestments.toLocaleString('en-US', { maximumFractionDigits: 0 });
+
+        const avgNetFlow = summary.avgIncome - summary.avgExpenses - summary.avgInvestments;
+        const totalNetFlow = summary.totalIncome - summary.totalExpenses - summary.totalInvestments;
+
+        document.getElementById('avgNetFlow').textContent = '¥' + avgNetFlow.toLocaleString('en-US', { maximumFractionDigits: 0 });
+        document.getElementById('totalNetFlow').textContent = '¥' + totalNetFlow.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    }
+
+    const forecastSummary = calculateForecastSummary(forecastData);
+    updateForecastSummaryTable(forecastSummary);
+</script>
+
+<!-- Gains Analysis Charts -->
+<script>
+    // Gains Comparison Bar Chart
+    const gainsCtx = document.getElementById('gainsComparisonChart').getContext('2d');
+    const gainsData = {
+        labels: ['{{ _('Realized Gains') }}', '{{ _('Unrealized Gains') }}'],
+        datasets: [{
+            label: 'Gains (CNY)',
+            data: [{{ gains_analysis_data.realized_gains }}, {{ gains_analysis_data.unrealized_gains }}],
+        backgroundColor: [
+            'rgba(40, 167, 69, 0.8)',   // Green for realized gains
+            'rgba(0, 123, 255, 0.8)'    // Blue for unrealized gains
+        ],
+        borderColor: [
+            'rgba(40, 167, 69, 1)',
+            'rgba(0, 123, 255, 1)'
+        ],
+        borderWidth: 2
+        }]
+    };
+
+    {% if gains_analysis_data.subclass_breakdown %}
+    // Sub-class level stacked bar chart
+    const subclassCtx = document.getElementById('subclassGainsChart').getContext('2d');
+    const subclassLabels = [{% for subclass in gains_analysis_data.subclass_breakdown.keys() %}'{{ subclass }}'{% if not loop.last %}, {% endif %} {% endfor %}];
+    const realizedData = [{% for subclass, data in gains_analysis_data.subclass_breakdown.items() %}{ { data.realized_gains } } {% if not loop.last %}, {% endif %} {% endfor %}];
+    const unrealizedData = [{% for subclass, data in gains_analysis_data.subclass_breakdown.items() %}{ { data.unrealized_gains } } {% if not loop.last %}, {% endif %} {% endfor %}];
+
+    const subclassData = {
+        labels: subclassLabels,
+        datasets: [
+            {
+                label: '{{ _('Realized Gains') }}',
+                data: realizedData,
+                backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                borderColor: 'rgba(40, 167, 69, 1)',
+                borderWidth: 1
+            },
+            {
+                label: '{{ _('Unrealized Gains') }}',
+                data: unrealizedData,
+                backgroundColor: 'rgba(0, 123, 255, 0.8)',
+                borderColor: 'rgba(0, 123, 255, 1)',
+                borderWidth: 1
+            }
+        ]
+    };
+    {% endif %}
+
+    // Initialize main gains chart
+    new Chart(gainsCtx, {
+        type: 'bar',
+        data: gainsData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: false
+                },
+                datalabels: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function (value) {
+                            return '¥' + new Intl.NumberFormat('zh-CN').format(value);
+                        }
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    });
+
+    // Initialize sub-class stacked bar chart (if data present)
+    {% if gains_analysis_data.subclass_breakdown %}
+    new Chart(subclassCtx, {
+        type: 'bar',
+        data: subclassData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                title: { display: false },
+                datalabels: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    ticks: { maxRotation: 45, minRotation: 0 }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function (value) {
+                            return '¥' + value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                        }
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+</script>
+
+<!-- Toggle functions for collapsible sections -->
+<script>
+    // Toggle functions for collapsible sections
+    function toggleLifetimePerf() {
+        const panel = document.getElementById('lifetimePerformancePanel');
+        const btn = document.getElementById('toggleLifetimeBtn');
+        if (panel.style.display === 'none') {
+            panel.style.display = 'block';
+            btn.textContent = '{{ _('Hide Table') }}';
+        } else {
+            panel.style.display = 'none';
+            btn.textContent = '{{ _('Show Table') }}';
+        }
+    }
+
+    function toggleXirrDiag() {
+        const panel = document.getElementById('xirrDiagnosticsPanel');
+        const btn = document.getElementById('toggleXirrBtn');
+        if (panel.style.display === 'none') {
+            panel.style.display = 'block';
+            btn.textContent = 'Hide Diagnostics';
+        } else {
+            panel.style.display = 'none';
+            btn.textContent = 'Show Diagnostics';
+        }
+    }
+
+    // Sortable table functionality
+    function sortLifetimeTable(columnIndex) {
+        // Implementation from original template
+        const table = document.getElementById('lifetimePerformanceTable');
+        const tbody = table.getElementsByTagName('tbody')[0];
+        const rows = Array.from(tbody.getElementsByTagName('tr'));
+
+        if (!table.sortDirection) table.sortDirection = {};
+        const isAscending = !table.sortDirection[columnIndex];
+        table.sortDirection[columnIndex] = isAscending;
+
+        rows.sort((a, b) => {
+            const aVal = a.getElementsByTagName('td')[columnIndex].textContent.trim();
+            const bVal = b.getElementsByTagName('td')[columnIndex].textContent.trim();
+
+            // Handle numeric columns
+            if (columnIndex >= 4 && columnIndex <= 8) {
+                const aNum = parseFloat(aVal.replace(/[¥,%]/g, '')) || 0;
+                const bNum = parseFloat(bVal.replace(/[¥,%]/g, '')) || 0;
+                return isAscending ? aNum - bNum : bNum - aNum;
+            }
+
+            return isAscending ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        });
+
+        rows.forEach(row => tbody.appendChild(row));
+    }
+</script>
+{% endblock %}

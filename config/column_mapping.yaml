@@ -1,0 +1,544 @@
+# Column Mapping Configuration
+# ============================
+# This file defines how raw Excel/CSV column headers map to internal system keys.
+# Users can customize mappings to work with their own spreadsheet formats.
+#
+# Structure:
+#   active_profile: Name of the profile to use (default: "default")
+#   profiles: Dictionary of named mapping profiles
+#     <profile_name>:
+#       <data_type>:  # e.g., holdings, transactions, balance_sheet
+#         <raw_column>: <internal_key>  # null value means drop the column
+#
+# Internal Keys (standardized across the system):
+#   - Asset_ID: Unique identifier (ticker, fund code)
+#   - Asset_Name: Display name
+#   - Asset_Type_Raw: Raw asset type for classification
+#   - Transaction_Date / Snapshot_Date: Date fields
+#   - Quantity: Number of shares/units
+#   - Market_Price_Unit: Current price per unit
+#   - Market_Value_Raw: Total market value
+#   - Amount_Gross: Transaction amount before fees
+#   - Amount_Net: Transaction amount after fees
+#   - Commission_Fee: Transaction fees
+#   - Price_Unit: Price per unit at transaction
+#   - Transaction_Type_Raw: Raw transaction type
+#   - Currency: Currency code (USD, CNY, etc.)
+#   - Account: Account identifier
+#   - Memo: Notes/description
+
+active_profile: default
+
+# ============================================================================
+# DEFAULT PROFILE - Generic English spreadsheet format
+# ============================================================================
+# Use this as a starting point for your own data. Customize column names
+# to match your actual spreadsheet headers.
+
+profiles:
+  default:
+    # ----- Holdings Data -----
+    # Expected columns: Symbol/Ticker, Name, Type, Date, Price, Quantity, Value
+    holdings:
+      # Common English column names -> internal keys
+      Symbol: Asset_ID
+      Ticker: Asset_ID
+      Fund Code: Asset_ID
+      Code: Asset_ID
+
+      Name: Asset_Name
+      Security Name: Asset_Name
+      Description: Asset_Name
+      Fund Name: Asset_Name
+
+      Type: Asset_Type_Raw
+      Security Type: Asset_Type_Raw
+      Asset Class: Asset_Type_Raw
+      Category: Asset_Type_Raw
+
+      Date: Snapshot_Date
+      As Of Date: Snapshot_Date
+      Price Date: Snapshot_Date
+
+      Price: Market_Price_Unit
+      Unit Price: Market_Price_Unit
+      NAV: Market_Price_Unit
+      Last Price: Market_Price_Unit
+
+      Quantity: Quantity
+      Shares: Quantity
+      Units: Quantity
+      Qty: Quantity
+
+      Value: Market_Value_Raw
+      Market Value: Market_Value_Raw
+      Total Value: Market_Value_Raw
+      Current Value: Market_Value_Raw
+
+      Cost Basis: Cost_Total
+      Total Cost: Cost_Total
+
+      Account: Account
+      Account Number: Account
+      Account Name: Account
+
+      Currency: Currency
+
+    # ----- Transaction Data -----
+    # Expected columns: Date, Symbol, Type, Quantity, Price, Amount, Fees
+    transactions:
+      Date: Transaction_Date
+      Transaction Date: Transaction_Date
+      Trade Date: Transaction_Date
+      Settlement Date: Transaction_Date
+
+      Symbol: Asset_ID
+      Ticker: Asset_ID
+      Fund Code: Asset_ID
+      Code: Asset_ID
+
+      Name: Asset_Name
+      Security Name: Asset_Name
+      Description: Asset_Name
+
+      Action: Transaction_Type_Raw
+      Type: Transaction_Type_Raw
+      Transaction Type: Transaction_Type_Raw
+      Activity: Transaction_Type_Raw
+
+      Quantity: Quantity
+      Shares: Quantity
+      Units: Quantity
+      Qty: Quantity
+
+      Price: Price_Unit
+      Unit Price: Price_Unit
+      Share Price: Price_Unit
+
+      Amount: Amount_Gross
+      Gross Amount: Amount_Gross
+      Total: Amount_Gross
+      Principal: Amount_Gross
+
+      Net Amount: Amount_Net
+      Proceeds: Amount_Net
+
+      Fees: Commission_Fee
+      Commission: Commission_Fee
+      Fee: Commission_Fee
+      "Fees & Comm": Commission_Fee
+
+      Account: Account
+      Account Number: Account
+
+      Currency: Currency
+
+      Notes: Memo
+      Memo: Memo
+      Description: Memo
+
+    # ----- Balance Sheet Data -----
+    # For tracking net worth over time with multiple asset categories
+    balance_sheet:
+      Date: Date
+
+      # Cash accounts
+      Cash: Asset_Cash
+      Checking: Asset_Checking
+      Savings: Asset_Savings
+
+      # Investment accounts
+      Brokerage: Asset_Brokerage
+      Retirement: Asset_Retirement
+      "401k": Asset_401k
+      IRA: Asset_IRA
+
+      # Other assets
+      Real Estate: Asset_Real_Estate
+      Property: Asset_Property
+      Vehicle: Asset_Vehicle
+
+      # Liabilities
+      Credit Card: Liability_Credit_Card
+      Mortgage: Liability_Mortgage
+      Auto Loan: Liability_Auto_Loan
+      Student Loan: Liability_Student_Loan
+      Other Debt: Liability_Other
+
+    # ----- Monthly Income/Expense Data -----
+    monthly_cashflow:
+      Date: Date
+      Month: Date
+
+      # Income
+      Salary: Income_Salary
+      Wages: Income_Salary
+      Bonus: Income_Bonus
+      Dividends: Income_Dividends
+      Interest: Income_Interest
+      Rental Income: Income_Rental
+      Other Income: Income_Other
+
+      # Expenses
+      Housing: Expense_Housing
+      Rent: Expense_Housing
+      Utilities: Expense_Utilities
+      Groceries: Expense_Groceries
+      Food: Expense_Food
+      Transportation: Expense_Transportation
+      Healthcare: Expense_Healthcare
+      Insurance: Expense_Insurance
+      Entertainment: Expense_Entertainment
+      Shopping: Expense_Shopping
+      Travel: Expense_Travel
+      Other Expenses: Expense_Other
+
+    # ----- Transaction Type Standardization -----
+    # Maps raw transaction types to internal standard types
+    transaction_types:
+      # Buys
+      Buy: Buy
+      Purchase: Buy
+      Bought: Buy
+
+      # Sells
+      Sell: Sell
+      Sale: Sell
+      Sold: Sell
+
+      # Dividends
+      Dividend: Dividend_Cash
+      Div: Dividend_Cash
+      Cash Dividend: Dividend_Cash
+      Qualified Dividend: Dividend_Cash
+      Reinvest Dividend: Dividend_Reinvest
+      Dividend Reinvestment: Dividend_Reinvest
+      DRIP: Dividend_Reinvest
+
+      # Interest
+      Interest: Interest
+      Credit Interest: Interest
+
+      # Transfers
+      Transfer: Transfer
+      Journal: Transfer
+      Wire: Transfer
+      ACH: Transfer
+
+      # Corporate actions
+      Split: Corporate_Action
+      Stock Split: Corporate_Action
+      Merger: Corporate_Action
+      Spinoff: Corporate_Action
+
+      # RSU/Stock compensation
+      Vest: RSU_Vest
+      RSU Vest: RSU_Vest
+      Stock Award: RSU_Vest
+
+      # Fees
+      Fee: Fee
+      Advisory Fee: Fee
+      Management Fee: Fee
+
+  # ============================================================================
+  # SCHWAB CSV PROFILE - Charles Schwab brokerage exports
+  # ============================================================================
+  schwab_csv:
+    holdings:
+      Symbol: Asset_ID
+      Description: Asset_Name
+      "Qty (Quantity)": Quantity
+      Price: Market_Price_Unit
+      "Mkt Val (Market Value)": Market_Value_Raw
+      "Security Type": Asset_Type_Raw
+      "Cost Basis": Cost_Total
+
+    transactions:
+      Date: Transaction_Date
+      Action: Transaction_Type_Raw
+      Symbol: Asset_ID
+      Description: Asset_Name
+      Quantity: Quantity
+      Price: Price_Unit
+      "Fees & Comm": Commission_Fee
+      Amount: Amount_Net
+
+    transaction_types:
+      Buy: Buy
+      Sell: Sell
+      Reinvest Dividend: Dividend_Reinvest
+      Dividend Reinvest: Dividend_Reinvest
+      Reinvest Long Term Capital Gain: Dividend_Reinvest
+      Reinvest Short Term Capital Gain: Dividend_Reinvest
+      Dividend: Dividend_Cash
+      Qualified Dividend: Dividend_Cash
+      Long Term Capital Gain: Dividend_Cash
+      Short Term Capital Gain: Dividend_Cash
+      Interest: Interest
+      Wire Funds Received: Cash_In
+      Wire Funds Sent: Cash_Out
+      Funds Received: Cash_In
+      Funds Sent: Cash_Out
+      Sweep In: Cash_In
+      Sweep Out: Cash_Out
+      Journal: Transfer
+      Journaled Shares: Transfer
+      Journaled Cash: Transfer
+      Credit Interest: Interest
+      Cash In Lieu: Dividend_Cash
+      Spinoff: Corporate_Action
+      Stock Split: Corporate_Action
+      Fee: Fee
+      Advisory Fee: Fee
+
+  # ============================================================================
+  # CHINESE EXCEL PROFILE - Chinese language spreadsheets
+  # ============================================================================
+  # This profile supports Chinese column headers commonly used in
+  # Chinese financial tracking spreadsheets.
+
+  chinese_excel:
+    holdings:
+      基金代码: Asset_ID
+      基金名称: Asset_Name
+      基金简称: Asset_Name
+      基金类型: Asset_Type_Raw
+      净值日期: Snapshot_Date
+      单位净值: Market_Price_Unit
+      持有份额: Quantity
+      参考市值: Market_Value_Raw
+      交易账户: Account
+
+    transactions:
+      交易日期: Transaction_Date
+      确认日期: Transaction_Date
+      基金代码: Asset_ID
+      基金名称: Asset_Name
+      基金简称: Asset_Name
+      操作类型: Transaction_Type_Raw
+      业务类型: Transaction_Type_Raw
+      交易原因: Memo
+      交易金额: Amount_Gross
+      确认金额: Amount_Gross
+      交易份额: Quantity
+      确认份额: Quantity
+      交易时基金单位净值: Price_Unit
+      确认净值: Price_Unit
+      手续费: Commission_Fee
+
+    gold_holdings:
+      标的名称: Asset_Name
+      持有数量: Quantity
+      单位: Unit
+      平均成本价: Cost_Price_Unit
+      单价: Market_Price_Unit
+      当前市值: Market_Value_Raw
+      未实现盈亏: Unrealized_PL_Raw
+      交易账户: Account
+
+    gold_transactions:
+      交易日期: Transaction_Date
+      资产类别: Asset_Class_L1
+      标的名称: Asset_Name
+      交易类型: Transaction_Type_Raw
+      金额: Amount_Gross
+      数量: Quantity
+      价格: Price_Unit
+      手续费: Commission_Fee
+      交易账户: Account
+
+    insurance_summary:
+      产品名称: Asset_Name
+      保险公司: Insurance_Company
+      产品类型: Asset_Type_Raw
+      开始日期: Policy_Start_Date
+      保障期限: Coverage_Term_Raw
+      缴费期限: Payment_Term_Raw
+      年保费: Annual_Premium
+      保额: Sum_Insured
+      保障范围: Coverage_Scope
+      保单状态: Policy_Status
+
+    rsu_transactions:
+      交易日期: Transaction_Date
+      资产名称: Asset_Name
+      交易类型: Transaction_Type_Raw
+      数量: Quantity
+      单位: Unit
+      单位价格_USD: Price_Unit
+      总金额_USD: Amount_Gross
+      手续费_USD: Commission_Fee
+      备注: Memo
+
+    balance_sheet:
+      # Cash - CNY
+      RMB现金现金: Asset_Cash_CNY
+      RMB存款_中行: Asset_Bank_Account_A
+      RMB存款_招行: Asset_Deposit_CMB_CNY
+      RMB存款_北京银行: Asset_Deposit_BOB_CNY
+
+      # Cash - USD
+      美元存款_中行_USD: Asset_Deposit_BOC_USD
+      美元存款_中行: Asset_Bank_Account_A_FromUSD
+      美元存款_Chase_USD: Asset_Deposit_Chase_USD
+      美元存款_Chase: Asset_Deposit_Chase_CNY
+      美元存款_Discover/Citi_USD: Asset_Deposit_Discover_USD
+      美元存款_Discover/Citi: Asset_Deposit_Discover_CNY
+
+      # Investments - CNY
+      投资资产_股票基金_A股基金: Asset_Invest_FundA_Value
+      投资资产_银行理财_招行: Asset_Invest_BankWealth_Value
+      投资资产_存款基金_个人养老金: Asset_Invest_Pension_Value
+      投资资产_黄金_纸黄金(元): Asset_Invest_Gold_Value
+      投资资产_黄金_纸黄金(克): Asset_Invest_Gold_Gram
+      投资资产_黄金_黄金ETF: Asset_Invest_GoldETF_Value
+      投资资产_长期保险_平安福: Asset_Invest_Insurance_Pingan
+      投资资产_另类投资_公司股份投资: Asset_Invest_Private_Equity_Investment_A
+      Private_Equity_Investment_A: Asset_Invest_Private_Equity_Investment_A
+
+      # Investments - USD
+      投资资产_股票基金_美股基金_USD: Asset_Invest_USFund_Value_USD
+      投资资产_股票基金_美股基金: Asset_Invest_USFund_Value_CNY
+      投资资产_公司RSU_USD: Asset_Invest_RSU_Value_USD
+      投资资产_公司RSU_CNY: Asset_Invest_RSU_Value_CNY
+
+      # Fixed Assets
+      固定资产_房产_蓝郡: Asset_Fixed_Property_Value
+
+      # Liabilities - CNY
+      短期负债_信用卡_招行: Liability_CC_CMB_CNY
+      短期负债_信用卡_中行: Liability_CC_BOC_CNY
+      短期负债_信用卡_中信: Liability_CC_CITIC_CNY
+      长期负债_房贷: Liability_Mortgage_CNY
+      长期负债_车贷: Liability_CarLoan_CNY
+      其他负债: Liability_Other_CNY
+
+      # Liabilities - USD
+      短期负债_信用卡_美国信用卡年费_USD: Liability_CC_US_Fee_USD
+      短期负债_信用卡_美国信用卡年费: Liability_CC_US_Fee_CNY
+      短期负债_信用卡_美国信用卡账单_USD: Liability_CC_US_Bill_USD
+      短期负债_信用卡_美国信用卡账单: Liability_CC_US_Bill_CNY
+
+    monthly_cashflow:
+      # Income - CNY
+      收入_主动收入_工资: Income_Salary_CNY
+      收入_主动收入_报销: Income_Reimbursement_CNY
+      收入_主动收入_福利: Income_Benefit_CNY
+      收入_主动收入_公积金: Income_HousingFund_CNY
+      收入_主动收入_其他偶然: Income_Other_CNY
+      收入_被动收入_: Income_Passive_Unknown_CNY
+      收入_被动收入_基金赎回: Income_Passive_FundRedemption_CNY
+      收入_被动收入_银行理财: Income_Passive_BankWealth_CNY
+      收入_被动收入_黄金卖出: Income_Passive_GoldSale_CNY
+
+      # Income - USD
+      收入_主动收入_RSU_USD: Income_RSU_USD
+      收入_主动收入_RSU: Income_RSU_CNY
+
+      # Expenses - CNY
+      必要开支_日常支出_餐饮娱乐: Expense_Food_CNY
+      必要开支_日常支出_房租水电: Expense_Housing_CNY
+      必要开支_日常支出_交通: Expense_Transport_CNY
+      必要开支_家庭及临时支出: Expense_FamilyTemp_CNY
+      非必要开支_旅行出游: Expense_Travel_CNY
+      非必要开支_护肤衣物: Expense_Apparel_CNY
+      非必要开支_电子产品: Expense_Electronics_CNY
+      非必要开支_运动健身健康: Expense_HealthFitness_CNY
+      非必要开支_其他/娱乐: Expense_Entertainment_CNY
+      工作开支_出差/团建（全额报销）: Expense_WorkRelated_CNY
+
+      # Investment outflows
+      投资理财_银行理财_招行: Outflow_Invest_BankWealth_CNY
+      投资理财_公司股份投资_Private_Equity_Investment_A: Outflow_Invest_Private_Equity_Investment_A_CNY
+      投资理财_股票基金_天天基金: Outflow_Invest_Fund_TT_CNY
+      投资理财_股票基金_Schawab_USD: Outflow_Invest_Fund_Schwab_USD
+      投资理财_股票基金_Schawab: Outflow_Invest_Fund_Schwab_CNY
+      投资理财_黄金_招行纸黄金: Outflow_Invest_Gold_Paper_CNY
+      投资理财_黄金_黄金ETF: Outflow_Invest_GoldETF_CNY
+      必要开支_保险_平安福: Outflow_Insurance_Pingan_CNY
+      必要开支_保险_公司补充保险: Outflow_Insurance_Amazon_CNY
+      必要开支_保险_支付宝: Outflow_Insurance_Alipay_CNY
+      必要开支_贷款_房贷: Outflow_Loan_Mortgage_CNY
+
+      # Reference data
+      参考_黄金价格_克价: Ref_Gold_Price_Gram_CNY
+      参考_Employer_Stock_Price: Ref_Employer_Stock_Price_USD
+      参考_美元汇率: Ref_USD_FX_Rate
+
+    transaction_types:
+      申购: Buy
+      认购: Buy
+      买入: Buy
+      买基金: Buy
+      赎回: Sell
+      卖出: Sell
+      卖基金: Sell
+      分红: Dividend_Cash
+      红利再投: Dividend_Reinvest
+      归属: RSU_Vest
+
+# ============================================================================
+# ASSET TYPE CORRECTIONS - Override incorrect asset types from source data
+# ============================================================================
+# Some data sources have incorrect asset type classifications.
+# This section allows overriding types based on ticker symbol.
+
+asset_type_overrides:
+    # Bond ETFs
+    BND: US Bond ETF
+    AGG: US Bond ETF
+    VCSH: US Bond ETF
+    VCIT: US Bond ETF
+    HYG: US Bond ETF
+    VTIP: US Bond ETF
+    IEF: US Government Bonds
+    SHV: US Government Bonds
+
+    # US Stock ETFs
+    VOO: US Stock ETF
+    VTI: US Stock ETF
+    QQQ: US Stock ETF
+    SPY: US Stock ETF
+    VB: US Stock ETF
+    IJR: US Stock ETF
+    IWM: US Stock ETF
+    VO: US Stock ETF
+    IJH: US Stock ETF
+    MDY: US Stock ETF
+
+    # International Stock ETFs
+    VEA: International Stock ETF
+    EFA: International Stock ETF
+    IEFA: International Stock ETF
+
+    # Emerging Markets ETFs
+    VWO: Emerging Markets ETF
+    EEM: Emerging Markets ETF
+    IEMG: Emerging Markets ETF
+
+    # Crypto ETFs
+    FBTC: Bitcoin ETF
+    GBTC: Bitcoin ETF
+    ETHE: Crypto ETF
+
+    # Commodity ETFs
+    GLD: Gold ETF
+    IAU: Gold ETF
+    GLDM: Gold ETF
+    SLV: Silver ETF
+    SIVR: Silver ETF
+
+    # Real Estate ETFs
+    VNQ: Real Estate ETF
+    IYR: Real Estate ETF
+    SCHH: Real Estate ETF
+
+    # Individual stocks
+    AAPL: US Stock
+    MSFT: US Stock
+    GOOGL: US Stock
+    AMZN: US Stock
+    META: US Stock
+    NVDA: US Stock
+    TSLA: US Stock

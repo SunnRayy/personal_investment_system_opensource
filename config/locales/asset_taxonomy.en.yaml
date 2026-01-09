@@ -1,0 +1,435 @@
+asset_identification_keywords:
+- Asset_Cash
+- Asset_Deposit
+- Asset_Invest
+- Asset_Fixed
+- Investable Assets
+- Fixed Assets
+- RMB
+- 美元
+- Deposit
+- Cash
+- Private_Equity_Investment_A
+- Equity
+- Funds
+- Wealth Management
+- Gold
+- Insurance
+- Real Estate
+top_level_classes:
+- Equity
+- Fixed Income
+- Real Estate
+- Commodities
+- Cash
+- Alternative
+- Insurance
+sub_classes:
+  Equity:
+  - CN Equity
+  - HK ETF
+  - US Equity
+  - Emerging Markets
+  Equities:
+  - CN Equity
+  Fixed Income:
+  - CN Govt Bonds
+  - US Govt Bonds
+  - Corporate Bonds
+  - Money Market
+  - Bank Products
+  Real Estate:
+  - Residential RE
+  - Commercial RE
+  - REITs
+  Commodities:
+  - Gold
+  - Other Precious Metals
+  - Energy
+  - Agriculture
+  Cash:
+  - Cash
+  - Current Deposit
+  - Time Deposit
+  Alternative:
+  - Venture Capital
+  - Crypto
+  Insurance:
+  - Insurance Products
+special_categories: []
+non_rebalanceable_classes:
+- Real Estate
+- Insurance
+non_rebalanceable_sub_classes:
+- Insurance Products
+risk_profiles:
+  Conservative:
+    Equity: 0.2
+    Fixed Income: 0.5
+    Real Estate: 0.1
+    Commodities: 0.05
+    Cash: 0.15
+    Alternative: 0.0
+  Balanced:
+    Equity: 0.4
+    Fixed Income: 0.3
+    Real Estate: 0.1
+    Commodities: 0.1
+    Cash: 0.05
+    Alternative: 0.05
+  Growth:
+    Equity: 0.75
+    Fixed Income: 0.1
+    Commodities: 0.05
+    Alternative: 0.05
+    Real Estate: 0.0
+    Cash: 0.05
+    Insurance: 0.0
+  Aggressive:
+    Equity: 0.85
+    Fixed Income: 0.0
+    Real Estate: 0.0
+    Commodities: 0.05
+    Cash: 0.0
+    Alternative: 0.1
+    Insurance: 0.0
+sub_category_weights:
+  Equity:
+    CN Equity: 0.5
+    HK ETF: 0.1
+    US Equity: 0.4
+    Emerging Markets: 0.0
+  Fixed Income:
+    US Govt Bonds: 0.9
+    CN Govt Bonds: 0.1
+    Corporate Bonds: 0.0
+    Money Market: 0.0
+    Bank Products: 0.0
+  Real Estate:
+    Residential RE: 1.0
+    Commercial RE: 0.0
+    REITs: 0.0
+  Commodities:
+    Gold: 1.0
+    Other Precious Metals: 0.0
+    Energy: 0.0
+    Agriculture: 0.0
+  Cash:
+    Cash: 0.9
+    Current Deposit: 0.1
+    Time Deposit: 0.0
+  Alternative:
+    Crypto: 1.0
+    Venture Capital: 0.0
+default_expectations:
+  CN Equity:
+    return: 0.09
+    risk: 0.2
+  HK ETF:
+    return: 0.08
+    risk: 0.22
+  US Equity:
+    return: 0.08
+    risk: 0.2
+  Emerging Markets:
+    return: 0.1
+    risk: 0.25
+  CN Govt Bonds:
+    return: 0.03
+    risk: 0.05
+  US Govt Bonds:
+    return: 0.04
+    risk: 0.07
+  Corporate Bonds:
+    return: 0.045
+    risk: 0.08
+  High Yield Bonds:
+    return: 0.06
+    risk: 0.12
+  Money Market:
+    return: 0.025
+    risk: 0.02
+  Bank Products:
+    return: 0.035
+    risk: 0.05
+  Residential RE:
+    return: 0.06
+    risk: 0.15
+  Commercial RE:
+    return: 0.07
+    risk: 0.16
+  REITs:
+    return: 0.07
+    risk: 0.17
+  Gold:
+    return: 0.04
+    risk: 0.15
+  Other Precious Metals:
+    return: 0.05
+    risk: 0.2
+  Energy:
+    return: 0.07
+    risk: 0.25
+  Agriculture:
+    return: 0.05
+    risk: 0.18
+  Cash:
+    return: 0.01
+    risk: 0.01
+  Current Deposit:
+    return: 0.02
+    risk: 0.01
+  Time Deposit:
+    return: 0.03
+    risk: 0.015
+  Venture Capital:
+    return: 0.15
+    risk: 0.35
+  Crypto:
+    return: 0.15
+    risk: 0.5
+asset_mapping:
+  # Example mappings
+  Cash_CNY: Cash
+  Bank_Account_A: Cash
+  Deposit_BOC_USD: Cash
+  BOC Deposit (USD): Cash
+  Deposit_BOB_CNY: Cash
+  Deposit_CMB_CNY: Cash
+  Deposit_Chase_USD: Cash
+  Deposit_Discover_USD: Cash
+  Asset_Bank_Account_A_FromUSD: Cash
+  Fund_US_Placeholder: US Equity
+  Paper_Gold: Gold
+  Pension_Personal: CN Govt Bonds
+  Property_Residential_A: Residential RE
+  FBTC: Crypto
+  ETHA: Crypto
+  # Standard US ETFs
+  US Stock ETF: US Equity
+  AMZN: US Equity
+  GOOG: US Equity
+  GOOGL: US Equity
+  ALPHABET INC CLASS CLASS A: US Equity
+  VOO: US Equity
+  VTI: US Equity
+  QQQ: US Equity
+  SPY: US Equity
+  AAPL: US Equity
+  MSFT: US Equity
+  META: US Equity
+  NVDA: US Equity
+  BND: US Govt Bonds
+  AGG: US Govt Bonds
+  VCSH: Corporate Bonds
+  VCIT: Corporate Bonds
+  HYG: High Yield Bonds
+  IEF: US Govt Bonds
+  SHV: Money Market
+  GLD: Gold
+  VNQ: REITs
+  VEA: US Equity
+  IEMG: Emerging Markets
+  International ETF: US Equity
+  Emerging Markets ETF: Emerging Markets
+  REIT: REITs
+  VTIP: US Govt Bonds
+  FIDELITY WISE ORIGIN BITCOIN FUND: Crypto
+  ISHARES ETHEREUM TRUST ETF IV: Crypto
+  VANGUARD TOTAL BOND MARKET ETF: US Govt Bonds
+  ISHARES CORE US AGGREGATE BOND ETF: US Govt Bonds
+  VANGUARD SHRT INF PROT SEC INDEX ETF: US Govt Bonds
+  ISHARES 7-10 YEAR TRSURYBOND ETF: US Govt Bonds
+  SPDR S&P 500 ETF: US Equity
+  INVESCO QQQ TRUST SERIES 1: US Equity
+  VANGUARD TOTAL STOCK MKT ETF: US Equity
+  VANGUARD S&P 500 ETF: US Equity
+  INVESCO QQQ ETF: US Equity
+  SPDR BRIDGEWATER ALL WEATHER ETF: US Equity
+  Vanguard Total Stock Market ETF: US Equity
+  Invesco QQQ Trust: US Equity
+  Fidelity Wise Origin Bitcoin Fund: Crypto
+  SPDR Gold Shares: Gold
+  iShares Core US Aggregate Bond ETF: US Govt Bonds
+  # Generic placeholders
+  Cash (CNY): Cash
+  BOB Deposit (CNY): Cash
+  BOC Deposit (CNY): Cash
+  CMB Deposit (CNY): Cash
+  Chase Deposit (USD): Cash
+  Discover Deposit (USD): Cash
+  ALLW: US Equity
+asset_id_mapping:
+  Employer_Stock_A: US Equity
+  FIDELITY WISE ORIGIN BITCOIN FUND: Crypto
+  QQQ: US Equity
+  INVESCO QQQ TRUST SERIES 1: US Equity
+  Pension_Personal: CN Govt Bonds
+  VANGUARD TOTAL BOND MARKET ETF: US Govt Bonds
+  ISHARES CORE US AGGREGATE BOND ETF: US Govt Bonds
+  VANGUARD SHRT INF PROT SEC INDEX ETF: US Govt Bonds
+  ISHARES 7-10 YEAR TRSURYBOND ETF: US Govt Bonds
+  SHARES ETHEREUM TRUST ETF IV: Crypto
+  SPDR S&P 500 ETF: US Equity
+  VANGUARD TOTAL STOCK MKT ETF: US Equity
+  VANGUARD S&P 500 ETF: US Equity
+  SPDR BRIDGEWATER ALL WEATHER ETF: US Equity
+raw_type_mapping:
+  US Securities: US Equity
+  CN Funds: CN Equity
+  Stock: CN Equity
+  Bond: Fixed Income
+  ETF: CN Equity
+  Mutual Fund: CN Equity
+  Bank Products: Bank Products
+  债券型基金: Corporate Bonds
+  理财产品: Bank Products
+  货币型基金: Money Market
+  US Bond ETF: US Govt Bonds
+  US Government Bonds: US Govt Bonds
+  Cash: Cash
+  Deposit: Cash
+  RMB现金: Cash
+  RMB存款: Cash
+  美元存款: Cash
+  Real Estate: Residential RE
+  Residential RE: Residential RE
+  Crypto ETF: Crypto
+  综合: Insurance
+  重疾: Insurance
+  医疗: Insurance
+  意外: Insurance
+  寿险: Insurance
+pattern_mapping:
+  Equity: CN Equity
+  混合: CN Equity
+  指数: CN Equity
+  ETF联接: CN Equity
+  沪深300: CN Equity
+  上证50: CN Equity
+  中证500: CN Equity
+  红利: CN Equity
+  价值: CN Equity
+  成长: CN Equity
+  QDII: US Equity
+  纳斯达克: US Equity
+  标普500: US Equity
+  海外: US Equity
+  国际: US Equity
+  债券: Corporate Bonds
+  货币: Money Market
+  RSU: US Equity
+  Employer: US Equity
+  Wealth Management: Bank Products
+  养老金: CN Govt Bonds
+  Gold: Gold
+  纸黄金: Gold
+  Cash: Cash
+  Deposit: Cash
+  Real Estate: Residential RE
+  Property: Residential RE
+  Insurance: Insurance
+  Ins_: Insurance
+  VOO|SPY|VTI|QQQ|IVV: US Equity
+  VB|IJR|IWM: US Equity
+  VO|IJH|MDY: US Equity
+  VEA|EFA|IEFA: US Equity
+  VWO|EEM|IEMG: Emerging Markets
+  BND|AGG|GOVT|IEF|SHY|SHV: US Govt Bonds
+  LQD|VCIT|VCSH|IGIB: Corporate Bonds
+  JNK|HYG|USHY: High Yield Bonds
+  VMBS|MBB|CMBS: US Govt Bonds
+  BIL|SGOV: Money Market
+  GLD|IAU|GLDM: Gold
+  SLV|SIVR: Other Precious Metals
+  VNQ|IYR|SCHH: REITs
+  BTC|ETH|COIN: Crypto
+benchmark_mapping:
+  CN Equity: Global_Equity
+  港股ETF: Global_Equity
+  US Equity: Global_Equity
+  Emerging Markets: Global_Equity
+  CN Govt Bonds: Global_Bonds
+  US Govt Bonds: Global_Bonds
+  Corporate Bonds: Global_Bonds
+  High Yield Bonds: Global_Bonds
+  Money Market: Global_Bonds
+  Bank Products: Global_Bonds
+  Residential RE: Real_Estate
+  Commercial RE: Real_Estate
+  REITs: Real_Estate
+  Gold: Commodities
+  Other Precious Metals: Commodities
+  Energy: Commodities
+  Agriculture: Commodities
+  Cash: Cash
+  Current Deposit: Cash
+  Time Deposit: Cash
+  Venture Capital: Global_Equity
+  Crypto: Alternative
+benchmark_categories:
+- Global_Equity
+- Global_Bonds
+- Real_Estate
+- Commodities
+- Alternative
+- Cash
+asset_tiers:
+  tier_1_core:
+    name: Tier 1 (Core/Value)
+    description: High Sharpe Ratio, Long-term Hold (Nasdaq-100, S&P 500, Gold)
+    color: blue
+  tier_2_diversification:
+    name: Tier 2 (Diversification)
+    description: Diversity & Hedge (Dividend, Silver)
+    color: green
+  tier_3_trading:
+    name: Tier 3 (Trading)
+    description: Low long-term value, buy low sell high (Cyclical, Thematic)
+    color: orange
+asset_tier_mapping:
+  Employer_Stock_A: tier_1_core
+  ALPHABET INC CLASS A: tier_1_core
+  ISHARES 7-10 YEAR TRSURYBOND ETF: tier_1_core
+  ISHARES CORE US AGGREGATE BOND ETF: tier_1_core
+  ISHARES 0-3 MONTH TREASURY BOND ETF: tier_1_core
+  FIDELITY WISE ORIGIN BITCOIN FUND: tier_2_diversification
+  ISHARES BITCOIN ETF: tier_2_diversification
+  ISHARES ETHEREUM TRUST ETF IV: tier_2_diversification
+asset_tier_mapping_rules:
+- pattern: S&P 500|标普500
+  tier: tier_1_core
+- pattern: Nasdaq|纳斯达克
+  tier: tier_1_core
+- pattern: MSCI World|Developed Markets|Global|World|International
+  tier: tier_1_core
+- pattern: Vanguard|Total Stock|Broad Market|Equity|Index Fund|ETF
+  tier: tier_1_core
+- pattern: Berkshire|BRK
+  tier: tier_1_core
+- pattern: Treasury|Bond|国债|债券
+  tier: tier_1_core
+- pattern: Dividend|红利
+  tier: tier_2_diversification
+- pattern: Gold|黄金
+  tier: tier_2_diversification
+- pattern: Real Estate|REIT|房地产
+  tier: tier_2_diversification
+- pattern: Bitcoin|BTC|Ethereum|ETH|Crypto
+  tier: tier_2_diversification
+- pattern: CSI 300|沪深300
+  tier: tier_3_trading
+- pattern: CSI 500|中证500
+  tier: tier_3_trading
+- pattern: ChiNext|创业板
+  tier: tier_3_trading
+- pattern: Hang Seng|恒生
+  tier: tier_3_trading
+- pattern: Sector|Theme|行业|主题
+  tier: tier_3_trading
+- pattern: Leveraged|2x|3x|TQQQ|SQQQ|Option|Future|Call|Put
+  tier: tier_3_trading
+tier_target_allocations:
+  tier_1_core: 0.5
+  tier_2_diversification: 0.35
+  tier_3_trading: 0.15

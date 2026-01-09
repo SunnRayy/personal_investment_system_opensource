@@ -1,0 +1,1485 @@
+{% extends "base_template.html" %}
+
+{% block title %}{{ _('Action Compass - Investment System') }}{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">{{ _('Home') }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ _('Action Compass') }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-5">
+    <div class="col-12">
+        <h2 class="section-title">
+            <i class="bi bi-compass me-2"></i>{{ _('Action Compass - Actionable Insights') }}
+        </h2>
+        <p class="text-muted">{{ _('Intelligent recommendations and alerts to help you optimize your investment
+            strategy.') }}</p>
+    </div>
+</div>
+
+<!-- Phase 2a.3: Strategic Command (Moved to top, context only) -->
+{% if strategic_directive %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div
+            class="card shadow-lg border-{% if strategic_directive.risk_level == 'HIGH' %}danger{% elif strategic_directive.risk_level == 'MEDIUM' %}warning{% else %}success{% endif %} border-3">
+            <div
+                class="card-header bg-{% if strategic_directive.risk_level == 'HIGH' %}danger{% elif strategic_directive.risk_level == 'MEDIUM' %}warning{% else %}success{% endif %} text-white py-3">
+                <div class="row align-items-center">
+                    <div class="col-md-9">
+                        <h3 class="mb-0">
+                            <i class="bi bi-compass-fill me-2"></i>
+                            {{ _('Strategic Command:') }} {{ _(strategic_directive.regime_name_cn) }}
+                            <span
+                                class="badge bg-white text-{% if strategic_directive.risk_level == 'HIGH' %}danger{% elif strategic_directive.risk_level == 'MEDIUM' %}warning{% else %}success{% endif %} ms-2">
+                                {{ _(strategic_directive.regime_name) }}
+                            </span>
+                        </h3>
+                        <p class="mb-0 mt-2 opacity-90">
+                            <i class="bi bi-info-circle me-1"></i>
+                            {{
+                            _(strategic_directive.regime_description_cn|default(strategic_directive.regime_description))
+                            }}
+                        </p>
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <div class="badge bg-white bg-opacity-25 text-white px-3 py-2">
+                            <i class="bi bi-shield-check me-1"></i>
+                            {{ _('Risk Level:') }} {{ _(strategic_directive.risk_level) }}
+                        </div>
+                        <div class="mt-1">
+                            <small class="text-white opacity-75">
+                                <i class="bi bi-graph-up-arrow me-1"></i>
+                                {{ _('Confidence:') }} {{ strategic_directive.confidence }}%
+                            </small>
+                        </div>
+                        <div class="mt-2">
+                            <a href="market_thermometer.html" class="btn btn-sm btn-outline-light">
+                                <i class="bi bi-thermometer-half me-1"></i>{{ _('Market Indicators') }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <!-- Core Objective Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div
+                            class="alert alert-{% if strategic_directive.risk_level == 'HIGH' %}danger{% elif strategic_directive.risk_level == 'MEDIUM' %}warning{% else %}success{% endif %} border-2 mb-0">
+                            <h5 class="mb-2">
+                                <i class="bi bi-bullseye me-2"></i>{{ _('Core Strategic Objective') }}
+                            </h5>
+                            <p class="h5 mb-1 fw-bold">{{ _(strategic_directive.core_objective_cn) }}</p>
+                            <p class="text-muted small mb-0">{{ _(strategic_directive.core_objective) }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Alignment Status (Phase 1B) -->
+                {% if strategic_directive.allocation_gaps and strategic_directive.allocation_gaps|length > 0 %}
+                <div class="row">
+                    <div class="col-12">
+                        <div class="alert alert-info border-2 mb-0">
+                            <h5 class="mb-3">
+                                <i class="bi bi-pie-chart me-2"></i>{{ _('Portfolio Alignment Analysis') }}
+                            </h5>
+                            <div class="row g-3">
+                                {% for gap in strategic_directive.allocation_gaps %}
+                                <div class="col-md-6 col-lg-4">
+                                    <div
+                                        class="d-flex align-items-center justify-content-between p-2 border rounded {% if gap.status == 'aligned' %}bg-success bg-opacity-10{% endif %}">
+                                        <div class="flex-grow-1">
+                                            <strong>{{ _(gap.asset_class) }}</strong>
+                                            <small class="text-muted d-block">{{ _(gap.asset_class_en) }}</small>
+                                        </div>
+                                        <div class="text-end ms-3">
+                                            {% if gap.status == 'aligned' %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> {{ _('Aligned') }}
+                                            </span>
+                                            <small class="text-muted d-block mt-1">
+                                                {{ "%.1f"|format(gap.current_pct * 100) }}%
+                                                (target: {{ "%.1f"|format(gap.target_pct * 100) }}%)
+                                            </small>
+                                            {% elif gap.status == 'reduce' %}
+                                            <span class="badge bg-{{ gap.alignment }}">
+                                                <i class="bi bi-arrow-down"></i> -{{ "%.1f"|format((gap.gap_pct|abs) *
+                                                100) }}%
+                                            </span>
+                                            <small class="text-muted d-block mt-1">
+                                                {{ "%.1f"|format(gap.current_pct * 100) }}% → {{
+                                                "%.1f"|format(gap.target_pct * 100) }}%
+                                            </small>
+                                            <small class="text-muted d-block">
+                                                {% if gap.gap_amount|abs >= 1000000 %}
+                                                ¥{{ "%.1f"|format(gap.gap_amount|abs / 1000000) }}M
+                                                {% elif gap.gap_amount|abs >= 10000 %}
+                                                ¥{{ "%.0f"|format(gap.gap_amount|abs / 10000) }}万
+                                                {% else %}
+                                                ¥{{ "%.0f"|format(gap.gap_amount|abs) }}
+                                                {% endif %}
+                                            </small>
+                                            {% else %}
+                                            <span class="badge bg-{{ gap.alignment }}">
+                                                <i class="bi bi-arrow-up"></i> +{{ "%.1f"|format((gap.gap_pct|abs) *
+                                                100) }}%
+                                            </span>
+                                            <small class="text-muted d-block mt-1">
+                                                {{ "%.1f"|format(gap.current_pct * 100) }}% → {{
+                                                "%.1f"|format(gap.target_pct * 100) }}%
+                                            </small>
+                                            <small class="text-muted d-block">
+                                                {% if gap.gap_amount|abs >= 1000000 %}
+                                                ¥{{ "%.1f"|format(gap.gap_amount|abs / 1000000) }}M
+                                                {% elif gap.gap_amount|abs >= 10000 %}
+                                                ¥{{ "%.0f"|format(gap.gap_amount|abs / 10000) }}万
+                                                {% else %}
+                                                ¥{{ "%.0f"|format(gap.gap_amount|abs) }}
+                                                {% endif %}
+                                            </small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <i class="bi bi-arrow-down-circle me-1"></i>
+                                    {{ _('See') }} <strong>{{ _('Priority Actions') }}</strong> {{ _('below for detailed
+                                    action plan') }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+<!-- End Strategic Command Card -->
+
+<!-- Phase 2a: Consolidated Priority Actions (Top 7 from all sources) -->
+{% if consolidated_actions and consolidated_actions|length > 0 %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm border-primary border-2">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-list-check me-2"></i>{{ _('Priority Actions') }}
+                    <span class="badge bg-white text-primary ms-2">{{ _('Top %(count)s',
+                        count=consolidated_actions|length) }}</span>
+                </h4>
+                <p class="mb-0 mt-2 small opacity-90">
+                    {{ _('Consolidated recommendations from strategic directive, rebalancing analysis, and alternative
+                    assets') }}
+                </p>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for action in consolidated_actions %}
+                    <div
+                        class="list-group-item border-start border-{% if action.priority >= 90 %}danger{% elif action.priority >= 70 %}warning{% else %}info{% endif %} border-3">
+                        <div class="d-flex w-100 justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <!-- Priority Badge & Icon -->
+                                <span
+                                    class="badge bg-{% if action.priority >= 90 %}danger{% elif action.priority >= 70 %}warning{% else %}info{% endif %} me-2">
+                                    {{ loop.index }}
+                                </span>
+                                {% if action.icon %}
+                                <span class="me-2">{{ action.icon }}</span>
+                                {% endif %}
+
+                                <!-- Action Text -->
+                                <strong>{{ _(action.action) }}</strong>
+
+                                <!-- Amount Badge if available -->
+                                {% if action.amount and action.amount != 0 %}
+                                <span class="badge bg-light text-dark ms-2">
+                                    {% if action.amount|abs >= 1000000 %}
+                                    {% if action.amount > 0 %}+{% endif %}¥{{ "%.1f"|format(action.amount / 1000000) }}M
+                                    {% elif action.amount|abs >= 10000 %}
+                                    {% if action.amount > 0 %}+{% endif %}¥{{ "%.0f"|format(action.amount / 10000) }}万
+                                    {% else %}
+                                    {% if action.amount > 0 %}+{% endif %}¥{{ "%.0f"|format(action.amount) }}
+                                    {% endif %}
+                                </span>
+                                {% endif %}
+
+                                <!-- Rationale -->
+                                {% if action.rationale %}
+                                <p class="mb-1 mt-2 text-muted small">{{ _(action.rationale) }}</p>
+                                {% endif %}
+
+                                <!-- Action Items from details if available -->
+                                {% if action.details and action.details.action_items and
+                                action.details.action_items|length > 0 %}
+                                <ul class="mb-0 mt-2 small">
+                                    {% for item in action.details.action_items %}
+                                    <li>
+                                        {% if item is mapping %}
+                                        {{ _(item.action) }}{% if item.amount %} (¥{{ "{:,.0f}".format(item.amount)
+                                        }}){% endif %}
+                                        {% else %}
+                                        {{ _(item) }}
+                                        {% endif %}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+
+                            <!-- Category & Source Badge -->
+                            <div class="ms-3 text-end">
+                                <span class="badge bg-secondary">{{ _(action.category) }}</span>
+                                {% if action.details and action.details.source %}
+                                <small class="d-block text-muted mt-1">{{ _(action.details.source) }}</small>
+                                {% endif %}
+                                <small class="d-block text-muted">{{ _('P%(priority)s', priority=action.priority)
+                                    }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+<!-- End Priority Actions -->
+
+<!-- Phase 3: Alternative Assets Recommendations (Gold & Crypto) - MOVED UP -->
+{% if alt_assets_recommendations %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="border-bottom pb-2 mb-3">
+            <i class="bi bi-coin me-2"></i>{{ _('Alternative Assets - Gold & Crypto Recommendations') }}
+            <span class="badge bg-warning text-dark ms-2">{{ alt_assets_recommendations|length }}</span>
+        </h4>
+        <p class="text-muted mb-3">
+            {{ _('Phase 3 weighted scoring recommendations for gold, Bitcoin, and Ethereum based on multi-indicator
+            contrarian signals and relative value analysis.') }}
+        </p>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    {% for asset_rec in alt_assets_recommendations %}
+    {% set rec = asset_rec.recommendation %}
+    {% set weighted_data = asset_rec.weighted_data|default({}) %}
+
+    <!-- Use Phase 3 weighted_data.recommendation if available, fallback to legacy rec.recommendation -->
+    {% if weighted_data.recommendation %}
+    {% set recommendation = weighted_data.recommendation %}
+    {% elif rec.recommendation is string %}
+    {% set recommendation = rec.recommendation|default('Hold') %}
+    {% elif rec.recommendation is iterable and rec.recommendation is not mapping %}
+    {% set recommendation = rec.recommendation[0]|default('Hold') %}
+    {% else %}
+    {% set recommendation = _('Hold') %}
+    {% endif %}
+
+    <!-- Determine recommendation level for styling -->
+    {% if recommendation == 'Strong Buy' %}
+    {% set rec_level = 0 %}
+    {% set rec_priority = 90 %}
+    {% set rec_emoji = '🟢🟢' %}
+    {% elif recommendation == 'Buy' %}
+    {% set rec_level = 1 %}
+    {% set rec_priority = 70 %}
+    {% set rec_emoji = '🟢' %}
+    {% elif recommendation == 'Hold' %}
+    {% set rec_level = 2 %}
+    {% set rec_priority = 50 %}
+    {% set rec_emoji = '🟡' %}
+    {% elif recommendation == 'Sell' %}
+    {% set rec_level = 3 %}
+    {% set rec_priority = 70 %}
+    {% set rec_emoji = '🔴' %}
+    {% elif recommendation == 'Strong Sell' %}
+    {% set rec_level = 4 %}
+    {% set rec_priority = 90 %}
+    {% set rec_emoji = '🔴🔴' %}
+    {% else %}
+    {% set rec_level = -1 %}
+    {% set rec_priority = 30 %}
+    {% set rec_emoji = '⚪' %}
+    {% endif %}
+
+    <div class="col-lg-4 col-md-6">
+        <div class="card h-100 shadow-sm 
+                    {% if rec_level == 0 or rec_level == 4 %}border-danger border-3
+                    {% elif rec_level == 1 or rec_level == 3 %}border-warning border-3
+                    {% else %}border-secondary border-2{% endif %}">
+
+            <!-- Card Header -->
+            <div class="card-header 
+                        {% if rec_level == 0 %}bg-success text-white
+                        {% elif rec_level == 1 %}bg-success bg-opacity-75 text-dark
+                        {% elif rec_level == 3 %}bg-danger bg-opacity-75 text-dark
+                        {% elif rec_level == 4 %}bg-danger text-white
+                        {% else %}bg-warning text-dark{% endif %}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <span class="me-2">{{ rec_emoji }}</span>
+                        {{ _(asset_rec.asset_name) }}
+                    </h5>
+                    <span class="badge bg-dark">{{ recommendation }}</span>
+                </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body">
+                <!-- Phase 3 Weighted Score Display -->
+                <div class="text-center mb-3 p-3 bg-light rounded">
+                    <h6 class="text-muted mb-2">{{ _('Phase 3 Weighted Score') }}</h6>
+                    <div class="display-6 
+                                {% if weighted_data.total_score|default(0) <= -6 %}text-success fw-bold
+                                {% elif weighted_data.total_score|default(0) <= -3 %}text-success
+                                {% elif weighted_data.total_score|default(0) >= 6 %}text-danger fw-bold
+                                {% elif weighted_data.total_score|default(0) >= 3 %}text-danger
+                                {% else %}text-warning{% endif %}">
+                        {{ "%+.1f"|format(weighted_data.total_score|default(0)) }}
+                    </div>
+                    <small class="text-muted">
+                        {{ _('Scale: -10 (Strong Buy) to +10 (Strong Sell)') }}
+                        <br>
+                        <span class="badge bg-secondary mt-1">
+                            {% if weighted_data.total_score|default(0) <= -6 %}{{ _('Strong Buy ≤ -6') }} {% elif
+                                weighted_data.total_score|default(0) <=-3 %}{{ _('Buy: -6 to -3') }} {% elif
+                                weighted_data.total_score|default(0) <=3 %}{{ _('Hold: -3 to +3') }} {% elif
+                                weighted_data.total_score|default(0) <=6 %}{{ _('Sell: +3 to +6') }} {% else %}{{
+                                _('Strong Sell ≥ +6') }}{% endif %} </span>
+                    </small>
+                </div>
+
+                <!-- Description -->
+                <p class="text-muted mb-3" style="font-size: 0.95rem;">
+                    {{ _(rec.description|default('Based on Phase 3 weighted multi-indicator analysis for this asset.'))
+                    }}
+                </p>
+
+                <!-- Phase 3 Weighted Breakdown Table -->
+                {% if weighted_data.breakdown %}
+                <h6 class="border-bottom pb-2 mb-2">
+                    <i class="bi bi-calculator me-1"></i>{{ _('Weighted Score Breakdown:') }}
+                </h6>
+                <div class="table-responsive mb-3">
+                    <table class="table table-sm table-striped" style="font-size: 0.85rem;">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>{{ _('Indicator') }}</th>
+                                <th class="text-end">{{ _('Value') }}</th>
+                                <th class="text-end">{{ _('Base') }}</th>
+                                <th class="text-end">{{ _('Weight') }}</th>
+                                <th class="text-end">{{ _('Score') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for indicator, data in weighted_data.breakdown.items() %}
+                            <tr>
+                                <td><strong>{{ _(indicator.replace('_', ' ').title()) }}</strong></td>
+                                <td class="text-end">
+                                    {% set raw_val = data.raw_value if data.raw_value is defined else data.value %}
+                                    {% if indicator in ['btc_volatility', 'eth_volatility', 'gvz'] %}
+                                    {{ "%.1f"|format(raw_val) }}
+                                    {% elif indicator in ['btc_eth_ratio', 'eth_btc_ratio', 'sp500_gold_ratio'] %}
+                                    {{ "%.3f"|format(raw_val) }}
+                                    {% elif indicator in ['gold_silver_ratio'] %}
+                                    {{ "%.2f"|format(raw_val) }}
+                                    {% else %}
+                                    {{ "%.2f"|format(raw_val) }}
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    {% set base = data.base_score if data.base_score is defined else data.score %}
+                                    <span class="badge 
+                                        {% if base < 0 %}bg-success
+                                        {% elif base > 0 %}bg-danger
+                                        {% else %}bg-warning{% endif %}">
+                                        {{ "%+.1f"|format(base) }}
+                                    </span>
+                                </td>
+                                <td class="text-end text-muted">{{ "%.1f"|format(data.weight) }}x</td>
+                                <td class="text-end">
+                                    <strong class="
+                                        {% if data.weighted_score < 0 %}text-success
+                                        {% elif data.weighted_score > 0 %}text-danger
+                                        {% else %}text-warning{% endif %}">
+                                        {{ "%+.2f"|format(data.weighted_score) }}
+                                    </strong>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-secondary">
+                            <tr>
+                                <td colspan="4" class="text-end"><strong>{{ _('Total Score:') }}</strong></td>
+                                <td class="text-end">
+                                    <strong class="fs-5
+                                        {% if weighted_data.total_score|default(0) < 0 %}text-success
+                                        {% elif weighted_data.total_score|default(0) > 0 %}text-danger
+                                        {% else %}text-warning{% endif %}">
+                                        {{ "%+.1f"|format(weighted_data.total_score|default(0)) }}
+                                    </strong>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                {% endif %}
+
+                <!-- Missing Indicators Warning -->
+                {% if weighted_data.missing_indicators and weighted_data.missing_indicators|length > 0 %}
+                <div class="alert alert-warning py-2 px-2 mb-2" style="font-size: 0.85rem;">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                    <strong>{{ _('Incomplete Data:') }}</strong> {{ _(', '.join(weighted_data.missing_indicators)) }}
+                </div>
+                {% endif %}
+
+                <!-- Status Indicator -->
+                {% if weighted_data.status %}
+                <div class="mb-3">
+                    <span class="badge 
+                        {% if weighted_data.status == 'success' %}bg-success
+                        {% elif weighted_data.status == 'warning' %}bg-warning text-dark
+                        {% else %}bg-danger{% endif %}">
+                        {{ _('Status:') }} {{ _(weighted_data.status|upper) }}
+                    </span>
+                    {% if weighted_data.error_message %}
+                    <small class="text-muted d-block mt-1">{{ _(weighted_data.error_message) }}</small>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Link to Market Thermometer -->
+                <div class="text-center mt-3">
+                    <a href="market_thermometer.html" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-thermometer-half me-1"></i>{{ _('View Raw Indicators') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+<!-- End Alternative Assets Recommendations -->
+
+<!-- Phase 2: Multi-Dimensional Recommendations -->
+{% if recommendations and recommendations|length > 0 %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="border-bottom pb-2 mb-3">
+            <i class="bi bi-lightbulb me-2"></i>{{ _('Intelligent Recommendations') }}
+            <span class="badge bg-primary ms-2">{{ recommendations|length }}</span>
+            <button class="btn btn-sm btn-outline-secondary ms-3" type="button" data-bs-toggle="collapse"
+                data-bs-target="#intelligentRecommendationsSection" aria-expanded="false"
+                aria-controls="intelligentRecommendationsSection">
+                <i class="bi bi-chevron-down"></i> {{ _('Expand All Details') }}
+            </button>
+        </h4>
+        <p class="text-muted mb-3">
+            💡 <strong>{{ _('Top priority items are shown above in Priority Actions section.') }}</strong> {{ _('Expand
+            below to see all %(count)s detailed recommendations with full analysis, alternative options, and
+            implementation steps.', count=recommendations|length) }}
+        </p>
+    </div>
+</div>
+
+<!-- Collapsible Recommendations Details -->
+<div class="collapse" id="intelligentRecommendationsSection">
+    <!-- Recommendation Summary - MOVED HERE -->
+    {% if recommendation_stats %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body p-4">
+                    <h5 class="mb-4">
+                        <i class="bi bi-graph-up me-2"></i>{{ _('Recommendation Summary') }}
+                    </h5>
+                    <div class="row g-4">
+                        <div class="col-lg-3 col-md-6 col-sm-6">
+                            <div class="text-center">
+                                <small class="text-muted d-block mb-2">{{ _('Total Recommendations') }}</small>
+                                <div class="h3 mb-0 text-primary">{{ recommendation_stats.total_count }}</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-6">
+                            <div class="text-center">
+                                <small class="text-muted d-block mb-2">{{ _('High Priority') }}</small>
+                                <div class="h3 mb-0 text-danger">{{ recommendation_stats.high_priority_count }}</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-6">
+                            <div class="text-center">
+                                <small class="text-muted d-block mb-2">{{ _('Total Potential Impact') }}</small>
+                                <div class="h3 mb-0 text-success">¥{{
+                                    '{:,.0f}'.format(recommendation_stats.total_potential_impact) }}</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-6">
+                            <div class="text-center">
+                                <small class="text-muted d-block mb-2">{{ _('Average Priority') }}</small>
+                                <div class="h3 mb-0 text-info">{{ '{:.0f}'.format(recommendation_stats.avg_priority) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row g-4 mb-5" id="recommendationsGrid">
+        {% for rec in recommendations|sort(attribute='priority', reverse=True) %}
+        <div class="col-lg-6 col-md-12">
+            <div
+                class="card recommendation-card h-100 shadow-sm
+                    {% if rec.type == 'STRATEGIC_REGIME' %}strategic-card{% endif %}
+                    {% if rec.priority >= 80 %}border-danger border-3{% elif rec.priority >= 60 %}border-warning border-3{% else %}border-info border-2{% endif %}">
+
+                <!-- Card Header -->
+                <div
+                    class="card-header 
+                        {% if rec.priority >= 80 %}bg-danger{% elif rec.priority >= 60 %}bg-warning{% else %}bg-info{% endif %}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5
+                            class="mb-0 {% if rec.priority >= 60 and rec.priority < 80 %}text-dark{% else %}text-white{% endif %}">
+                            {% if rec.type == 'STRATEGIC_REGIME' %}
+                            <span class="badge bg-warning text-dark fw-bold me-2 strategic-badge"
+                                style="padding: 0.3em 0.6em; font-size: 0.85rem;"
+                                title="{{ _('Strategic recommendation from market regime') }}">⭐ {{ _('STRATEGIC')
+                                }}</span>
+                            {% endif %}
+                            <span class="me-2">{{ rec.icon|default('📌') }}</span>
+                            {{ _(rec.title_cn) }}
+                        </h5>
+                        <span
+                            class="badge 
+                                {% if rec.priority >= 80 %}bg-dark{% elif rec.priority >= 60 %}bg-secondary{% else %}bg-dark{% endif %}">
+                            {{ _('Priority: %(priority)s', priority=rec.priority) }}
+                        </span>
+                    </div>
+                    <small
+                        class="d-block mt-1 {% if rec.priority >= 60 and rec.priority < 80 %}text-dark opacity-75{% else %}text-white opacity-75{% endif %}">{{
+                        _(rec.title) }}</small>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body" style="background-color: white;">
+                    <p class="text-muted" style="color: #6c757d !important;">{{
+                        _(rec.description_cn|default(rec.description)) }}</p>
+
+                    <!-- Impact Metrics -->
+                    <div class="row mb-3">
+                        {% if rec.impact.dollar_value %}
+                        <div class="col-6">
+                            <small class="text-muted">{{ _('Financial Impact') }}</small>
+                            <div class="h5">¥{{ '{:,.0f}'.format(rec.impact.dollar_value) }}</div>
+                        </div>
+                        {% endif %}
+                        {% if rec.impact.risk_reduction %}
+                        <div class="col-6">
+                            <small class="text-muted">{{ _('Risk Reduction') }}</small>
+                            <div class="h5">
+                                <span class="badge 
+                                        {% if rec.impact.risk_reduction == 'HIGH' %}bg-success
+                                        {% elif rec.impact.risk_reduction == 'MEDIUM' %}bg-warning
+                                        {% else %}bg-secondary{% endif %}">
+                                    {{ _(rec.impact.risk_reduction) }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if rec.impact.drift_reduction %}
+                        <div class="col-6">
+                            <small class="text-muted">{{ _('Drift Reduction') }}</small>
+                            <div class="h5">{{ '{:.1f}'.format(rec.impact.drift_reduction) }}%</div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Action Items -->
+                    {% if rec.action_items and rec.action_items|length > 0 %}
+                    <h6 class="border-bottom pb-2 mb-2">
+                        <i class="bi bi-list-check me-1"></i>{{ _('Action Steps:') }}
+                    </h6>
+                    <ol class="mb-3">
+                        {% for action in rec.action_items %}
+                        <li class="mb-2" style="color: #212529;">
+                            <strong style="color: #212529;">{{ _(action.action) }}</strong>
+                            {% if action.amount %}
+                            <span class="badge bg-secondary">¥{{ '{:,.0f}'.format(action.amount) }}</span>
+                            {% endif %}
+                            <br>
+                            <small class="text-muted" style="color: #6c757d !important;">{{ _(action.rationale)
+                                }}</small>
+                        </li>
+                        {% endfor %}
+                    </ol>
+                    {% endif %}
+
+                    <!-- Product Recommendations (Phase 3) -->
+                    {% if rec.product_recommendations and rec.product_recommendations|length > 0 %}
+                    <div class="accordion mb-3" id="productAccordion{{ rec.id }}">
+                        <div class="accordion-item border-0">
+                            <h6 class="accordion-header" id="productHeading{{ rec.id }}">
+                                <button class="accordion-button collapsed bg-light" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#productCollapse{{ rec.id }}"
+                                    aria-expanded="false" aria-controls="productCollapse{{ rec.id }}">
+                                    <i class="bi bi-cart-check me-2"></i>
+                                    <strong>{{ _('Specific Product Recommendations (%(count)s asset classes)',
+                                        count=rec.product_recommendations|length) }}</strong>
+                                </button>
+                            </h6>
+                            <div id="productCollapse{{ rec.id }}" class="accordion-collapse collapse"
+                                aria-labelledby="productHeading{{ rec.id }}"
+                                data-bs-parent="#productAccordion{{ rec.id }}">
+                                <div class="accordion-body bg-white">
+                                    {% for prod_rec in rec.product_recommendations %}
+                                    <div class="product-recommendation-section mb-4 pb-3 border-bottom">
+                                        <h6 class="text-primary">
+                                            {{ _(prod_rec.asset_class) }} ({{ _(prod_rec.asset_class_en) }})
+                                            <span class="badge bg-primary ms-2">¥{{ '{:,.0f}'.format(prod_rec.amount)
+                                                }}</span>
+                                        </h6>
+                                        <p class="text-muted small mb-3">
+                                            <i class="bi bi-lightbulb me-1"></i>{{ _(prod_rec.strategy) }}
+                                        </p>
+
+                                        {% if prod_rec.products and prod_rec.products|length > 0 %}
+                                        <div class="products-list">
+                                            {% for product in prod_rec.products %}
+                                            <div
+                                                class="card mb-2 border-start border-3 
+                                                    {% if product.priority == 'high' %}border-success{% else %}border-info{% endif %}">
+                                                <div class="card-body p-3">
+                                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                                        <div>
+                                                            <h6 class="mb-1">
+                                                                {{ product.sequence }}. {{ _(product.name) }}
+                                                                {% if product.is_existing %}
+                                                                <span class="badge bg-secondary text-white">{{
+                                                                    _('Current Holding') }}</span>
+                                                                {% else %}
+                                                                <span class="badge bg-success">{{ _('New Suggestion')
+                                                                    }}</span>
+                                                                {% endif %}
+                                                            </h6>
+                                                            {% if product.code %}
+                                                            <small class="text-muted">{{ _('Code:') }} {{ product.code
+                                                                }}</small>
+                                                            {% endif %}
+                                                        </div>
+                                                        <span class="badge 
+                                                                {% if 'high' in product.priority.lower() %}bg-success
+                                                                {% else %}bg-info{% endif %}">
+                                                            {{ _(product.priority|upper) }}
+                                                        </span>
+                                                    </div>
+
+                                                    <div class="row g-2 small mb-2">
+                                                        <div class="col-6">
+                                                            <i class="bi bi-graph-up text-success me-1"></i>
+                                                            <strong>{{ _('Yield:') }}</strong> {{
+                                                            _(product.yield_estimate) }}
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <i class="bi bi-shield text-warning me-1"></i>
+                                                            <strong>{{ _('Risk:') }}</strong> {{ _(product.risk_level)
+                                                            }}
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <i class="bi bi-clock text-info me-1"></i>
+                                                            <strong>{{ _('Liquidity:') }}</strong> {{
+                                                            _(product.liquidity) }}
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <i class="bi bi-coin text-primary me-1"></i>
+                                                            <strong>{{ _('Min:') }}</strong> {{
+                                                            _(product.min_investment) }}
+                                                        </div>
+                                                    </div>
+
+                                                    <p class="mb-2 small">
+                                                        <i class="bi bi-lightbulb-fill text-warning me-1"></i>
+                                                        <strong>{{ _('Rationale:') }}</strong> {{ _(product.rationale)
+                                                        }}
+                                                    </p>
+
+                                                    {% if product.execution_steps and product.execution_steps|length > 0
+                                                    %}
+                                                    <div class="mt-2 p-2 bg-light rounded">
+                                                        <strong class="small">{{ _('How to Execute:') }}</strong>
+                                                        <ol class="mb-0 mt-1 ps-3 small">
+                                                            {% for step in product.execution_steps %}
+                                                            <li>{{ _(step) }}</li>
+                                                            {% endfor %}
+                                                        </ol>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+
+                                        {% if prod_rec.sub_class_breakdown and prod_rec.sub_class_breakdown|length > 0
+                                        %}
+                                        <div class="mt-3 p-2 bg-light rounded">
+                                            <strong class="small">{{ _('Sub-Class Breakdown:') }}</strong>
+                                            <ul class="mb-0 mt-1 ps-3 small">
+                                                {% for sub in prod_rec.sub_class_breakdown %}
+                                                <li>{{ _(sub.sub_class) }}: ¥{{ '{:,.0f}'.format(sub.amount) }} ({{
+                                                    '{:.1f}'.format(sub.percentage) }}%)</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Footer Info -->
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        {% if rec.estimated_effort %}
+                        <span class="badge bg-light text-dark mb-1">
+                            <i class="bi bi-clock me-1"></i>{{ _(rec.estimated_effort) }}
+                        </span>
+                        {% endif %}
+                        {% if rec.category %}
+                        <span class="badge bg-light text-dark mb-1">
+                            <i class="bi bi-tag me-1"></i>{{ _(rec.category) }}
+                        </span>
+                        {% endif %}
+                        {% if rec.urgency %}
+                        <span class="badge 
+                                {% if rec.urgency == 'HIGH' %}bg-danger
+                                {% elif rec.urgency == 'MEDIUM' %}bg-warning text-dark
+                                {% else %}bg-secondary{% endif %} mb-1">
+                            <i class="bi bi-exclamation-triangle me-1"></i>{{ _(rec.urgency) }}
+                        </span>
+                        {% endif %}
+                        {% if rec.tax_implications %}
+                        <span class="badge bg-warning text-dark mb-1" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="{{ _(rec.tax_implications) }}">
+                            <i class="bi bi-info-circle me-1"></i>{{ _('Tax Impact') }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<!-- End collapse div for Intelligent Recommendations -->
+{% endif %}
+<!-- End Phase 2 Recommendations -->
+
+<!-- Tactical Rebalancing Analysis Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <h3 class="section-title border-bottom pb-3 mb-4">
+            <i class="bi bi-graph-up-arrow me-2"></i>{{ _('Tactical Rebalancing Analysis') }}
+        </h3>
+
+        <!-- Info Alert: Strategic vs Tactical Recommendations -->
+        <div class="alert alert-primary border-start border-primary border-4 mb-4" role="alert">
+            <div class="d-flex align-items-start">
+                <i class="bi bi-info-circle-fill me-3 mt-1" style="font-size: 1.5rem;"></i>
+                <div>
+                    <h5 class="alert-heading mb-2">{{ _('Understanding Strategic vs Tactical Recommendations') }}</h5>
+                    <p class="mb-2">
+                        <strong>{{ _('Strategic Recommendations (above):') }}</strong> {{ _('Market regime-based advice
+                        driven by macroeconomic conditions,') }}
+                        {{ _('valuation metrics, and sentiment indicators. These provide high-level guidance on overall
+                        portfolio positioning') }}
+                        {{ _('and asset class selection based on market cycles.') }}
+                    </p>
+                    <p class="mb-0">
+                        <strong>{{ _('Tactical Rebalancing Analysis (below):') }}</strong> {{ _('Drift-based guidance
+                        comparing your current allocation') }}
+                        {{ _('against target weights. These recommendations focus on maintaining portfolio discipline
+                        and risk management') }}
+                        {{ _('by rebalancing when allocations deviate significantly from your investment strategy.') }}
+                    </p>
+                    <hr class="my-3">
+                    <p class="mb-0 small">
+                        <i class="bi bi-lightbulb me-1"></i><strong>{{ _('Best Practice:') }}</strong> {{ _('Use
+                        strategic recommendations for new capital') }}
+                        {{ _('deployment and market-timing decisions. Use tactical rebalancing for portfolio maintenance
+                        and risk control.') }}
+                        {{ _('When they conflict, consider your investment timeline and market conditions to determine
+                        the appropriate balance.') }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rebalancing content will be populated by context -->
+    {% if rebalancing_data %}
+    <div class="col-12 mb-4">
+        <div class="table-container">
+            <h4 class="section-title d-flex align-items-center">
+                <span>{{ _('Rebalancing Overview') }}</span>
+                <button id="toggleRebalancingBtn" class="btn btn-sm btn-outline-secondary ms-3" type="button"
+                    onclick="toggleRebalancing()">{{ _('Hide') }}</button>
+            </h4>
+            <div id="rebalancingPanel">
+                <p class="text-muted mb-3">
+                    {{ _('The following recommendations are based on the rebalanceable portion of your portfolio.') }}
+                    {{ _('Assets such as Real Estate and Insurance are excluded from this calculation.') }}
+                </p>
+
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <div class="kpi-card">
+                            <div class="kpi-value">¥{{ '{:,.0f}'.format(rebalancing_data.total_portfolio_value) }}</div>
+                            <div class="kpi-label">{{ _('Total Portfolio Value') }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="kpi-card">
+                            <div class="kpi-value">¥{{ '{:,.0f}'.format(rebalancing_data.non_rebalanceable_value) }}
+                            </div>
+                            <div class="kpi-label">{{ _('Non-Rebalanceable Assets') }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="kpi-card">
+                            <div class="kpi-value">¥{{ '{:,.0f}'.format(rebalancing_data.rebalanceable_value) }}</div>
+                            <div class="kpi-label">{{ _('Rebalanceable Sub-Portfolio') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+<!-- End Tactical Rebalancing Analysis Section -->
+
+<!-- Module 1: Intelligent Incremental Capital Allocator -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-calculator me-2"></i>{{ _('New Capital Injection Simulation') }}
+                    <span class="small">({{ _('新资金注入模拟') }})</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">
+                    {{ _('Simulate how new capital should be deployed to minimize portfolio allocation drift.') }}
+                    {{ _('The system recommends investing in the most under-allocated asset class.') }}
+                </p>
+
+                {% if capital_allocation_suggestion and capital_allocation_suggestion.target_class %}
+                <div class="alert alert-info mb-3">
+                    <strong><i class="bi bi-info-circle me-2"></i>{{ _('Portfolio Allocation Gaps:') }}</strong><br>
+                    {% if proportional_allocation and proportional_allocation.allocations|length > 1 %}
+                    <span class="fs-6">{{ proportional_allocation.allocations|length }} {{ _('asset classes are
+                        under-allocated') }}</span>
+                    <br>
+                    <small class="text-muted">
+                        {{ _('Primary gap:') }} {{ capital_allocation_suggestion.target_class }} ({{
+                        "{:.2f}".format(capital_allocation_suggestion.drift) }}%)
+                    </small>
+                    {% else %}
+                    <span class="fs-5">{{ capital_allocation_suggestion.target_class }} ({{
+                        capital_allocation_suggestion.target_class_en }})</span>
+                    {{ _('is under-allocated by') }} <strong>{{ "{:.2f}".format(capital_allocation_suggestion.drift)
+                        }}%</strong>
+                    <br>
+                    <small class="text-muted">
+                        {{ _('Current:') }} {{ "{:.2f}".format(capital_allocation_suggestion.current_pct) }}% |
+                        {{ _('Target:') }} {{ "{:.2f}".format(capital_allocation_suggestion.target_pct) }}%
+                    </small>
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="newCapitalAmount" class="form-label">
+                            <strong>{{ _('Enter New Capital Amount (¥)') }}</strong>
+                        </label>
+                        <input type="number" class="form-control form-control-lg" id="newCapitalAmount"
+                            placeholder="e.g., 50000" min="0" step="1000">
+                    </div>
+                    <div class="col-md-6 mb-3 d-flex align-items-end">
+                        <button class="btn btn-primary btn-lg w-100" onclick="calculateCapitalAllocation()">
+                            <i class="bi bi-calculator-fill me-2"></i>{{ _('Calculate Allocation') }} ({{ _('计算分配') }})
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Allocation Results Placeholder -->
+                <div id="allocationRecommendation" class="d-none mt-3">
+                    <div class="alert alert-success" role="alert">
+                        <h5 class="alert-heading"><i class="bi bi-check-circle me-2"></i>{{ _('Recommended Proportional
+                            Allocation') }}</h5>
+                        <p id="recommendationSummary" class="mb-2 fs-6"></p>
+                    </div>
+
+                    <div id="proportionalTable" class="table-responsive mb-3">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+
+                    <div id="portfolioImpact" class="alert alert-light">
+                        <h6><i class="bi bi-graph-up me-2"></i>{{ _('Portfolio Impact') }}</h6>
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <small class="text-muted">{{ _('Total Drift Before') }}</small>
+                                <div id="driftBefore" class="fs-5 fw-bold">-</div>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted">{{ _('Total Drift After') }}</small>
+                                <div id="driftAfter" class="fs-5 fw-bold text-success">-</div>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted">{{ _('Improvement') }}</small>
+                                <div id="driftImprovement" class="fs-5 fw-bold text-primary">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="subClassAccordion" class="accordion d-none">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>{{ _('No allocation gap detected.') }}</strong>
+                    {{ _('Your portfolio is currently well-balanced according to your target allocation.') }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Module 1.5: Rebalancing Analysis -->
+{% if rebalancing_data and (rebalancing_data.top_level_table or rebalancing_data.sub_level_table) %}
+<div class="row mb-4">
+    <!-- Rebalancing Drift Analysis -->
+    <div class="col-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-arrows-angle-expand me-2"></i>{{ _('Rebalancing Drift Analysis') }}
+                </h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">
+                    {{ _('Two-level analysis showing drift for both top-level asset classes and sub-categories, with
+                    targets based on the Growth strategy profile.') }}
+                </p>
+
+                <!-- Top-Level Classes Table -->
+                <h5 class="mb-3">{{ _('Top-Level Asset Classes') }}</h5>
+                <div class="table-responsive mb-4">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>{{ _('Asset Class') }}</th>
+                                <th class="text-end">{{ _('Current %') }}</th>
+                                <th class="text-end">{{ _('Target %') }}</th>
+                                <th class="text-end">{{ _('Drift') }}</th>
+                                <th class="text-end">{{ _('Current Value') }}</th>
+                                <th class="text-end">{{ _('Target Value') }}</th>
+                                <th class="text-center">{{ _('Status') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in rebalancing_data.top_level_table %}
+                            <tr
+                                class="{% if item.drift|abs > 10 %}bg-danger bg-opacity-10{% elif item.drift|abs > 5 %}bg-warning bg-opacity-10{% endif %}">
+                                <td><strong>{{ item.asset_class }}</strong></td>
+                                <td class="text-end">{{ '{:.1f}'.format(item.current_pct) }}%</td>
+                                <td class="text-end">{{ '{:.1f}'.format(item.target_pct) }}%</td>
+                                <td
+                                    class="text-end {% if item.drift > 0 %}text-success{% elif item.drift < 0 %}text-danger{% endif %}">
+                                    {{ '{:+.1f}'.format(item.drift) }}%
+                                </td>
+                                <td class="text-end">¥{{ '{:,.0f}'.format(item.current_value) }}</td>
+                                <td class="text-end">¥{{ '{:,.0f}'.format(item.target_value) }}</td>
+                                <td class="text-center">
+                                    {% if not item.is_rebalanceable %}
+                                    <span class="badge bg-secondary">{{ _('Non-Rebalanceable') }}</span>
+                                    {% elif item.target_pct == 0 %}
+                                    <!-- Special case: zero target, use absolute drift -->
+                                    {% if item.drift|abs > 10 %}
+                                    <span class="badge bg-danger">{{ _('High Risk') }}</span>
+                                    {% elif item.drift|abs > 5 %}
+                                    <span class="badge bg-warning">{{ _('Medium Risk') }}</span>
+                                    {% else %}
+                                    <span class="badge bg-success">{{ _('On Target') }}</span>
+                                    {% endif %}
+                                    {% else %}
+                                    <!-- Normal case: relative drift from target -->
+                                    {% set relative_drift = (item.drift|abs / item.target_pct * 100) %}
+                                    {% if relative_drift > 50 %}
+                                    <span class="badge bg-danger">{{ _('High Risk') }}</span>
+                                    {% elif relative_drift > 25 %}
+                                    <span class="badge bg-warning">{{ _('Medium Risk') }}</span>
+                                    {% else %}
+                                    <span class="badge bg-success">{{ _('On Target') }}</span>
+                                    {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Sub-Classes Table -->
+                <h5 class="mb-3">{{ _('Sub-Class Breakdown') }}</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>{{ _('Top-Level Class') }}</th>
+                                <th>{{ _('Sub-Category') }}</th>
+                                <th class="text-end">{{ _('Current %') }}</th>
+                                <th class="text-end">{{ _('Target %') }}</th>
+                                <th class="text-end">{{ _('Drift') }}</th>
+                                <th class="text-end">{{ _('Current Value') }}</th>
+                                <th class="text-end">{{ _('Target Value') }}</th>
+                                <th class="text-center">{{ _('Status') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in rebalancing_data.sub_level_table %}
+                            <tr
+                                class="{% if item.drift|abs > 10 %}bg-danger bg-opacity-10{% elif item.drift|abs > 5 %}bg-warning bg-opacity-10{% endif %}">
+                                <td class="text-muted">{{ item.asset_class }}</td>
+                                <td><strong>{{ item.sub_category }}</strong></td>
+                                <td class="text-end">{{ '{:.1f}'.format(item.current_pct) }}%</td>
+                                <td class="text-end">{{ '{:.1f}'.format(item.target_pct) }}%</td>
+                                <td
+                                    class="text-end {% if item.drift > 0 %}text-success{% elif item.drift < 0 %}text-danger{% endif %}">
+                                    {{ '{:+.1f}'.format(item.drift) }}%
+                                </td>
+                                <td class="text-end">¥{{ '{:,.0f}'.format(item.current_value) }}</td>
+                                <td class="text-end">¥{{ '{:,.0f}'.format(item.target_value) }}</td>
+                                <td class="text-center">
+                                    {% if not item.is_rebalanceable %}
+                                    <span class="badge bg-secondary">{{ _('Non-Rebalanceable') }}</span>
+                                    {% elif item.target_pct == 0 %}
+                                    <!-- Special case: zero target, use absolute drift -->
+                                    {% if item.drift|abs > 10 %}
+                                    <span class="badge bg-danger">{{ _('High Risk') }}</span>
+                                    {% elif item.drift|abs > 5 %}
+                                    <span class="badge bg-warning">{{ _('Medium Risk') }}</span>
+                                    {% else %}
+                                    <span class="badge bg-success">{{ _('On Target') }}</span>
+                                    {% endif %}
+                                    {% else %}
+                                    <!-- Normal case: relative drift from target -->
+                                    {% set relative_drift = (item.drift|abs / item.target_pct * 100) %}
+                                    {% if relative_drift > 50 %}
+                                    <span class="badge bg-danger">{{ _('High Risk') }}</span>
+                                    {% elif relative_drift > 25 %}
+                                    <span class="badge bg-warning">{{ _('Medium Risk') }}</span>
+                                    {% else %}
+                                    <span class="badge bg-success">{{ _('On Target') }}</span>
+                                    {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommended Actions -->
+    <div class="col-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-lightbulb me-2"></i>{{ _('Recommended Actions') }}
+                </h4>
+            </div>
+            <div class="card-body">
+                {% if rebalancing_data.needs_rebalancing and rebalancing_data.hierarchical_recommendations %}
+                <div class="alert alert-info" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>{{ _('Rebalancing Recommended:') }}</strong> {{ _('Your portfolio has drifted from target
+                    allocations.') }}
+                    {{ _('Consider the following hierarchical actions:') }}
+                </div>
+
+                <!-- Hierarchical Recommendations -->
+                <div class="recommendation-hierarchy">
+                    {% for recommendation in rebalancing_data.hierarchical_recommendations %}
+                    <div class="card mb-3 recommendation-card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0 d-flex align-items-center">
+                                <span class="me-2">{{ recommendation.icon }}</span>
+                                <strong>{{ recommendation.action_text }} ¥{{
+                                    "{:,.0f}".format(recommendation.total_amount) }} {{ _('的') }} {{
+                                    recommendation.top_level_category }}</strong>
+                                <span
+                                    class="badge bg-{% if recommendation.action_type == 'buy' %}success{% else %}warning{% endif %} ms-2">
+                                    {% if recommendation.drift > 0 %}+{% endif %}{{
+                                    "{:.1f}".format(recommendation.drift) }}% {{ _('偏移') }}
+                                </span>
+                            </h5>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="sub-recommendations">
+                                {% for sub_rec in recommendation.sub_recommendations %}
+                                <div
+                                    class="sub-recommendation-item d-flex justify-content-between align-items-center py-2 border-bottom">
+                                    <div class="sub-action-details">
+                                        <i
+                                            class="bi bi-{% if sub_rec.action == '买入' %}arrow-up-circle text-success{% else %}arrow-down-circle text-warning{% endif %} me-2"></i>
+                                        <span class="fw-medium">{{ sub_rec.action }} ¥{{
+                                            "{:,.0f}".format(sub_rec.amount) }}</span>
+                                        <span class="text-muted ms-2">{{ _('的') }} "{{ sub_rec.sub_category }}"</span>
+                                    </div>
+                                    <div class="sub-action-meta text-end">
+                                        <small class="text-muted d-block">
+                                            {{ _('当前持仓:') }} ¥{{ "{:,.0f}".format(sub_rec.current_value) }}
+                                        </small>
+                                        <small class="text-muted">
+                                            {{ _('偏移:') }} {% if sub_rec.drift > 0 %}+{% endif %}{{
+                                            "{:.1f}".format(sub_rec.drift)
+                                            }}%
+                                        </small>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>{{ _('Implementation Notes:') }}</strong>
+                        {{ _('Execute trades gradually to minimize market impact. Prioritize sub-categories with larger
+                        drifts first.') }}
+                        {{ _('Consider transaction costs and tax implications before implementing changes.') }}
+                        {{ _('Review your investment timeline and risk tolerance before making significant
+                        adjustments.')
+                        }}
+                    </small>
+                </div>
+
+                {% elif rebalancing_data.needs_rebalancing %}
+                <!-- Fallback to old format if hierarchical_recommendations not available -->
+                <div class="alert alert-info" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>{{ _('Rebalancing Recommended:') }}</strong> {{ _('Your portfolio has drifted from target
+                    allocations.') }}
+                    {{ _('Consider the following actions:') }}
+                </div>
+
+                <div class="list-group">
+                    {% for trade in rebalancing_data.recommended_trades %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-arrow-right-circle text-primary"></i> {{ trade }}</span>
+                        <span class="badge bg-primary rounded-pill">{{ _('Action Required') }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% else %}
+                <div class="alert alert-success" role="alert">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <strong>{{ _('Portfolio Well-Balanced:') }}</strong> {{ _('Your current allocation is within
+                    acceptable tolerance
+                    levels.') }}
+                    {{ _('No immediate rebalancing actions are required.') }}
+                </div>
+
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>{{ _('Maintenance:') }}</strong>
+                        {{ _('Continue monitoring your portfolio quarterly. Consider rebalancing if any category drifts
+                        more
+                        than 5% from target allocation.') }}
+                    </small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Module 2: RSU Risk Management -->
+{% if rsu_alerts and rsu_alerts|length > 0 %}
+<div class="row">
+    <div class="col-12">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ _('RSU Risk Management Alerts') }}
+                    <span class="badge bg-dark ms-2">{{ rsu_alerts|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">
+                    <strong>{{ _('Automated alerts for RSU vesting events requiring action.') }}</strong>
+                    {{ _('Review your planned actions and ensure timely execution.') }}
+                </p>
+
+                {% for alert in rsu_alerts %}
+                <div class="alert {% if alert.status == 'vested' %}alert-danger{% else %}alert-warning{% endif %} mb-3"
+                    role="alert">
+                    <h6 class="alert-heading">
+                        {% if alert.status == 'vested' %}
+                        ⚠️ <strong>{{ _('Action Required:') }}</strong> {{ _('Recent Vesting Event') }}
+                        {% else %}
+                        🔔 <strong>{{ _('Upcoming:') }}</strong> {{ _('Vesting Event Approaching') }}
+                        {% endif %}
+                    </h6>
+                    <hr>
+                    <p class="mb-2">
+                        {% if alert.status == 'vested' %}
+                        {{ _('A batch of') }} <strong>{{ alert.shares }}</strong> {{ _('shares of') }} <strong>{{
+                            alert.asset_id }}</strong>
+                        {{ _('vested on') }} <strong>{{ alert.vesting_date.strftime('%Y-%m-%d') }}</strong>
+                        ({{ alert.days_ago }} {{ _('days ago') }}).
+                        {% else %}
+                        {{ _('A batch of') }} <strong>{{ alert.shares }}</strong> {{ _('shares of') }} <strong>{{
+                            alert.asset_id }}</strong>
+                        {{ _('will vest on') }} <strong>{{ alert.vesting_date.strftime('%Y-%m-%d') }}</strong>
+                        ({{ _('in') }} {{ -alert.days_ago }} {{ _('days') }}).
+                        {% endif %}
+                    </p>
+                    <p class="mb-0">
+                        <strong>{{ _('Your Plan:') }}</strong> <em>"{{ alert.plan }}"</em>
+                    </p>
+                </div>
+                {% endfor %}
+
+                <div class="alert alert-info mt-3 mb-0">
+                    <small>
+                        <i class="bi bi-info-circle me-1"></i>
+                        <strong>{{ _('Note:') }}</strong> {{ _('RSU alerts are configured in') }}
+                        <code>config/rsu_schedule.yaml</code>.
+                        {{ _('Update this file to manage your vesting schedule and action plans.') }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bi bi-check-circle me-2"></i>RSU Risk Management
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-0">
+                    <i class="bi bi-shield-check me-2"></i>
+                    No actionable RSU alerts at this time. Configure your vesting schedule in
+                    <code>config/rsu_schedule.yaml</code> to enable automated alerts.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Toggle rebalancing panel visibility
+    function toggleRebalancing() {
+        const panel = document.getElementById('rebalancingPanel');
+        const btn = document.getElementById('toggleRebalancingBtn');
+        if (panel.style.display === 'none') {
+            panel.style.display = 'block';
+            btn.textContent = 'Hide';
+        } else {
+            panel.style.display = 'none';
+            btn.textContent = 'Show';
+        }
+    }
+
+    // Capital allocation calculator
+    // Action Compass: Capital Allocation Calculator
+    function calculateCapitalAllocation() {
+        const amount = parseFloat(document.getElementById('newCapitalAmount').value);
+        const resultDiv = document.getElementById('allocationRecommendation');
+        const resultSummary = document.getElementById('recommendationSummary');
+        const proportionalTable = document.getElementById('proportionalTable');
+        const subClassAccordion = document.getElementById('subClassAccordion');
+
+        if (!amount || amount <= 0) {
+            alert("{{ _('Please enter a valid capital amount greater than 0.') }}");
+            return;
+        }
+
+        // Get proportional allocation data from backend (if available)
+        {% if proportional_allocation and proportional_allocation.allocations %}
+        const proportionalData = {{ proportional_allocation | tojson
+    }};
+    const subClassData = {{ sub_class_breakdowns | tojson }};
+    const rebalanceableValue = proportionalData.rebalanceable_value || 1;  // Prevent division by zero
+
+    // Calculate proportional allocations based on user input
+    const allocations = proportionalData.allocations.map(a => {
+        const scaledAmount = amount * a.percentage / 100;
+        // Recalculate new drift dynamically based on actual capital input
+        const capitalImpactOnDrift = (scaledAmount / rebalanceableValue) * 100;
+        const newDrift = a.current_drift + capitalImpactOnDrift;
+
+        return {
+            asset_class: a.asset_class,
+            asset_class_en: a.asset_class_en,
+            amount: scaledAmount.toFixed(2),
+            percentage: a.percentage,
+            new_drift: newDrift,
+            current_drift: a.current_drift,
+            current_pct: a.current_pct,
+            target_pct: a.target_pct
+        };
+    });
+
+    // Generate summary
+    const summary = allocations.map((a, i) => {
+        const formattedAmount = parseFloat(a.amount).toLocaleString('en-US');
+        return `<strong>¥${formattedAmount}</strong> {{ _('to') }} ${a.asset_class} (${a.asset_class_en})`;
+    }).join(', ');
+
+    resultSummary.innerHTML = `{{ _('Allocate:') }} ${summary}`;
+
+    // Build proportional allocation table
+    let tableHtml = '<table class="table table-hover"><thead class="table-light">';
+    tableHtml += '<tr><th>{{ _("Asset Class") }}</th><th>{{ _("Amount (¥)") }}</th><th>{{ _("Percentage") }}</th><th>{{ _("Current") }}</th><th>{{ _("Target") }}</th><th>{{ _("New Drift") }}</th></tr></thead><tbody>';
+
+    allocations.forEach(a => {
+        const formattedAmount = parseFloat(a.amount).toLocaleString('en-US');
+        const driftClass = parseFloat(a.new_drift) < 0 ? 'text-danger' : 'text-success';
+        tableHtml += `<tr>
+                <td><strong>${a.asset_class}</strong><br><small class="text-muted">${a.asset_class_en}</small></td>
+                <td class="fs-5">¥${formattedAmount}</td>
+                <td>${a.percentage.toFixed(1)}%</td>
+                <td>${a.current_pct.toFixed(2)}%</td>
+                <td>${a.target_pct.toFixed(2)}%</td>
+                <td class="${driftClass}">${a.new_drift.toFixed(2)}%</td>
+            </tr>`;
+    });
+    tableHtml += '</tbody></table>';
+    proportionalTable.innerHTML = tableHtml;
+
+    // Update portfolio impact metrics (recalculate dynamically)
+    const driftBefore = proportionalData.total_drift_before;
+
+    // Calculate new total drift by summing absolute new drifts
+    const newTotalDrift = allocations.reduce((sum, a) => sum + Math.abs(a.new_drift), 0);
+    const improvement = driftBefore - newTotalDrift;
+
+    document.getElementById('driftBefore').textContent = Math.abs(driftBefore).toFixed(2) + '%';
+    document.getElementById('driftAfter').textContent = newTotalDrift.toFixed(2) + '%';
+    document.getElementById('driftImprovement').textContent = improvement.toFixed(2) + '%';
+
+    // Build sub-class breakdown accordion (if available)
+    if (subClassData && subClassData.length > 0) {
+        let accordionHtml = '<h6 class="mt-3 mb-2"><i class="bi bi-diagram-3 me-2"></i>{{ _("Detailed Sub-Class Breakdown") }}</h6>';
+        const referenceAmount = proportionalData.reference_capital || 100000;
+
+        subClassData.forEach((breakdown, index) => {
+            const assetClass = breakdown.asset_class;
+            const totalAmount = (amount * breakdown.total_amount / referenceAmount).toFixed(2);
+
+            accordionHtml += `
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading${index}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${index}">
+                            <strong>${assetClass}</strong> <span class="ms-2 text-muted">(¥${parseFloat(totalAmount).toLocaleString('en-US')})</span>
+                        </button>
+                    </h2>
+                    <div id="collapse${index}" class="accordion-collapse collapse" data-bs-parent="#subClassAccordion">
+                        <div class="accordion-body">
+                            <table class="table table-sm">
+                                <thead><tr><th>{{ _("Sub-Class") }}</th><th>{{ _("Amount") }}</th><th>{{ _("Priority") }}</th><th>{{ _("Drift") }}</th><th>{{ _("Rationale") }}</th></tr></thead>
+                                <tbody>`;
+
+            breakdown.sub_allocations.forEach(sub => {
+                const subAmount = (amount * sub.amount / referenceAmount).toFixed(2);
+                const priorityBadge = sub.priority === 'HIGH' ? 'danger' : (sub.priority === 'MEDIUM' ? 'warning' : 'secondary');
+                accordionHtml += `<tr>
+                        <td><strong>${sub.sub_class}</strong><br><small class="text-muted">${sub.sub_class_cn}</small></td>
+                        <td>¥${parseFloat(subAmount).toLocaleString('en-US')} (${sub.percentage.toFixed(1)}%)</td>
+                        <td><span class="badge bg-${priorityBadge}">${sub.priority}</span></td>
+                        <td class="text-danger">${sub.drift.toFixed(2)}%</td>
+                        <td><small>${sub.rationale}</small></td>
+                    </tr>`;
+            });
+
+            accordionHtml += '</tbody></table></div></div></div>';
+        });
+
+        subClassAccordion.innerHTML = accordionHtml;
+        subClassAccordion.classList.remove('d-none');
+    } else {
+        subClassAccordion.classList.add('d-none');
+    }
+
+    {% else %}
+    // Fallback to single-class allocation
+    const targetClass = '{{ capital_allocation_suggestion.target_class }}';
+    const targetClassEn = '{{ capital_allocation_suggestion.target_class_en }}';
+
+    const formattedAmount = amount.toLocaleString('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    });
+
+    resultSummary.innerHTML = `{{ _('Based on your current allocation gap, allocate the entire') }} <strong>¥${formattedAmount}</strong> {{ _('to purchase') }} <strong>${targetClass} (${targetClassEn})</strong> {{ _('assets.') }}`;
+    proportionalTable.innerHTML = '';
+    document.getElementById('portfolioImpact').classList.add('d-none');
+    subClassAccordion.classList.add('d-none');
+    {% endif %}
+
+    // Show the result
+    resultDiv.classList.remove('d-none');
+    }
+
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function () {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+{% endblock %}
