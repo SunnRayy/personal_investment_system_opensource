@@ -2,17 +2,14 @@
 
 <div align="center">
 
-![Project Banner](https://via.placeholder.com/1200x300.png?text=Personal+Investment+System+Dashboard)
-<!-- Replace with actual dashboard screenshot in Visual Showcase -->
-
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://docs.docker.com/)
 [![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Vibe Coding](https://img.shields.io/badge/Vibe-Coding-purple.svg)](https://github.com/topics/vibe-coding)
 
 **The AI-Native, Privacy-First Portfolio Intelligence Platform.**
 
-[Features](#features) • [Quick Start](#quick-start) • [Showcase](#visual-showcase) • [Architecture](#architecture)
+[Features](#-why-this-project) • [Quick Start](#-quick-start) • [Docker](#-docker-deployment) • [Architecture](#-architecture)
 
 </div>
 
@@ -74,19 +71,20 @@ python -m flask --app src.web_app.app run
 
 ---
 
-## 🎨 Visual Showcase
+## 🐳 Docker Deployment
 
-> *The system transforms raw data into actionable strategic insights.*
+**Zero-configuration deployment** - get started in seconds:
 
-<div align="center">
-  <img src="https://via.placeholder.com/800x450.png?text=Dashboard+Overview" alt="Dashboard Overview" width="800" />
-  <p><em>Real-time Net Worth & Allocation Tracking</em></p>
-  
-  <br/>
+```bash
+# Clone and run
+git clone https://github.com/yourusername/personal_investment_system.git
+cd personal_investment_system
+docker-compose up -d
+```
 
-  <img src="https://via.placeholder.com/800x450.png?text=Efficient+Frontier+Matrix" alt="MPT Analysis" width="800" />
-  <p><em>Modern Portfolio Theory: Efficient Frontier Optimization</em></p>
-</div>
+Open `http://localhost:5000` and explore with demo data or upload your own.
+
+See [docs/docker.md](docs/docker.md) for configuration, troubleshooting, and best practices.
 
 ---
 
@@ -113,12 +111,31 @@ graph TD
 
 ---
 
-## 🛠️ Advanced Configuration
+## 🔌 API Integrations
 
-Fine-tune the system to your exact financial DNA.
+Connect your accounts for automated sync (optional):
 
-- **`config/settings.yaml`**: Control risk parameters, FX rates, and data paths.
-- **`config/asset_taxonomy.yaml`**: Define your custom asset class hierarchy.
+| Integration | Status | Notes |
+| :--- | :---: | :--- |
+| **Crypto Exchanges** | ✅ Ready | Binance, Coinbase, Kraken via CCXT |
+| **Interactive Brokers** | ✅ Ready | Client Portal API |
+| **Schwab** | 🔧 Planned | OAuth2 integration |
+| **Custom Plugins** | ✅ Ready | Extensible plugin system |
+
+See `config/data_sources.yaml` and `docs/automated-integrations/` for setup guides.
+
+---
+
+## 🛠️ Configuration
+
+| File | Purpose |
+| :--- | :--- |
+| `config/settings.yaml` | Data paths, FX rates, risk parameters |
+| `config/asset_taxonomy.yaml` | Custom asset class hierarchy |
+| `config/data_sources.yaml` | API integrations configuration |
+| `.env` | Secrets and API keys (gitignored) |
+
+---
 
 ## 🤝 Contributing & License
 

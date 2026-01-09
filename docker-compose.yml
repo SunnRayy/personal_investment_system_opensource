@@ -7,7 +7,7 @@ services:
   pis-web:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     image: personal-investment-system:latest
     container_name: pis-web
     restart: unless-stopped

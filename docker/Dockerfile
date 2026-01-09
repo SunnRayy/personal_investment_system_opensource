@@ -65,7 +65,7 @@ RUN mkdir -p /app/data/user_uploads \
     chown -R appuser:appuser /app/data /app/logs /app/output
 
 # Copy and set up entrypoint script
-COPY --chown=appuser:appuser docker-entrypoint.sh /usr/local/bin/
+COPY --chown=appuser:appuser docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Switch to non-root user

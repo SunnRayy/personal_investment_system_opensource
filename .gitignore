@@ -79,6 +79,9 @@ logs/
 docs/_active_projects/wealth_insights/
 docs/_active_projects/phase6_discrepancy_resolution_summary.md
 
+# Archived development plans (internal use only)
+docs/_archive/
+
 
 # Personal data backup (not for open source)
 data/personal_backup/
