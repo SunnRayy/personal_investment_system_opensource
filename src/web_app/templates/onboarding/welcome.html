@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Welcome') }} - Personal Investment System{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center">
+    <div class="max-w-4xl w-full mx-auto px-6">
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+            <div
+                class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-6 shadow-lg">
+                <i class="fas fa-chart-line text-white text-3xl"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">
+                {{ _('Welcome to Personal Investment System') }}
+            </h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                {{ _('Track, analyze, and optimize your investments with powerful analytics and beautiful
+                visualizations.') }}
+            </p>
+        </div>
+
+        <!-- Options Grid -->
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+            <!-- Demo Mode Card -->
+            <div
+                class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-4">
+                        <i class="fas fa-play text-blue-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800">{{ _('Try Demo Mode') }}</h3>
+                </div>
+                <p class="text-gray-600 mb-6">
+                    {{ _('Explore the system with sample data. No upload required. See all features in action.') }}
+                </p>
+                {% if has_demo_data %}
+                <form action="{{ url_for('onboarding.enable_demo') }}" method="POST">
+                    <button type="submit"
+                        class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md hover:shadow-lg">
+                        <i class="fas fa-rocket mr-2"></i>{{ _('Start Demo') }}
+                    </button>
+                </form>
+                {% else %}
+                <button disabled
+                    class="w-full bg-gray-300 text-gray-500 py-3 px-6 rounded-xl font-semibold cursor-not-allowed">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>{{ _('Demo Data Not Available') }}
+                </button>
+                {% endif %}
+            </div>
+
+            <!-- Upload Data Card -->
+            <div
+                class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mr-4">
+                        <i class="fas fa-upload text-green-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800">{{ _('Upload Your Data') }}</h3>
+                </div>
+                <p class="text-gray-600 mb-6">
+                    {{ _('Import your transactions and holdings from CSV or Excel files.') }}
+                </p>
+                <a href="{{ url_for('onboarding.upload') }}"
+                    class="block w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 px-6 rounded-xl font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-md hover:shadow-lg text-center">
+                    <i class="fas fa-file-upload mr-2"></i>{{ _('Upload Data') }}
+                </a>
+            </div>
+        </div>
+
+        <!-- Skip Option -->
+        <div class="text-center">
+            <a href="{{ url_for('onboarding.skip') }}"
+                class="inline-flex items-center text-gray-500 hover:text-gray-700 transition-colors">
+                {{ _('Skip for now') }} <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+            <p class="text-gray-400 text-sm mt-2">
+                {{ _('You can always upload data later from Data Workbench') }}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

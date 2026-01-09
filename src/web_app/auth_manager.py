@@ -38,6 +38,11 @@ def verify_user(username: str, password: str) -> bool:
 
 def load_user(user_id: str) -> User | None:
     """Load user by ID."""
+    # Allow demo user in demo mode
+    from src.web_app.system_state import is_demo_mode
+    if user_id == 'demo' and is_demo_mode():
+        return User(user_id)
+
     expected_user = os.environ.get('WEB_ADMIN_USER', 'admin')
     if user_id == expected_user:
         return User(user_id)

@@ -1,0 +1,6 @@
+Symbol,Name,Quantity,Cost_Basis,Current_Price,Account,Asset_Type
+AAPL,Apple Inc,50,7500.00,185.50,Brokerage,US Stock
+VTI,Vanguard Total Stock Market,100,20000.00,225.30,IRA,ETF
+BND,Vanguard Total Bond,75,7500.00,72.50,401k,Bond ETF
+GOOGL,Alphabet Inc,20,5200.00,142.00,Brokerage,US Stock
+MSFT,Microsoft Corporation,30,8000.00,378.50,Brokerage,US Stock

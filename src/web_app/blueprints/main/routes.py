@@ -17,10 +17,19 @@ def set_language(lang_code):
 
 
 @main_bp.route('/')
-@login_required
 def index():
-    """Main dashboard page"""
-    # Assuming templates are configured correctly in the app factory
+    """Main dashboard page - redirects to onboarding for first-run users"""
+    from flask_login import current_user
+    from src.web_app.system_state import is_first_run
+    
+    # Check first-run BEFORE login check to allow unauthenticated onboarding
+    if is_first_run():
+        return redirect(url_for('onboarding.index'))
+    
+    # For non-first-run, require authentication
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login', next=request.url))
+    
     return render_template('dashboard/index.html')
 
 @main_bp.route('/compass')

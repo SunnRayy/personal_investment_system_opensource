@@ -1,0 +1,8 @@
+Date,Category,Item,Amount,Type
+2024-01-01,Asset_Investment,Stocks and ETFs,150000.00,Asset
+2024-01-01,Asset_Investment,Bonds,25000.00,Asset
+2024-01-01,Asset_Cash,Savings Account,30000.00,Asset
+2024-01-01,Asset_Retirement,401k Balance,85000.00,Asset
+2024-01-01,Asset_RealEstate,Home Equity,200000.00,Asset
+2024-01-01,Liability_Debt,Mortgage,-180000.00,Liability
+2024-01-01,Liability_Debt,Car Loan,-15000.00,Liability

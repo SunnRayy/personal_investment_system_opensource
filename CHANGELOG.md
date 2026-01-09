@@ -17,6 +17,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Health check endpoints (`/health`, `/api/health`) for container orchestration
   - `DOCKER_QUICKSTART.md` with usage instructions
   - Development plan documentation in `docs/docker-deployment/`
+  - **Phase 2**: System state detection module (`src/web_app/system_state.py`)
+    - `SystemState` enum (FIRST_RUN, DEMO_MODE, USER_DATA, MIXED_MODE)
+    - `SystemStateManager` class for detecting system state
+    - Context processor for template access (`system_state`, `is_demo_mode`, `is_first_run`)
+    - First-run redirect middleware
+  - **Phase 3-4**: Onboarding flow for first-run experience
+    - Welcome page with Demo/Upload/Skip options
+    - Drag-and-drop file upload interface
+    - Column mapping for CSV/Excel imports
+    - CSV templates for transactions, holdings, and balance sheet
+  - **Phase 5**: Data import engine (`src/data_import/csv_importer.py`)
+  - **Phase 8**: Verification & Fixes
+    - Fixed first-run redirect logic to prioritize onboarding
+    - Implemented auto-login for Demo Mode
+    - Resolved system state detection conflict in entrypoint script
+    - Auto-detection of encoding and delimiter
+    - Flexible column mapping with auto-detection
+    - Data validation and error reporting
+  - **Phase 6**: UX polish
+    - Demo mode banner with dismiss functionality
+    - Custom 404 and 500 error pages
+  - **Phase 7**: Documentation (`docs/csv-formats.md`)
 
 - **Internationalization (I18n)**: Implemented full localization support using Flask-Babel.
   - Added language switcher (English/Chinese) in navigation bar.

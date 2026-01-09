@@ -1,0 +1,6 @@
+Date,Description,Amount,Category,Account,Notes
+2024-01-15,Stock Purchase - AAPL,-1500.00,Investment,Brokerage,Buy 10 shares
+2024-01-20,Dividend - VTI,45.23,Income,Brokerage,Quarterly dividend
+2024-02-01,401k Contribution,-500.00,Retirement,401k,Monthly contribution
+2024-02-15,Salary Deposit,5000.00,Income,Checking,Monthly salary
+2024-03-01,Bond ETF Purchase,-2000.00,Investment,IRA,Buy BND shares

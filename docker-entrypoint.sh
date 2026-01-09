@@ -87,22 +87,22 @@ fi
 
 if [ "$DEMO_MODE" = "true" ]; then
     echo "[INFO] Demo mode enabled via environment"
-    export SYSTEM_STATE="demo_mode"
+    STATE_LOG="demo_mode"
 elif [ "$USER_DATA_COUNT" -gt 0 ] || [ "$DB_TABLES" -gt 5 ]; then
-    echo "[INFO] User data detected"
-    export SYSTEM_STATE="user_data"
+    echo "[INFO] User data/schema detected"
+    STATE_LOG="user_data"
 else
-    echo "[INFO] No user data found - First run detected"
-    export SYSTEM_STATE="first_run"
+    echo "[INFO] Start conditions check - First run potential"
+    STATE_LOG="first_run"
 fi
 
-echo "[INFO] System state: $SYSTEM_STATE"
+echo "[INFO] Preliminary state check: $STATE_LOG"
 
 # -----------------------------------------------------------------------------
 # Demo Data Check
 # -----------------------------------------------------------------------------
 
-if [ "$SYSTEM_STATE" = "first_run" ] || [ "$SYSTEM_STATE" = "demo_mode" ]; then
+if [ "$STATE_LOG" = "first_run" ] || [ "$STATE_LOG" = "demo_mode" ]; then
     if [ -d "/app/data/demo_source" ] && [ "$(ls -A /app/data/demo_source 2>/dev/null)" ]; then
         echo "[INFO] Demo data available at /app/data/demo_source"
     else

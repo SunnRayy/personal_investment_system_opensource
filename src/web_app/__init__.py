@@ -1,10 +1,11 @@
 import os
 import logging
-from flask import Flask
+from flask import Flask, redirect, url_for, request as flask_request
 from flask_cors import CORS
 from flask_login import LoginManager
 from .stability_manager import WebStabilityManager
 from .auth_manager import load_user
+from .system_state import get_system_state, is_first_run, is_demo_mode, SystemState
 
 def create_app(config_object=None):
     """Application Factory"""
@@ -87,6 +88,49 @@ def create_app(config_object=None):
         except Exception:
             return dict(cache_info=None)
     
+    # Context Processor for System State (Docker first-run/demo mode)
+    @app.context_processor
+    def inject_system_state():
+        """Expose system state to all templates."""
+        return {
+            'system_state': get_system_state().value,
+            'is_demo_mode': is_demo_mode(),
+            'is_first_run': is_first_run(),
+        }
+    
+    # First-run redirect middleware (Phase 3 onboarding)
+    @app.before_request
+    def check_first_run():
+        """
+        Redirect to onboarding if first run.
+        
+        Checks if this is a fresh installation with no user data
+        and redirects to the onboarding flow.
+        """
+        from flask import session
+        
+        # Skip for exempt endpoints (health checks, static files, auth, API)
+        exempt_prefixes = [
+            '/onboarding',
+            '/static',
+            '/health',
+            '/api/',
+            '/auth/',
+        ]
+        
+        if any(flask_request.path.startswith(prefix) for prefix in exempt_prefixes):
+            return None
+        
+        # Skip if user explicitly skipped onboarding
+        if session.get('onboarding_skipped'):
+            return None
+        
+        # Redirect to onboarding if first run and blueprint exists
+        if is_first_run() and 'onboarding' in app.blueprints:
+            return redirect(url_for('onboarding.index'))
+        
+        return None
+    
     # Register Blueprints
     from .blueprints.main import main_bp
     app.register_blueprint(main_bp)
@@ -121,6 +165,10 @@ def create_app(config_object=None):
     from .blueprints.simulation import simulation_bp
     app.register_blueprint(simulation_bp, url_prefix='/reports/simulation')
 
+    # Onboarding blueprint for first-run experience
+    from .blueprints.onboarding import bp as onboarding_bp
+    app.register_blueprint(onboarding_bp)
+
     # Root-level health check for Docker (no authentication required)
     @app.route('/health')
     def root_health():
@@ -131,6 +179,20 @@ def create_app(config_object=None):
         Use /api/health for more detailed health status.
         """
         return {'status': 'healthy', 'app': 'Personal Investment System'}, 200
+
+    # Custom error handlers for better UX
+    @app.errorhandler(404)
+    def not_found_error(error):
+        """Handle 404 errors with custom page."""
+        from flask import render_template
+        return render_template('errors/404.html'), 404
+
+    @app.errorhandler(500)
+    def internal_error(error):
+        """Handle 500 errors with custom page."""
+        from flask import render_template
+        app.logger.error(f'Server Error: {error}')
+        return render_template('errors/500.html'), 500
 
     return app
 

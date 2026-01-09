@@ -11,6 +11,41 @@
 </head>
 
 <body class="bg-gray-100 min-h-screen font-sans">
+    <!-- Demo Mode Banner -->
+    {% if is_demo_mode %}
+    <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-black py-2 px-4 text-center relative"
+        id="demo-banner">
+        <div class="container mx-auto flex items-center justify-center gap-4 flex-wrap">
+            <span
+                class="inline-flex items-center bg-black text-amber-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                <i class="fas fa-flask mr-1"></i>{{ _('Demo Mode') }}
+            </span>
+            <span class="text-black/80 text-sm">
+                {{ _("You're exploring with sample data.") }}
+            </span>
+            <a href="{{ url_for('onboarding.upload') }}"
+                class="inline-flex items-center bg-black text-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-gray-800 transition">
+                <i class="fas fa-upload mr-2"></i>{{ _('Upload Your Data') }}
+            </a>
+            <button onclick="dismissDemoBanner()"
+                class="absolute right-4 text-black/60 hover:text-black transition text-xl" title="{{ _('Dismiss') }}">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    <script>
+        function dismissDemoBanner() {
+            document.getElementById('demo-banner').style.display = 'none';
+            sessionStorage.setItem('demoBannerDismissed', 'true');
+        }
+        if (sessionStorage.getItem('demoBannerDismissed') === 'true') {
+            document.addEventListener('DOMContentLoaded', function () {
+                var banner = document.getElementById('demo-banner');
+                if (banner) banner.style.display = 'none';
+            });
+        }
+    </script>
+    {% endif %}
     <nav class="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 text-white shadow-xl">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center py-3">

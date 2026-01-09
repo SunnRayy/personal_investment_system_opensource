@@ -99,6 +99,7 @@ CMD ["python", "main.py", "run-web", "--host", "0.0.0.0", "--port", "5000"]
 ```
 
 **Implementation Notes**:
+
 - Multi-stage build reduces image from ~1.5GB to ~500MB
 - Non-root user `appuser` for security
 - Pre-created directories ensure write permissions
@@ -182,6 +183,7 @@ networks:
 ```
 
 **Usage Instructions**:
+
 ```bash
 # Basic startup
 docker-compose up -d
@@ -413,6 +415,7 @@ exec "$@"
 ```
 
 **Permissions**:
+
 ```bash
 chmod +x docker-entrypoint.sh
 ```
@@ -730,6 +733,7 @@ def create_app():
 ### 3.1 Create Onboarding Blueprint
 
 **Directory Structure**:
+
 ```
 src/web_app/blueprints/onboarding/
 ├── __init__.py
@@ -1473,4 +1477,70 @@ docker-compose exec pis-web /bin/bash
 
 # View database
 docker-compose exec pis-web sqlite3 /app/data/investment_system.db ".tables"
+```
+
+---
+
+## Phase 8: Verification & Fixes
+
+### 8.1 Entrypoint Logic Fix
+
+**File**: `/docker-entrypoint.sh`
+
+Cleaned up state detection logic to prevent false positives for "User Data" state.
+
+```bash
+# Before: Exported SYSTEM_STATE based on table count (unreliable)
+# After: Only logs state for info; delegates logic to Python app
+if [ "$DEMO_MODE" = "true" ]; then
+    echo "[INFO] Demo mode enabled via environment"
+    STATE_LOG="demo_mode"
+elif [ "$USER_DATA_COUNT" -gt 0 ] || [ "$DB_TABLES" -gt 5 ]; then
+    echo "[INFO] User data/schema detected"
+    STATE_LOG="user_data"
+else
+    STATE_LOG="first_run"
+fi
+```
+
+### 8.2 First-Run Redirect Fix
+
+**File**: `src/web_app/blueprints/main/routes.py`
+
+Modified the root index route to prioritize first-run detection over authentication.
+
+```python
+@main_bp.route('/')
+def index():
+    # Check first-run BEFORE login check
+    if is_first_run():
+        return redirect(url_for('onboarding.index'))
+    
+    # Then force login for normal use
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login', next=request.url))
+    
+    return render_template('dashboard/index.html')
+```
+
+### 8.3 Demo Mode Auto-Login
+
+**Files**: `src/web_app/blueprints/onboarding/routes.py`, `src/web_app/auth_manager.py`
+
+Implemented seamless transition to dashboard when enabling demo mode.
+
+1. **Auth Manager**: Updated `load_user` to accept 'demo' user when in Demo Mode.
+2. **Onboarding Route**: Auto-login 'demo' user upon activation.
+
+```python
+# src/web_app/blueprints/onboarding/routes.py
+@bp.route('/demo', methods=['POST'])
+def enable_demo():
+    state_manager.enable_demo_mode()
+    
+    # Auto-login demo user
+    user = User('demo')
+    login_user(user) # Flask-Login integration
+
+    return redirect(url_for('main.index'))
 ```
