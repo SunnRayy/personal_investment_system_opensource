@@ -1,5 +1,32 @@
 # Claude Code Guide for Personal Investment System
 
+## Dual Repository Setup
+
+**IMPORTANT**: This project exists in TWO repositories. Read this section first.
+
+| Repository | Type | Location | GitHub |
+|------------|------|----------|--------|
+| **Open Source** (this repo) | Public | `/Users/ray/Documents/personal_investment_system` | `github.com/SunnRayy/personal_investment_system_opensource` |
+| **Legacy** | Private/Personal | `/Users/ray/Documents/personal_investment_system Legacy` | `github.com/SunnRayy/personal_investment_system` |
+
+### Workflow Rules
+
+1. **Develop new features HERE** (Open Source) using demo data in `data/demo_source/`
+2. **Sync features TO Legacy** using `~/bin/sync-investment-repos.sh`
+3. **NEVER include personal financial data** in this repository
+4. **Personal-only features** go in Legacy repo with `personal/` branch prefix
+
+### Before Any Commit
+
+```bash
+# Verify you're in the correct repo
+git remote -v | grep opensource  # Should match for this repo
+```
+
+For complete AI agent instructions, see: `~/Documents/Investment_System_AI_Agent_Instructions.md`
+
+---
+
 ## Project Overview
 
 A comprehensive Python system for tracking, analyzing, and optimizing personal investments. Features multi-source data integration, portfolio analytics, Monte Carlo simulations, and HTML reporting.
