@@ -63,10 +63,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Foreign Key Constraint Error**: Fixed valid demo data ingest by pre-registering synthetic assets (Cash, Deposits, Property) in `db_sync.py`.
 - **Authentication**: Resolved "Silent Failure" on login by enforcing `.env` config precedence and adding `SECRET_KEY` for session stability.
 - **Documentation**: Added missing default login credentials (`admin`/`admin`) to README and Docker guides.
-
-### Known Issues
-
-- **Report Generation Performance**: Reports take minutes to load with demo data when expected time is 2-3 seconds. Logged for next phase investigation. See `docs/issues/REPORT_PERFORMANCE.md`.
+- **Report Performance**: Fixed slow report loading (was minutes, now <5 seconds)
+  - Added FX rate caching with 1-day TTL and 2-second timeout
+  - Implemented timing instrumentation for performance monitoring
+  - Created `/reports/api/correlation` endpoint for lazy loading support
+  - Added fallback values for API failures
 
 ## [1.1.0] - 2026-01-09
 

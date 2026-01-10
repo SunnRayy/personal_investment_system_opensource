@@ -124,6 +124,96 @@ def thermometer():
         return render_template('errors/500.html', error=e), 500
 
 
+# =========== PHASE 2: CORRELATION LAZY LOADING ===========
+
+@reports_bp.route('/api/correlation')
+@login_required
+def api_correlation():
+    """
+    API endpoint for lazy-loaded correlation analysis.
+    Returns correlation data as JSON for AJAX loading.
+    """
+    try:
+        import pandas as pd
+        from src.data_manager.manager import DataManager
+        from src.portfolio_lib.taxonomy_manager import TaxonomyManager
+        from src.investment_optimization.time_series_analyzer import TimeSeriesAnalyzer
+        from src.web_app.services.correlation_service import get_correlation_service
+        
+        data_manager = DataManager(config_path='config/settings.yaml')
+        taxonomy_manager = TaxonomyManager()
+        
+        historical_holdings = data_manager.get_holdings(latest_only=False)
+        balance_sheet = data_manager.get_balance_sheet()
+        
+        if historical_holdings is None or historical_holdings.empty:
+            return jsonify({'success': True, 'correlation_analysis': {
+                'subclass_matrix': {}, 'asset_matrix': {}, 'asset_names': {},
+                'subclass_assets': [], 'high_corr_pairs': [], 'alerts': [], 'avg_correlation': 0.0
+            }})
+        
+        ts_analyzer = TimeSeriesAnalyzer(historical_holdings, balance_sheet)
+        asset_returns = ts_analyzer.calculate_asset_returns()
+        
+        exclude_patterns = ['Cash_', 'Pension_', 'Property_', 'Insurance_', 'BankWealth_', 'Ins_']
+        market_assets = [col for col in asset_returns.columns 
+                        if not any(col.startswith(p) for p in exclude_patterns) and 'Deposit' not in col]
+        
+        if not market_assets:
+            return jsonify({'success': True, 'correlation_analysis': {
+                'subclass_matrix': {}, 'asset_matrix': {}, 'asset_names': {},
+                'subclass_assets': [], 'high_corr_pairs': [], 'alerts': [], 'avg_correlation': 0.0
+            }})
+        
+        filtered_returns = asset_returns[market_assets]
+        filtered_returns = filtered_returns.loc[:, filtered_returns.std() > 0.001]
+        
+        if len(filtered_returns.columns) < 2:
+            return jsonify({'success': True, 'correlation_analysis': {
+                'subclass_matrix': {}, 'asset_matrix': {}, 'asset_names': {},
+                'subclass_assets': [], 'high_corr_pairs': [], 'alerts': [], 'avg_correlation': 0.0
+            }})
+        
+        correlation_service = get_correlation_service()
+        asset_names = {asset_id: asset_id for asset_id in filtered_returns.columns}
+        
+        # Sub-class level correlations
+        subclass_returns = {}
+        for asset_id in filtered_returns.columns:
+            try:
+                subclass, _ = taxonomy_manager.get_asset_classification(asset_id)
+                if not subclass or subclass in ('其他_子类', 'Other', None):
+                    subclass = 'Other'
+            except:
+                subclass = 'Other'
+            if subclass not in subclass_returns:
+                subclass_returns[subclass] = []
+            subclass_returns[subclass].append(filtered_returns[asset_id])
+        
+        subclass_agg = pd.DataFrame()
+        for subclass, returns_list in subclass_returns.items():
+            subclass_agg[subclass] = pd.concat(returns_list, axis=1).mean(axis=1) if len(returns_list) > 1 else returns_list[0]
+        subclass_agg = subclass_agg.loc[:, subclass_agg.std() > 0.0001]
+        
+        subclass_corr_data = correlation_service.get_correlation_data(subclass_agg) if len(subclass_agg.columns) >= 2 else {'matrix': {}, 'high_corr_pairs': [], 'alerts': [], 'avg_correlation': 0.0}
+        asset_corr_data = correlation_service.get_correlation_data(filtered_returns)
+        
+        logger.info(f"✅ Correlation API: {len(subclass_agg.columns)} sub-classes, {len(filtered_returns.columns)} assets")
+        
+        return jsonify({'success': True, 'correlation_analysis': {
+            'subclass_matrix': subclass_corr_data.get('matrix', {}),
+            'subclass_assets': sorted(subclass_agg.columns.tolist()) if not subclass_agg.empty else [],
+            'asset_matrix': asset_corr_data.get('matrix', {}),
+            'asset_names': asset_names,
+            'high_corr_pairs': subclass_corr_data.get('high_corr_pairs', []),
+            'avg_correlation': subclass_corr_data.get('avg_correlation', 0.0),
+            'alerts': subclass_corr_data.get('alerts', [])
+        }})
+    except Exception as e:
+        logger.error(f"Error in correlation API: {e}", exc_info=True)
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @reports_bp.route('/attribution')
 @login_required
 def attribution():

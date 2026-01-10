@@ -16,8 +16,61 @@ from src.portfolio_lib.holdings_calculator import HoldingsCalculator
 from src.portfolio_lib.price_service import PriceService
 from src.investment_optimization.time_series_analyzer import TimeSeriesAnalyzer
 from src.web_app.services.correlation_service import get_correlation_service
+import functools
 
 logger = logging.getLogger(__name__)
+
+# === PERFORMANCE FIX: Cached FX Rate Fetcher (1-day TTL) ===
+_fx_cache = {'usd_cny': None, 'stock_price': None, 'timestamp': 0}
+FX_CACHE_TTL = 86400  # 1 day in seconds
+
+def get_cached_rates(balance_sheet_df=None):
+    """
+    Get FX rates with 1-day caching and fast fallback.
+    Returns (usd_cny_rate, employer_stock_price) tuple.
+    """
+    global _fx_cache
+    import time as _time
+    
+    # Check cache validity
+    now = _time.time()
+    if _fx_cache['timestamp'] > 0 and (now - _fx_cache['timestamp']) < FX_CACHE_TTL:
+        logger.debug(f"Using cached FX rates (age: {now - _fx_cache['timestamp']:.0f}s)")
+        return _fx_cache['usd_cny'], _fx_cache['stock_price']
+    
+    # Try to fetch with short timeout
+    usd_cny_rate = None
+    employer_stock_price_usd = None
+    try:
+        import socket
+        old_timeout = socket.getdefaulttimeout()
+        socket.setdefaulttimeout(2.0)  # 2 second max for API call
+        try:
+            from src.data_manager.connectors.google_finance_connector import get_google_finance_connector
+            connector = get_google_finance_connector()
+            usd_cny_rate = connector.get_exchange_rate('USD', 'CNY')
+            employer_stock_price_usd = connector.get_stock_price('AMZN')
+            logger.info(f"✅ Fetched live FX rates: USD/CNY={usd_cny_rate}, AMZN=${employer_stock_price_usd}")
+        finally:
+            socket.setdefaulttimeout(old_timeout)
+    except Exception as e:
+        logger.warning(f"⏱️ FX API timeout/error ({e}), using fallback")
+    
+    # Fallback to balance sheet if API failed
+    if usd_cny_rate is None and balance_sheet_df is not None and not balance_sheet_df.empty:
+        latest_row = balance_sheet_df.iloc[-1]
+        usd_cny_rate = latest_row.get('Ref_USD_FX_Rate', 7.25)  # Default fallback
+        employer_stock_price_usd = latest_row.get('Ref_Employer_Stock_Price_USD')
+        logger.info(f"📊 Using Excel fallback FX: USD/CNY={usd_cny_rate}")
+    
+    # Ultimate fallback
+    if usd_cny_rate is None:
+        usd_cny_rate = 7.25  # Safe default
+        logger.warning(f"⚠️ Using hardcoded FX fallback: USD/CNY={usd_cny_rate}")
+    
+    # Update cache
+    _fx_cache = {'usd_cny': usd_cny_rate, 'stock_price': employer_stock_price_usd, 'timestamp': now}
+    return usd_cny_rate, employer_stock_price_usd
 
 class NumpyEncoder(json.JSONEncoder):
     """Custom encoder for NumPy data types"""
@@ -179,7 +232,7 @@ class ReportDataService:
             return self._cache
         
         start_time = time.perf_counter()
-        logger.debug(f"ReportDataService: Loading portfolio data... (Profile: {active_risk_profile or 'Default'})")
+        logger.info(f"⏱️ [PERF] get_portfolio_data START (Profile: {active_risk_profile or 'Default'})")
         
         # Phase 6.3: Use HoldingsCalculator if in database mode
         # NOTE (2025-12-16): HoldingsCalculator has bugs (missing SGOV, wrong FX for USD deposits).
@@ -190,9 +243,10 @@ class ReportDataService:
         #     ... (disabled)
         
         # Excel mode (legacy) - ALWAYS use this for now for consistency with Parity
+        step_start = time.perf_counter()
         current_holdings = self.data_manager.get_holdings(latest_only=True)
-        
         balance_sheet = self.data_manager.get_balance_sheet()
+        logger.info(f"⏱️ [PERF] Data loading: {time.perf_counter() - step_start:.2f}s")
         
         # 2. Calculate Total Portfolio Value
         total_portfolio_value = 0
@@ -218,24 +272,14 @@ class ReportDataService:
             except Exception as e:
                 logger.warning(f"Could not calculate last month change: {e}")
 
-        # 4. Get Real-time Rates (Optional/Best Effort)
-        usd_cny_rate = None
-        employer_stock_price_usd = None
-        try:
-            from src.data_manager.connectors.google_finance_connector import get_google_finance_connector
-            connector = get_google_finance_connector()
-            usd_cny_rate = connector.get_exchange_rate('USD', 'CNY')
-            employer_stock_price_usd = connector.get_stock_price('AMZN')
-        except Exception as e:
-            logger.warning(f"Could not fetch real-time rates: {e}")
-            # Fallback to Excel data
-            if balance_sheet is not None and not balance_sheet.empty:
-                latest_row = balance_sheet.iloc[-1]
-                usd_cny_rate = latest_row.get('Ref_USD_FX_Rate')
-                employer_stock_price_usd = latest_row.get('Ref_Employer_Stock_Price_USD')
+        # 4. Get Real-time Rates (PERFORMANCE FIX: Cached with 1-day TTL)
+        step_start = time.perf_counter()
+        usd_cny_rate, employer_stock_price_usd = get_cached_rates(balance_sheet)
+        logger.info(f"⏱️ [PERF] FX rates: {time.perf_counter() - step_start:.2f}s")
 
         # 5. Build Data Dictionary using existing logic
         # We reuse build_real_data_dict to ensure 100% parity with static reports
+        step_start = time.perf_counter()
         real_data = build_real_data_dict(
             self.data_manager,
             self.portfolio_manager,
@@ -248,8 +292,10 @@ class ReportDataService:
             employer_stock_price_usd,
             active_risk_profile=active_risk_profile
         )
+        logger.info(f"⏱️ [PERF] build_real_data_dict: {time.perf_counter() - step_start:.2f}s")
         
         # 6. Add Correlation Analysis (Sub-class and Asset levels)
+        step_start = time.perf_counter()
         try:
             historical_holdings = self.data_manager.get_holdings(latest_only=False)
             if historical_holdings is not None and not historical_holdings.empty:
@@ -353,8 +399,8 @@ class ReportDataService:
             import traceback
             traceback.print_exc()
             real_data['correlation_analysis'] = {'subclass_matrix': {}, 'asset_matrix': {}, 'asset_names': {}, 'high_corr_pairs': [], 'alerts': [], 'avg_correlation': 0.0}
-
-
+        logger.info(f"⏱️ [PERF] Correlation analysis: {time.perf_counter() - step_start:.2f}s")
+        
         # Update cache
         self._cache = real_data
         self._save_cache(real_data)

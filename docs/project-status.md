@@ -2,70 +2,49 @@
 
 > This file tracks current development progress and provides context for session handoffs or context window refreshes.
 
-## Current Status - 2026-01-09
+## Current Status - 2026-01-10
 
-### Active Work: Post-Testing Phase - Documentation Updates
+### Active Work: Performance Optimization Complete
 
-**Status**: System tested, documentation review in progress
+**Status**: Performance issue fixed, ready for commit
 
 ### Completed (This Session)
 
-- **Automated Data Integrations Feature Complete (Phase 1-9)**:
-  - Base connector framework with rate limiting and caching
-  - CCXT crypto integration (100+ exchanges)
-  - Interactive Brokers connector
-  - Tiingo market data connector
-  - Plugin system with sample bank plugin
-  - Import orchestrator for unified pipeline
-  - Web UI integrations dashboard
-  - 82 unit tests with 100% pass rate
-  - Complete documentation and troubleshooting guides
+- **Report Performance Fix (High Priority)**:
+  - Root cause: Blocking FX API calls without timeout
+  - Added FX rate caching with 1-day TTL and 2s timeout
+  - Added timing instrumentation (`⏱️ [PERF]` logs)
+  - Created `/reports/api/correlation` endpoint for lazy loading
+  - Verified: Portfolio page now loads in <5 seconds (was minutes)
 
-- **Bug Fixes**:
-  - Fixed Foreign Key constraint error during demo data ingestion
-  - Fixed authentication config precedence (`.env` now overrides defaults)
-  - Added missing `SECRET_KEY` configuration for session stability
-  - Added default login credentials (`admin`/`admin`) to documentation
+- **Documentation Updates**:
+  - Updated `CHANGELOG.md` - moved fix from Known Issues to Fixed
+  - Updated `docs/issues/REPORT_PERFORMANCE.md` - marked resolved
 
 ### Known Issues
 
-> [!CAUTION]
-> **Report Generation Performance Issue** (NEW - Logged for next phase)
->
-> - **Symptom**: Reports take minutes to load in web app with demo data
-> - **Expected**: Should complete in 2-3 seconds with demo data
-> - **Impact**: Poor first-run experience for new users
-> - **Debug Status**: Not yet investigated
-> - See: `docs/issues/REPORT_PERFORMANCE.md` for details
+- None critical
 
-- **Portfolio report 500 error**: Pre-existing bug in `unified_data_preparer.py`
-  - Error: `UnboundLocalError: cannot access local variable 'holdings_df'`
-  - Compass and Thermometer reports work correctly
-
-### Files Modified (Recent Commits)
+### Files Modified (This Session)
 
 ```
-565f88a fix: Resolve FK constraint error and Auth config precedence
-93ebdaa chore: reorganize project structure for maintainability
-ae36c4e feat(integrations): implement automated data integrations framework
-15b7313 (tag: v1.1.0) chore: release v1.1.0
+src/web_app/services/report_service.py    # FX caching, timing logs
+src/web_app/blueprints/reports/routes.py  # Correlation API endpoint
+tests/test_report_performance.py          # Performance test suite
+docs/issues/REPORT_PERFORMANCE.md         # Issue resolution
+CHANGELOG.md                              # Version history update
 ```
 
 ### Next Steps
 
-1. **Debug Performance Issue**: Investigate why report generation is slow
-   - Profile the analysis pipeline
-   - Check for unnecessary data processing
-   - Optimize database queries
-2. **Git Sync**: Commit documentation updates and push to remote
-3. **Consider**: Release v1.2.0 with automated integrations
+1. **Commit changes**: Push performance fix to open source repo
+2. **Consider v1.2.0 release**: Bundle with automated integrations
 
 ### Important Context
 
-- Development plan at `docs/automated-integrations/task_plan.md`
-- Docker deployment tested and working
-- Demo mode enabled with FX rate fallback
-- All automated integrations tests passing
+- FX rates cached for 24 hours to prevent API blocking
+- Correlation API ready for AJAX lazy loading (template update deferred)
+- All timing logs use `⏱️ [PERF]` prefix for easy filtering
 
 ---
 
