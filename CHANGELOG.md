@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **UX/UI Redesign (Phase 1)**:
+  - **Design System**: Created `design-tokens.css` with SunnRayy palette (Champagne Gold + Tech Blue) and Inter font.
+  - **Components**: Added reusable Jinja2 macros (Buttons, Badges, Metrics, Alerts) in `src/web_app/templates/macros/components.html`.
+  - **Layout**: Complete rewrite of `base.html` featuring a modern Sidebar navigation and responsive Top Bar.
+  - **Verification**: Added temporary `/test-components` route to verify UI elements.
+
 - **Automated Data Integrations**: API-based portfolio sync replacing manual Excel/CSV workflows
   - **Base Connector Framework** (`src/data_manager/connectors/`)
     - `base_connector.py`: Abstract base class with standard interface

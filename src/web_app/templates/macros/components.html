@@ -1,0 +1,70 @@
+{#
+UI Components Library
+Theme: SunnRayy
+Usage: {% from 'macros/components.html' import metric_card, badge, button %}
+#}
+
+{# --- Metric Card --- #}
+{% macro metric_card(label, value, change=None, trend='neutral', icon=None, tooltip=None) %}
+<div class="metric-card">
+    <h3>
+        {% if icon %}<i class="{{ icon }}"></i>{% endif %}
+        {{ label }}
+        {% if tooltip %}
+        <span class="tooltip-icon" title="{{ tooltip }}"><i class="fas fa-info-circle"
+                style="font-size: 0.8em; opacity: 0.5;"></i></span>
+        {% endif %}
+    </h3>
+    <div class="metric-value">{{ value }}</div>
+    {% if change %}
+    <div class="metric-trend {{ trend }}">
+        {% if trend == 'positive' %}<i class="fas fa-arrow-up"></i>
+        {% elif trend == 'negative' %}<i class="fas fa-arrow-down"></i>
+        {% endif %}
+        {{ change }}
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# --- Badge --- #}
+{% macro badge(text, variant='primary') %}
+{# Variants: primary, success, warning, error, neutral #}
+<span class="badge badge-{{ variant }}">{{ text }}</span>
+{% endmacro %}
+
+{# --- Button --- #}
+{% macro button(text, variant='primary', size='md', type='button', icon=None, href=None, class='') %}
+{# Variants: primary, secondary, danger, outline #}
+{% if href %}
+<a href="{{ href }}" class="btn btn-{{ variant }} btn-{{ size }} {{ class }}">
+    {% if icon %}<i class="{{ icon }} mr-2"></i>{% endif %}{{ text }}
+</a>
+{% else %}
+<button type="{{ type }}" class="btn btn-{{ variant }} btn-{{ size }} {{ class }}">
+    {% if icon %}<i class="{{ icon }} mr-2"></i>{% endif %}{{ text }}
+</button>
+{% endif %}
+{% endmacro %}
+
+{# --- Page Header --- #}
+{% macro page_header(title, subtitle=None) %}
+<div class="page-header">
+    <div>
+        <h1>{{ title }}</h1>
+        {% if subtitle %}<p class="subtitle">{{ subtitle }}</p>{% endif %}
+    </div>
+    {# Caller can insert buttons here #}
+    <div class="header-actions">
+        {{ caller() if caller else '' }}
+    </div>
+</div>
+{% endmacro %}
+
+{# --- Alert --- #}
+{% macro alert(title, message, type='info') %}
+<div class="alert alert-{{ type }}">
+    {% if title %}<strong>{{ title }}</strong><br>{% endif %}
+    {{ message }}
+</div>
+{% endmacro %}

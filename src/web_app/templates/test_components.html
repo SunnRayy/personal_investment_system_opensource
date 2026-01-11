@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% from 'macros/components.html' import metric_card, badge, button, alert, page_header %}
+
+{% block title %}Component Library - Verified{% endblock %}
+
+{% block header_title %}Design System Verification{% endblock %}
+
+{% block content %}
+
+{# Header #}
+{% call page_header('Component Library', 'Verifying SunnRayy Design System implementation') %}
+{{ button('Download Docs', variant='outline', icon='fas fa-download') }}
+{{ button('Create New', icon='fas fa-plus') }}
+{% endcall %}
+
+<div class="dashboard-grid" style="grid-template-columns: 1fr; gap: var(--space-8);">
+
+    {# --- Metrics --- #}
+    <div class="dashboard-section">
+        <h2>Metric Cards</h2>
+        <div class="metrics-grid">
+            {{ metric_card('Total Net Worth', '$1,250,400', '+2.5%', 'positive', 'fas fa-wallet', 'Total assets minus
+            liabilities') }}
+            {{ metric_card('Monthly Cash Flow', '$8,200', '+12%', 'positive', 'fas fa-money-bill-wave') }}
+            {{ metric_card('Expenses', '$4,300', '-5%', 'positive', 'fas fa-credit-card') }}
+            {{ metric_card('Market Impact', '-$1,200', '-0.4%', 'negative', 'fas fa-chart-line') }}
+        </div>
+    </div>
+
+    {# --- Buttons --- #}
+    <div class="dashboard-section">
+        <h2>Buttons</h2>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+            {{ button('Primary Button', variant='primary') }}
+            {{ button('Secondary Button', variant='secondary') }}
+            {{ button('Outline Button', variant='outline') }}
+            {{ button('Danger Button', variant='danger') }}
+            {{ button('Small', size='sm') }}
+            {{ button('Large', size='lg') }}
+            {{ button('With Icon', icon='fas fa-check') }}
+        </div>
+    </div>
+
+    {# --- Badges --- #}
+    <div class="dashboard-section">
+        <h2>Badges</h2>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            {{ badge('Primary', 'primary') }}
+            {{ badge('Success', 'success') }}
+            {{ badge('Warning', 'warning') }}
+            {{ badge('Error', 'error') }}
+            {{ badge('Neutral', 'neutral') }}
+        </div>
+    </div>
+
+    {# --- Alerts --- #}
+    <div class="dashboard-section">
+        <h2>Alerts</h2>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            {{ alert('Information', 'This is a standard informational alert.', 'info') }}
+            {{ alert('Success!', 'Your changes have been saved successfully.', 'success') }}
+            {{ alert('Warning', 'Your portfolio is drifting from target allocation.', 'warning') }}
+            {{ alert('Error', 'Failed to connect to data source.', 'error') }}
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

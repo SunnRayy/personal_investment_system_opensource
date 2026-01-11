@@ -1,0 +1,95 @@
+/* 
+ * Personal Investment System - Design Tokens
+ * Implementation of docs/design-framework.md
+ * Theme: SunnRayy (Champagne Gold + Tech Blue)
+ */
+
+:root {
+  /* --- Brand Colors --- */
+  /* SunnRayy Identity */
+  --brand-gold: #D4AF37;         /* Champagne Gold - Wealth/Prestige */
+  --brand-gold-light: #E5C158;   /* Light Gold - Hover */
+  --brand-gold-dark: #C9A227;    /* Deep Gold - Emphasis */
+  --brand-blue: #3B82F6;         /* Tech Blue - Trust/Action */
+  --brand-blue-light: #60A5FA;   /* Light Blue - Hover */
+  --brand-blue-dark: #2563EB;    /* Deep Blue - Active */
+  
+  /* Brand Gradient (Accents only) */
+  --brand-gradient: linear-gradient(135deg, #D4AF37 0%, #3B82F6 100%);
+
+  /* --- Semantic Colors --- */
+  /* Backgrounds */
+  --bg-surface: #FAFAFA;         /* Page background */
+  --bg-container: #FFFFFF;       /* Cards, modals */
+  --bg-container-inset: #F5F5F5; /* Nested containers */
+  --bg-container-hover: #F0F0F0;
+
+  /* Text */
+  --text-primary: #171717;       /* Gray-900 */
+  --text-secondary: #525252;     /* Gray-600 */
+  --text-tertiary: #A3A3A3;      /* Gray-400 */
+  --text-inverse: #FFFFFF;
+
+  /* Borders */
+  --border-primary: rgba(0, 0, 0, 0.15);
+  --border-secondary: rgba(0, 0, 0, 0.10);
+  --border-tertiary: rgba(0, 0, 0, 0.05);
+
+  /* Functional Colors */
+  --color-success: #10B981;      /* Emerald-500 */
+  --color-success-bg: #D1FAE5;
+  --color-warning: #F59E0B;      /* Amber-500 */
+  --color-warning-bg: #FEF3C7;
+  --color-error: #EF4444;        /* Red-500 */
+  --color-error-bg: #FEE2E2;
+  --color-info: #3B82F6;         /* Blue-500 */
+  --color-info-bg: #DBEAFE;
+
+  /* Financial Semantics */
+  --color-gain: #10B981;
+  --color-loss: #EF4444;
+  --color-neutral: #6B7280;
+
+  /* --- Chart Colors --- */
+  --chart-equity: #D4AF37;       /* Gold */
+  --chart-fixed-income: #3B82F6; /* Tech Blue */
+  --chart-cash: #6B7280;         /* Gray */
+  --chart-alternatives: #0EA5E9; /* Sky Blue */
+  --chart-real-estate: #C9A227;  /* Deep Gold */
+  --chart-crypto: #14B8A6;       /* Teal */
+  --chart-commodities: #60A5FA;  /* Light Blue */
+  --chart-other: #78716C;        /* Stone */
+
+  /* --- Typography --- */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* --- Spacing System (8px Grid) --- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* --- Effects --- */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+  
+  --transition-base: all 0.2s ease-in-out;
+}
+
+/* Dark Mode Support (Future Proofing) */
+@media (prefers-color-scheme: dark) {
+  /* Add dark mode overrides here in Phase 4 */
+}

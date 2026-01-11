@@ -97,3 +97,8 @@ def health_check():
         'status': 'healthy',
         'timestamp': datetime.now().isoformat()
     })
+
+@main_bp.route('/test-components')
+def test_components():
+    """Route to verify UI components"""
+    return render_template('test_components.html')
