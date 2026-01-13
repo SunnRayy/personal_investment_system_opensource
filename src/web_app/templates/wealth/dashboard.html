@@ -1,303 +1,306 @@
 {% extends "base.html" %}
+{% from 'macros/components.html' import metric_card, badge, button, page_header %}
 
-{% block title %}Cash Flow & Wealth Dashboard{% endblock %}
+{% block title %}Wealth Overview - WealthOS{% endblock %}
+
+{% block header_title %}
+{{ page_header('Wealth Overview', 'Comprehensive analysis of improved net worth and cash flow') }}
+{% endblock %}
 
 {% block content %}
-<!-- Page Header -->
-<div
-    class="bg-gradient-to-r from-teal-600 to-cyan-600 rounded-b-lg shadow-lg text-white p-6 mb-8 -mt-8 mx-4 rounded-t-none">
-    <div class="container mx-auto">
-        <h1 class="text-3xl font-bold mb-2"><i class="fas fa-money-bill-wave mr-2"></i> Cash Flow & Wealth Dashboard
-        </h1>
-        <p class="opacity-90">Comprehensive analysis of your income, expenses, savings, and net worth trends</p>
+
+<!-- Financial Overview Metrics -->
+<div class="dashboard-grid mb-8" style="grid-template-columns: repeat(4, 1fr);">
+    {{ metric_card('Net Worth', '--', id='kpi-net-worth', icon='fas fa-wallet', tooltip='Total Assets - Total
+    Liabilities') }}
+    {{ metric_card('YTD Growth', '--', id='kpi-growth', icon='fas fa-chart-line', tooltip='Annualized growth rate') }}
+    {{ metric_card('Savings Rate', '--', id='kpi-savings-rate', icon='fas fa-piggy-bank', tooltip='(Income - Expense) /
+    Income') }}
+    {{ metric_card('Avg Monthly Flow', '--', id='kpi-net-flow', icon='fas fa-stream', tooltip='Average monthly net cash
+    flow') }}
+</div>
+
+<!-- Tab Navigation -->
+<div class="tabs-container mb-6">
+    <div class="tabs-header">
+        <button class="tab-btn active" onclick="switchTab('net-worth', this)">
+            <i class="fas fa-chart-line mr-2"></i>Net Worth & Health
+        </button>
+        <button class="tab-btn" onclick="switchTab('cash-flow', this)">
+            <i class="fas fa-exchange-alt mr-2"></i>Cash Flow
+        </button>
+        <button class="tab-btn" onclick="switchTab('expenses', this)">
+            <i class="fas fa-receipt mr-2"></i>Expenses
+        </button>
     </div>
 </div>
 
-<div class="container mx-auto px-4">
-    <!-- At-a-Glance KPIs -->
-    <div class="mb-8">
-        <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-teal-500 pb-2 mb-6">Financial Overview</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <!-- Total Net Worth -->
-            <div
-                class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32 border-t-4 border-teal-500">
-                <div class="text-2xl font-bold text-gray-800 mb-1" id="kpi-net-worth">--</div>
-                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Total Net Worth</div>
-                <div class="text-xs text-gray-400 mt-1">Includes all assets</div>
+<!-- Tab: Net Worth & Health -->
+<div id="tab-net-worth" class="tab-pane active">
+    <!-- Trend & Allocation -->
+    <div class="dashboard-grid mb-8" style="grid-template-columns: 2fr 1fr;">
+        <div class="card">
+            <div class="card-header">
+                <h3>Net Worth Trend</h3>
             </div>
-
-            <!-- YTD Growth -->
-            <div
-                class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32 border-t-4 border-green-500">
-                <div class="text-2xl font-bold text-gray-800 mb-1" id="kpi-growth">--</div>
-                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">YTD Growth</div>
-                <div class="text-xs text-gray-400 mt-1">Annualized rate</div>
+            <div class="card-body" style="height: 350px; position: relative;">
+                <canvas id="chart-net-worth-trend"></canvas>
             </div>
-
-            <!-- Avg Savings Rate -->
-            <div
-                class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32 border-t-4 border-blue-500">
-                <div class="text-2xl font-bold text-gray-800 mb-1" id="kpi-savings-rate">--</div>
-                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Avg Savings Rate</div>
-                <div class="text-xs text-gray-400 mt-1">Income - Expense / Income</div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h3>Asset Allocation</h3>
             </div>
-
-            <!-- Avg Monthly Net Flow -->
-            <div
-                class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32 border-t-4 border-purple-500">
-                <div class="text-2xl font-bold text-gray-800 mb-1" id="kpi-net-flow">--</div>
-                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Avg Mth Net Flow</div>
-                <div class="text-xs text-gray-400 mt-1">Monthly surplus</div>
+            <div class="card-body" style="height: 350px; position: relative;">
+                <canvas id="chart-asset-allocation"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- Tab Navigation -->
-    <div class="mb-8">
-        <div class="flex flex-wrap gap-2 mb-6">
-            <button onclick="showTab('net-worth')" id="tab-btn-net-worth"
-                class="tab-btn px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-md">
-                <i class="fas fa-chart-line mr-2"></i>Net Worth & Health
-            </button>
-            <button onclick="showTab('cash-flow')" id="tab-btn-cash-flow"
-                class="tab-btn px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300">
-                <i class="fas fa-exchange-alt mr-2"></i>Cash Flow Summary
-            </button>
-            <button onclick="showTab('expenses')" id="tab-btn-expenses"
-                class="tab-btn px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300">
-                <i class="fas fa-receipt mr-2"></i>Expenses Analysis
-            </button>
+    <!-- Health Ratios -->
+    <div class="card mb-8">
+        <div class="card-header">
+            <h3>Financial Health Ratios</h3>
+            {{ badge('Last 24 Months', 'neutral') }}
         </div>
+        <div class="card-body" style="height: 300px; position: relative;">
+            <canvas id="chart-ratios"></canvas>
+        </div>
+    </div>
+</div>
 
-        <!-- Tab Content: Net Worth & Health -->
-        <div id="tab-net-worth" class="tab-content">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Net Worth Trend Chart -->
-                <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <i class="fas fa-chart-area mr-2 text-teal-500"></i> Net Worth Trend
-                    </h3>
-                    <div class="h-80">
-                        <canvas id="chart-net-worth-trend"></canvas>
-                    </div>
-                </div>
-
-                <!-- Asset Allocation -->
-                <div class="bg-white rounded-xl shadow-md p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <i class="fas fa-pie-chart mr-2 text-purple-500"></i> Asset Allocation
-                    </h3>
-                    <div class="h-80">
-                        <canvas id="chart-asset-allocation"></canvas>
-                    </div>
-                </div>
+<!-- Tab: Cash Flow -->
+<div id="tab-cash-flow" class="tab-pane" style="display: none;">
+    <div class="dashboard-grid mb-8" style="grid-template-columns: 1fr 1fr;">
+        <!-- Income vs Expense -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Income vs Expense</h3>
             </div>
-
-            <!-- Financial Health Ratios -->
-            <div class="mt-6 bg-white rounded-xl shadow-md p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                    <i class="fas fa-heartbeat mr-2 text-red-500"></i> Financial Health Ratios
-                </h3>
-                <div class="h-64">
-                    <canvas id="chart-ratios"></canvas>
-                </div>
+            <div class="card-body" style="height: 350px; position: relative;">
+                <canvas id="chart-income-expense"></canvas>
             </div>
         </div>
-
-        <!-- Tab Content: Cash Flow Summary -->
-        <div id="tab-cash-flow" class="tab-content hidden">
-            <!-- Income vs Expense -->
-            <div class="bg-white rounded-xl shadow-md p-6 mb-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                    <i class="fas fa-balance-scale mr-2 text-green-500"></i> Income vs Expense Trend
-                </h3>
-                <div class="h-80">
-                    <canvas id="chart-income-expense"></canvas>
-                </div>
+        <!-- Net Cash Flow -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Net Cash Flow</h3>
             </div>
-
-            <!-- Net Cash Flow -->
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                    <i class="fas fa-arrow-trend-up mr-2 text-blue-500"></i> Net Cash Flow
-                </h3>
-                <div class="h-64">
-                    <canvas id="chart-net-cash-flow"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tab Content: Expenses Analysis -->
-        <div id="tab-expenses" class="tab-content hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Expense Breakdown -->
-                <div class="bg-white rounded-xl shadow-md p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <i class="fas fa-chart-pie mr-2 text-orange-500"></i> Expenses by Category (Top 6)
-                    </h3>
-                    <div class="h-80">
-                        <canvas id="chart-expense-breakdown"></canvas>
-                    </div>
-                </div>
-
-                <!-- Expense Trend -->
-                <div class="bg-white rounded-xl shadow-md p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <i class="fas fa-layer-group mr-2 text-indigo-500"></i> Essential vs Non-Essential Trend
-                    </h3>
-                    <div class="h-80">
-                        <canvas id="chart-expense-trend"></canvas>
-                    </div>
-                </div>
+            <div class="card-body" style="height: 350px; position: relative;">
+                <canvas id="chart-net-cash-flow"></canvas>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Tab: Expenses -->
+<div id="tab-expenses" class="tab-pane" style="display: none;">
+    <div class="dashboard-grid mb-8" style="grid-template-columns: 1fr 1fr;">
+        <!-- Breakdown -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Expenses by Category</h3>
+                {{ badge('Top 6', 'primary') }}
+            </div>
+            <div class="card-body" style="height: 350px; position: relative;">
+                <canvas id="chart-expense-breakdown"></canvas>
+            </div>
+        </div>
+        <!-- Trend -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Essential vs Non-Essential</h3>
+            </div>
+            <div class="card-body" style="height: 350px; position: relative;">
+                <canvas id="chart-expense-trend"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
 <script>
-    // Tab switching
-    function showTab(tabName) {
-        // Hide all tab content
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-        // Show selected tab
-        document.getElementById('tab-' + tabName).classList.remove('hidden');
+    // --- Styles for Tabs (Inline for now, should move to CSS) ---
+    // Actually, I'll rely on the existing style.css updates I made earlier?
+    // No, I haven't added specific tab styles yet. I'll add a <style> block here for now
+    // or assume I will update style.css in the next step. Let's add block style for safety.
+</script>
 
-        // Update button styles
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('bg-gradient-to-r', 'from-teal-600', 'to-cyan-600', 'text-white', 'shadow-md');
-            btn.classList.add('bg-gray-200', 'text-gray-700');
-        });
-        const activeBtn = document.getElementById('tab-btn-' + tabName);
-        activeBtn.classList.remove('bg-gray-200', 'text-gray-700');
-        activeBtn.classList.add('bg-gradient-to-r', 'from-teal-600', 'to-cyan-600', 'text-white', 'shadow-md');
+
+
+<script>
+    // --- Tab Switching Logic ---
+    function switchTab(tabId, btnElement) {
+        // Hide all panes
+        document.querySelectorAll('.tab-pane').forEach(el => el.style.display = 'none');
+        document.getElementById('tab-' + tabId).style.display = 'block';
+
+        // Update Buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+
+        // Trigger resize for charts to ensure they render correctly in new tab
+        window.dispatchEvent(new Event('resize'));
     }
 
-    // Chart color palette
-    const COLORS = {
-        primary: '#0d9488',    // teal-600
-        secondary: '#06b6d4',  // cyan-500
-        success: '#22c55e',    // green-500
-        danger: '#ef4444',     // red-500
-        warning: '#f59e0b',    // amber-500
-        purple: '#8b5cf6',     // violet-500
-        navy: '#1e40af',       // blue-800
-        gray: '#6b7280'        // gray-500
+    // --- Chart Config & Data Fetching ---
+
+    // Helper to update card metrics matching the macro structure
+    // Helper to update card metrics matching the macro structure
+    document.updateMetric = function (id, value) {
+        // Since macros now render the ID attribute on the root element, we can select directly.
+        const card = document.getElementById(id);
+        if (card) {
+            const valEl = card.querySelector('.metric-value');
+            if (valEl) valEl.textContent = value;
+            // Also handle trend/color if needed, but basic value update is here
+        }
     };
 
-    const CHART_COLORS = ['#0d9488', '#8b5cf6', '#22c55e', '#f59e0b', '#1e40af', '#6b7280'];
+    // SunnRayy Palette
+    const COLORS = {
+        gold: '#D4AF37',
+        blue: '#00A3E0',
+        navy: '#1A365D',
+        green: '#10B981',
+        red: '#EF4444',
+        gray: '#94a3b8',
+        purple: '#8B5CF6',
+        orange: '#F59E0B'
+    };
 
-    // Currency formatter
-    function formatCurrency(value) {
-        if (Math.abs(value) >= 1000000) return '¥' + (value / 1000000).toFixed(1) + 'M';
-        if (Math.abs(value) >= 1000) return '¥' + (value / 1000).toFixed(0) + 'K';
-        return '¥' + value.toFixed(0);
-    }
-
-    // Common chart options
-    const commonLineOptions = {
+    // Standard Chart Options
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.color = '#64748b';
+    const commonOptions = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
             legend: { position: 'top', labels: { usePointStyle: true, padding: 15 } },
             tooltip: {
-                callbacks: {
-                    label: ctx => ctx.dataset.label + ': ¥' + ctx.parsed.y.toLocaleString()
-                }
+                mode: 'index',
+                intersect: false,
+                callbacks: { label: ctx => ctx.dataset.label + ': ' + formatCurrency(ctx.parsed.y) }
             }
         },
         scales: {
-            y: { ticks: { callback: v => formatCurrency(v) }, grid: { color: 'rgba(0,0,0,0.05)' } },
+            y: { grid: { borderDash: [2, 4], color: '#f1f5f9' }, ticks: { callback: v => formatCurrencyS(v) } },
             x: { grid: { display: false } }
         }
     };
 
+    // Formatters
+    function formatCurrency(val) {
+        return new Intl.NumberFormat('zh-CN', { style: 'currency', currency: 'CNY' }).format(val);
+    }
+    function formatCurrencyS(val) {
+        if (Math.abs(val) >= 1000000) return '¥' + (val / 1000000).toFixed(1) + 'M';
+        if (Math.abs(val) >= 1000) return '¥' + (val / 1000).toFixed(0) + 'k';
+        return val;
+    }
+
+    // --- Main Logic ---
     document.addEventListener("DOMContentLoaded", fetchData);
 
     function fetchData() {
         fetch('/wealth/api/summary')
             .then(r => r.json())
             .then(data => {
-                if (data.error) { console.error("API Error:", data.error); return; }
-                console.log("Dashboard Data:", data);
+                if (data.error) { console.error(data.error); return; }
                 updateKPIs(data.summary);
-                renderCharts(data);
+                initCharts(data);
             })
-            .catch(err => console.error("Fetch Error:", err));
+            .catch(err => console.error(err));
     }
 
     function updateKPIs(summary) {
         if (!summary) return;
-        document.getElementById('kpi-net-worth').innerText = summary.net_worth;
-        document.getElementById('kpi-growth').innerText = summary.net_worth_growth_ytd;
-        document.getElementById('kpi-savings-rate').innerText = summary.savings_rate;
-        document.getElementById('kpi-net-flow').innerText = summary.monthly_details?.avg_net_cash_flow || '--';
+        document.updateMetric('kpi-net-worth', summary.net_worth);
+        document.updateMetric('kpi-growth', summary.net_worth_growth_ytd);
+        document.updateMetric('kpi-savings-rate', summary.savings_rate);
+        document.updateMetric('kpi-net-flow', summary.monthly_details?.avg_net_cash_flow || '--');
     }
 
-    function renderCharts(data) {
+    function initCharts(data) {
         // 1. Net Worth Trend
-        const nwCtx = document.getElementById('chart-net-worth-trend').getContext('2d');
-        if (data.balance_sheet?.trend_chart?.labels?.length > 0) {
-            const nwDs = data.balance_sheet.trend_chart.datasets.find(d => d.label === 'Net_Worth_Calc_CNY');
-            const assetsDs = data.balance_sheet.trend_chart.datasets.find(d => d.label === 'Total_Assets_Calc_CNY');
-            const liabDs = data.balance_sheet.trend_chart.datasets.find(d => d.label === 'Total_Liabilities_Calc_CNY');
+        if (data.balance_sheet?.trend_chart?.labels) {
+            const ctx = document.getElementById('chart-net-worth-trend').getContext('2d');
+            const dsNW = data.balance_sheet.trend_chart.datasets.find(d => d.label === 'Net_Worth_Calc_CNY');
+            const dsAst = data.balance_sheet.trend_chart.datasets.find(d => d.label === 'Total_Assets_Calc_CNY');
 
-            new Chart(nwCtx, {
+            new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: data.balance_sheet.trend_chart.labels,
                     datasets: [
-                        { label: 'Net Worth', data: nwDs?.data || [], borderColor: COLORS.primary, backgroundColor: 'rgba(13, 148, 136, 0.1)', fill: true, tension: 0.4, pointRadius: 0, borderWidth: 3 },
-                        { label: 'Assets', data: assetsDs?.data || [], borderColor: COLORS.purple, borderDash: [5, 5], tension: 0.4, pointRadius: 0, borderWidth: 2 },
-                        { label: 'Liabilities', data: liabDs?.data || [], borderColor: COLORS.danger, borderDash: [3, 3], tension: 0.4, pointRadius: 0, borderWidth: 2 }
+                        {
+                            label: 'Net Worth',
+                            data: dsNW?.data || [],
+                            borderColor: COLORS.blue,
+                            backgroundColor: 'rgba(0, 163, 224, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'Total Assets',
+                            data: dsAst?.data || [],
+                            borderColor: COLORS.gold,
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            pointRadius: 0
+                        }
                     ]
                 },
-                options: commonLineOptions
+                options: commonOptions
             });
         }
 
         // 2. Asset Allocation
-        const allocCtx = document.getElementById('chart-asset-allocation').getContext('2d');
-        if (data.balance_sheet?.asset_allocation?.labels?.length > 0) {
-            new Chart(allocCtx, {
+        if (data.balance_sheet?.asset_allocation?.labels) {
+            const ctx = document.getElementById('chart-asset-allocation').getContext('2d');
+            new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: data.balance_sheet.asset_allocation.labels,
-                    datasets: [{ data: data.balance_sheet.asset_allocation.data, backgroundColor: CHART_COLORS, borderWidth: 2, borderColor: '#fff' }]
+                    datasets: [{
+                        data: data.balance_sheet.asset_allocation.data,
+                        backgroundColor: [COLORS.blue, COLORS.gold, COLORS.green, COLORS.purple, COLORS.orange, COLORS.navy, COLORS.red],
+                        borderWidth: 0
+                    }]
                 },
                 options: {
-                    responsive: true, maintainAspectRatio: false, cutout: '60%',
-                    plugins: {
-                        legend: { position: 'right', labels: { usePointStyle: true } },
-                        tooltip: { callbacks: { label: ctx => ctx.label + ': ¥' + ctx.parsed.toLocaleString() } }
-                    }
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: { legend: { position: 'right' } }
                 }
             });
         }
 
-        // 3. Financial Health Ratios
-        const ratiosCtx = document.getElementById('chart-ratios').getContext('2d');
-        if (data.balance_sheet?.ratios_chart?.labels?.length > 0) {
+        // 3. Health Ratios
+        if (data.balance_sheet?.ratios_chart?.labels) {
+            const ctx = document.getElementById('chart-ratios').getContext('2d');
             const debtDs = data.balance_sheet.ratios_chart.datasets.find(d => d.label === 'Debt_to_Asset_Ratio');
             const liqDs = data.balance_sheet.ratios_chart.datasets.find(d => d.label === 'Liquidity_Ratio');
 
-            new Chart(ratiosCtx, {
+            new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: data.balance_sheet.ratios_chart.labels,
                     datasets: [
-                        { label: 'Debt/Asset Ratio', data: debtDs?.data || [], borderColor: COLORS.danger, tension: 0.4, pointRadius: 2, borderWidth: 2, yAxisID: 'y' },
-                        { label: 'Liquidity Ratio', data: liqDs?.data || [], borderColor: COLORS.secondary, tension: 0.4, pointRadius: 2, borderWidth: 2, yAxisID: 'y1' }
+                        { label: 'Debt Ratio', data: debtDs?.data, borderColor: COLORS.red, yAxisID: 'y', tension: 0.3 },
+                        { label: 'Liquidity', data: liqDs?.data, borderColor: COLORS.green, yAxisID: 'y1', tension: 0.3 }
                     ]
                 },
                 options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top', labels: { usePointStyle: true } }, tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + (ctx.parsed.y * 100).toFixed(1) + '%' } } },
+                    ...commonOptions,
                     scales: {
-                        y: { type: 'linear', position: 'left', title: { display: true, text: 'Debt/Asset' }, ticks: { callback: v => (v * 100).toFixed(0) + '%' } },
-                        y1: { type: 'linear', position: 'right', title: { display: true, text: 'Liquidity' }, grid: { drawOnChartArea: false }, ticks: { callback: v => v.toFixed(1) + 'x' } },
+                        y: { position: 'left', title: { display: true, text: 'Debt %' }, ticks: { callback: v => (v * 100).toFixed(0) + '%' } },
+                        y1: { position: 'right', title: { display: true, text: 'Liquidity x' }, grid: { drawOnChartArea: false } },
                         x: { grid: { display: false } }
                     }
                 }
@@ -305,63 +308,78 @@
         }
 
         // 4. Income vs Expense
-        const cfCtx = document.getElementById('chart-income-expense').getContext('2d');
-        const incomeDs = data.cash_flow?.income_chart?.datasets?.find(d => d.label === 'Total_Income_Calc_CNY');
-        const expenseDs = data.cash_flow?.expense_chart?.datasets?.find(d => d.label === 'Total_Expense_Calc_CNY');
+        if (data.cash_flow?.income_chart && data.cash_flow?.expense_chart) {
+            const ctx = document.getElementById('chart-income-expense').getContext('2d');
+            const incDs = data.cash_flow.income_chart.datasets.find(d => d.label === 'Total_Income_Calc_CNY');
+            const expDs = data.cash_flow.expense_chart.datasets.find(d => d.label === 'Total_Expense_Calc_CNY');
 
-        if (incomeDs && expenseDs) {
-            new Chart(cfCtx, {
+            new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: data.cash_flow.income_chart.labels,
                     datasets: [
-                        { label: 'Income', data: incomeDs.data, backgroundColor: COLORS.success, borderRadius: 4 },
-                        { label: 'Expense', data: expenseDs.data, backgroundColor: COLORS.danger, borderRadius: 4 }
+                        { label: 'Income', data: incDs.data, backgroundColor: COLORS.green, borderRadius: 4 },
+                        { label: 'Expense', data: expDs.data, backgroundColor: COLORS.red, borderRadius: 4 }
                     ]
                 },
-                options: commonLineOptions
+                options: commonOptions
             });
         }
 
         // 5. Net Cash Flow
-        const netCfCtx = document.getElementById('chart-net-cash-flow').getContext('2d');
-        if (data.cash_flow?.net_cash_flow_chart?.labels?.length > 0) {
-            const netCfDs = data.cash_flow.net_cash_flow_chart.datasets.find(d => d.label === 'Net_Cash_Flow');
-            const netData = netCfDs?.data || [];
-            const barColors = netData.map(v => v >= 0 ? COLORS.success : COLORS.danger);
+        if (data.cash_flow?.net_cash_flow_chart) {
+            const ctx = document.getElementById('chart-net-cash-flow').getContext('2d');
+            const ds = data.cash_flow.net_cash_flow_chart.datasets.find(d => d.label === 'Net_Cash_Flow');
 
-            new Chart(netCfCtx, {
+            new Chart(ctx, {
                 type: 'bar',
-                data: { labels: data.cash_flow.net_cash_flow_chart.labels, datasets: [{ label: 'Net Cash Flow', data: netData, backgroundColor: barColors, borderRadius: 4 }] },
-                options: { ...commonLineOptions, plugins: { ...commonLineOptions.plugins, legend: { display: false } } }
+                data: {
+                    labels: data.cash_flow.net_cash_flow_chart.labels,
+                    datasets: [{
+                        label: 'Net Flow',
+                        data: ds.data,
+                        backgroundColor: ds.data.map(v => v >= 0 ? COLORS.green : COLORS.red),
+                        borderRadius: 4
+                    }]
+                },
+                options: commonOptions
             });
         }
 
         // 6. Expense Breakdown
-        const expBreakCtx = document.getElementById('chart-expense-breakdown').getContext('2d');
-        if (data.cash_flow?.expense_breakdown?.labels?.length > 0) {
-            new Chart(expBreakCtx, {
+        if (data.cash_flow?.expense_breakdown) {
+            const ctx = document.getElementById('chart-expense-breakdown').getContext('2d');
+            new Chart(ctx, {
                 type: 'pie',
-                data: { labels: data.cash_flow.expense_breakdown.labels, datasets: [{ data: data.cash_flow.expense_breakdown.data, backgroundColor: CHART_COLORS, borderWidth: 2, borderColor: '#fff' }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { usePointStyle: true } }, tooltip: { callbacks: { label: ctx => ctx.label + ': ¥' + ctx.parsed.toLocaleString() } } } }
+                data: {
+                    labels: data.cash_flow.expense_breakdown.labels,
+                    datasets: [{
+                        data: data.cash_flow.expense_breakdown.data,
+                        backgroundColor: [COLORS.navy, COLORS.blue, COLORS.gold, COLORS.orange, COLORS.purple, COLORS.gray],
+                        borderWidth: 0
+                    }]
+                },
+                options: { ...commonOptions, cutout: '0%' } // Full pie
             });
         }
 
-        // 7. Expense Trend (Stacked)
-        const expTrendCtx = document.getElementById('chart-expense-trend').getContext('2d');
-        const stacked = data.cash_flow?.expense_stacked_chart;
-        if (stacked?.datasets?.length > 0) {
-            const datasets = stacked.datasets.map((ds, i) => ({
-                label: ds.label.replace('_Expense_Calc', '').replace('_', ' '),
-                data: ds.data,
-                backgroundColor: i === 0 ? COLORS.navy : COLORS.warning,
+        // 7. Expense Trend
+        if (data.cash_flow?.expense_stacked_chart) {
+            const ctx = document.getElementById('chart-expense-trend').getContext('2d');
+            const datasets = data.cash_flow.expense_stacked_chart.datasets.map((d, i) => ({
+                label: d.label.replace('_Expense_Calc', '').replace('_', ' '),
+                data: d.data,
+                backgroundColor: i === 0 ? COLORS.navy : COLORS.orange,
                 borderRadius: 2
             }));
 
-            new Chart(expTrendCtx, {
+            new Chart(ctx, {
                 type: 'bar',
-                data: { labels: stacked.labels, datasets },
-                options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { stacked: true, grid: { display: false } }, y: { ...commonLineOptions.scales.y, stacked: true } } }
+                data: { labels: data.cash_flow.expense_stacked_chart.labels, datasets },
+                options: {
+                    ...commonOptions,
+                    scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true } }
+                }
             });
         }
     }

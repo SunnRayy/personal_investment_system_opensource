@@ -1,32 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}WealthOS{% endblock %}</title>
-    
+
     <!-- Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    
-    <!-- Legacy Tailwind (Keeping strictly for backward compatibility of inner content until fully migrated) -->
-    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
-    <!-- Tailwind removed to force usage of new design system. If layout breaks, we fix the CSS. -->
+
+    <!-- Tailwind CSS (CDN for development) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-gold': '#D4AF37',
+                        'brand-gold-light': '#E5C158',
+                        'brand-gold-dark': '#C9A227',
+                        'brand-blue': '#3B82F6',
+                        'brand-blue-light': '#60A5FA',
+                        'brand-blue-dark': '#2563EB',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        '4xl': '28px',
+                    }
+                }
+            }
+        }
+    </script>
+
+    {% block styles %}{% endblock %}
 </head>
+
 <body>
     <!-- Demo Banner -->
     {% if is_demo_mode %}
-    <div style="background: var(--color-warning-bg); color: var(--text-primary); padding: 8px; text-align: center; font-size: 14px; border-bottom: 1px solid var(--color-warning);">
-        <i class="fas fa-flask" style="color: var(--color-warning);"></i> 
+    <div
+        style="background: var(--color-warning-bg); color: var(--text-primary); padding: 8px; text-align: center; font-size: 14px; border-bottom: 1px solid var(--color-warning);">
+        <i class="fas fa-flask" style="color: var(--color-warning);"></i>
         <strong>{{ _('Demo Mode') }}</strong>: {{ _("You're exploring with sample data.") }}
-        <a href="{{ url_for('onboarding.upload') }}" style="margin-left: 10px; color: var(--brand-blue); font-weight: 500;">
+        <a href="{{ url_for('onboarding.upload') }}"
+            style="margin-left: 10px; color: var(--brand-blue); font-weight: 500;">
             {{ _('Upload Your Data') }} &rarr;
         </a>
     </div>
@@ -44,46 +73,60 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
+
             <nav class="sidebar-nav">
-                <div style="padding: 0 var(--space-4); margin-top: var(--space-4); margin-bottom: var(--space-2); font-size: 11px; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.5px; font-weight: 600;">Main</div>
-                
+                <div
+                    style="padding: 0 var(--space-4); margin-top: var(--space-4); margin-bottom: var(--space-2); font-size: 11px; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.5px; font-weight: 600;">
+                    Main</div>
+
                 <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}">
                     <i class="fas fa-home"></i> {{ _('Dashboard') }}
                 </a>
-                <a href="{{ url_for('data_workbench.index') }}" class="nav-item {% if 'data-workbench' in request.path %}active{% endif %}">
+                <a href="{{ url_for('data_workbench.index') }}"
+                    class="nav-item {% if 'data-workbench' in request.path %}active{% endif %}">
                     <i class="fas fa-database"></i> {{ _('Data Workbench') }}
                 </a>
-                <a href="{{ url_for('logic_studio.index') }}" class="nav-item {% if 'logic-studio' in request.path %}active{% endif %}">
+                <a href="{{ url_for('logic_studio.index') }}"
+                    class="nav-item {% if 'logic-studio' in request.path %}active{% endif %}">
                     <i class="fas fa-cogs"></i> {{ _('Logic Studio') }}
                 </a>
 
-                <div style="padding: 0 var(--space-4); margin-top: var(--space-4); margin-bottom: var(--space-2); font-size: 11px; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.5px; font-weight: 600;">Analysis</div>
-                
-                <a href="{{ url_for('reports.portfolio') }}" class="nav-item {% if 'reports/portfolio' in request.path %}active{% endif %}">
+                <div
+                    style="padding: 0 var(--space-4); margin-top: var(--space-4); margin-bottom: var(--space-2); font-size: 11px; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.5px; font-weight: 600;">
+                    Analysis</div>
+
+                <a href="{{ url_for('reports.portfolio') }}"
+                    class="nav-item {% if 'reports/portfolio' in request.path %}active{% endif %}">
                     <i class="fas fa-briefcase"></i> {{ _('Portfolio') }}
                 </a>
-                <a href="{{ url_for('reports.cashflow') }}" class="nav-item {% if 'reports/cashflow' in request.path %}active{% endif %}">
+                <a href="{{ url_for('reports.cashflow') }}"
+                    class="nav-item {% if 'reports/cashflow' in request.path %}active{% endif %}">
                     <i class="fas fa-money-bill-wave"></i> {{ _('Cash Flow') }}
                 </a>
-                <a href="{{ url_for('reports.compass') }}" class="nav-item {% if 'reports/compass' in request.path %}active{% endif %}">
+                <a href="{{ url_for('reports.compass') }}"
+                    class="nav-item {% if 'reports/compass' in request.path %}active{% endif %}">
                     <i class="fas fa-compass"></i> {{ _('Compass') }}
                 </a>
-                <a href="{{ url_for('simulation.index') }}" class="nav-item {% if 'simulation' in request.path %}active{% endif %}">
+                <a href="{{ url_for('simulation.index') }}"
+                    class="nav-item {% if 'simulation' in request.path %}active{% endif %}">
                     <i class="fas fa-microchip"></i> {{ _('Simulation') }}
                 </a>
 
-                <div style="padding: 0 var(--space-4); margin-top: var(--space-4); margin-bottom: var(--space-2); font-size: 11px; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.5px; font-weight: 600;">System</div>
+                <div
+                    style="padding: 0 var(--space-4); margin-top: var(--space-4); margin-bottom: var(--space-2); font-size: 11px; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.5px; font-weight: 600;">
+                    System</div>
 
-                <a href="{{ url_for('integrations.dashboard') }}" class="nav-item {% if 'integrations' in request.path %}active{% endif %}">
+                <a href="{{ url_for('integrations.dashboard') }}"
+                    class="nav-item {% if 'integrations' in request.path %}active{% endif %}">
                     <i class="fas fa-plug"></i> {{ _('Integrations') }}
                 </a>
-                <a href="{{ url_for('dashboard.data_quality_health_check') }}" class="nav-item {% if 'health-check' in request.path %}active{% endif %}">
+                <a href="{{ url_for('dashboard.data_quality_health_check') }}"
+                    class="nav-item {% if 'health-check' in request.path %}active{% endif %}">
                     <i class="fas fa-heartbeat"></i> {{ _('Health') }}
                 </a>
             </nav>
         </aside>
-        
+
         <!-- Mobile Overlay -->
         <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
@@ -94,24 +137,31 @@
                 <button class="mobile-menu-toggle" onclick="toggleSidebar()">
                     <i class="fas fa-bars"></i>
                 </button>
-                
+
                 <!-- Page Title (Dynamic) -->
                 <h1 style="font-size: 1.2rem; margin: 0;">{% block header_title %}{% endblock %}</h1>
 
                 <div style="display: flex; align-items: center; gap: var(--space-4);">
                     <!-- Cache Status -->
                     {% if cache_info %}
-                    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); background: var(--bg-container-inset); padding: 4px 10px; border-radius: 20px;">
-                        <span style="width: 8px; height: 8px; border-radius: 50%; background-color: {% if cache_info.status == 'valid' %}var(--color-success){% else %}var(--color-warning){% endif %};"></span>
+                    <div
+                        style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); background: var(--bg-container-inset); padding: 4px 10px; border-radius: 20px;">
+                        <span
+                            style="width: 8px; height: 8px; border-radius: 50%; background-color: {% if cache_info.status == 'valid' %}var(--color-success){% else %}var(--color-warning){% endif %};"></span>
                         <span>{{ cache_info.age_minutes }}m</span>
-                        <button onclick="refreshCache()" style="background: none; border: none; cursor: pointer; color: var(--text-tertiary);"><i class="fas fa-sync-alt"></i></button>
+                        <button onclick="refreshCache()"
+                            style="background: none; border: none; cursor: pointer; color: var(--text-tertiary);"><i
+                                class="fas fa-sync-alt"></i></button>
                     </div>
                     {% endif %}
 
                     <!-- Language Switcher -->
                     <div style="position: relative; display: flex; align-items: center;">
-                        <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-right: 5px;">{{ get_locale()|upper }}</span>
-                        <a href="{{ url_for('main.set_language', lang_code='en' if get_locale() == 'zh' else 'zh') }}" style="color: var(--text-tertiary); font-size: 14px;">
+                        <span
+                            style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-right: 5px;">{{
+                            get_locale()|upper }}</span>
+                        <a href="{{ url_for('main.set_language', lang_code='en' if get_locale() == 'zh' else 'zh') }}"
+                            style="color: var(--text-tertiary); font-size: 14px;">
                             <i class="fas fa-globe"></i>
                         </a>
                     </div>
@@ -125,7 +175,8 @@
                 {% if messages %}
                 <div style="margin-bottom: var(--space-5);">
                     {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}" style="padding: var(--space-4); border-radius: var(--radius-md); margin-bottom: var(--space-3); background: {% if category == 'error' %}var(--color-error-bg){% else %}var(--color-success-bg){% endif %}; color: {% if category == 'error' %}var(--color-error){% else %}var(--color-success){% endif %}; border: 1px solid {% if category == 'error' %}var(--color-error){% else %}var(--color-success){% endif %};">
+                    <div class="alert alert-{{ category }}"
+                        style="padding: var(--space-4); border-radius: var(--radius-md); margin-bottom: var(--space-3); background: {% if category == 'error' %}var(--color-error-bg){% else %}var(--color-success-bg){% endif %}; color: {% if category == 'error' %}var(--color-error){% else %}var(--color-success){% endif %}; border: 1px solid {% if category == 'error' %}var(--color-error){% else %}var(--color-success){% endif %};">
                         {{ message }}
                     </div>
                     {% endfor %}
@@ -135,7 +186,7 @@
 
                 {% block content %}{% endblock %}
             </div>
-            
+
             <footer style="text-align: center; color: var(--text-tertiary); font-size: 12px; padding: var(--space-6);">
                 &copy; 2025 WealthOS. All rights reserved.
             </footer>
@@ -174,4 +225,5 @@
     </script>
     {% block scripts %}{% endblock %}
 </body>
+
 </html>

@@ -1,0 +1,5 @@
+{
+  "name": "WealthOS Data Workbench",
+  "description": "A professional fintech data management platform for importing transactions, holdings, and accounts with intelligent mapping and error validation.",
+  "requestFramePermissions": []
+}

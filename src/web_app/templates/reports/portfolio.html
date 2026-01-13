@@ -3,291 +3,258 @@
 {% block title %}Portfolio & Performance Report{% endblock %}
 
 {% block content %}
-<!-- Page Header -->
-<div
-    class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-b-lg shadow-lg text-white p-6 mb-8 -mt-8 mx-4 rounded-t-none">
-    <div class="container mx-auto">
-        <h1 class="text-3xl font-bold mb-2"><i class="fas fa-chart-line mr-2"></i> {{ _('Portfolio & Performance
-            Report') }}</h1>
-        <p class="opacity-90">{{ _('Comprehensive analysis of your investments, holdings, and historical performance')
-            }}</p>
-    </div>
-</div>
+<div class="space-y-8 pb-12">
+    <!-- Net Worth Hero Section -->
+    <div class="bg-white rounded-4xl border border-slate-200 shadow-sm p-8 md:p-10 relative overflow-hidden">
+        <!-- Gradient top border -->
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand-gold to-brand-blue"></div>
 
-<div class="container mx-auto px-4">
-    <!-- Portfolio At-a-Glance Section -->
-    <div class="mb-8">
-        <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-blue-500 pb-2 mb-6">{{ _('Portfolio
-            At-a-Glance') }}</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <!-- Total Portfolio Value -->
-            <div
-                class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32 border-t-4 border-blue-500">
-                <div class="text-2xl font-bold text-gray-800 mb-1">¥{{ total_portfolio_value }}</div>
-                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">{{ _('Total Portfolio Value')
-                    }}</div>
+        <div class="relative z-10">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">{{ _('Net Worth') }}</p>
+            <div class="flex items-end gap-4 mb-4">
+                <h1 class="text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight">¥{{ total_net_assets }}
+                </h1>
+                <span class="text-lg font-bold mb-2
+                    {% if dual_metrics.trailing_12m.portfolio_growth != 'N/A' and dual_metrics.trailing_12m.portfolio_growth | float > 0 %}
+                        text-emerald-500
+                    {% else %}
+                        text-rose-500
+                    {% endif %}">
+                    <i class="fa-solid 
+                        {% if dual_metrics.trailing_12m.portfolio_growth != 'N/A' and dual_metrics.trailing_12m.portfolio_growth | float > 0 %}
+                            fa-arrow-trend-up
+                        {% else %}
+                            fa-arrow-trend-down
+                        {% endif %} mr-1"></i>
+                    {{ dual_metrics.trailing_12m.portfolio_growth }}%
+                    <span class="text-slate-400 font-medium ml-1">{{ _('trailing 12 months') }}</span>
+                </span>
             </div>
+        </div>
 
-            <!-- Total Liability -->
-            <div
-                class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32 border-t-4 border-red-500">
-                <div class="text-2xl font-bold text-gray-800 mb-1">¥{{ total_liability }}</div>
-                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Total Liability</div>
-            </div>
-
-            <!-- Total Net Assets -->
-            <div
-                class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32 border-t-4 border-green-500">
-                <div class="text-2xl font-bold text-gray-800 mb-1">¥{{ total_net_assets }}</div>
-                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Total Net Assets</div>
-            </div>
-
-            <!-- Total Liquid Portfolio -->
-            <div
-                class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32 border-t-4 border-purple-500">
-                <div class="text-2xl font-bold text-gray-800 mb-1">¥{{ total_liquid_portfolio }}</div>
-                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Total Liquid Portfolio</div>
-            </div>
+        <!-- Embedded Growth Chart -->
+        <div class="h-80 w-full mt-6">
+            <canvas id="portfolioGrowthChart"></canvas>
         </div>
     </div>
 
-    <!-- Lifetime Performance Metrics -->
-    <div class="mb-8">
-        <h3 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-            <i class="fas fa-infinity mr-2"></i> Lifetime Performance (Since 2018)
-        </h3>
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- 12-Month Return -->
+        <div
+            class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 border-l-4 border-l-brand-gold hover:shadow-md transition-shadow">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">{{ _('12-Month Return') }}
+            </p>
+            <p class="text-3xl font-extrabold tracking-tight
+                {% if dual_metrics.trailing_12m.portfolio_growth != 'N/A' and dual_metrics.trailing_12m.portfolio_growth | float > 0 %}
+                    text-emerald-500
+                {% else %}
+                    text-rose-500
+                {% endif %}">
+                {{ dual_metrics.trailing_12m.portfolio_growth }}%
+            </p>
+        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <!-- Overall XIRR -->
-            <div
-                class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32">
-                <div class="text-2xl font-bold text-gray-800 mb-1 flex items-center justify-center">
-                    {{ dual_metrics.lifetime.xirr }}%
-                    {% if xirr_metadata.show_warning %}
-                    <i class="fas fa-exclamation-triangle text-yellow-500 ml-2 text-sm" title="Approximated"></i>
-                    {% endif %}
-                </div>
-                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">
-                    Overall XIRR
-                    {% if xirr_metadata.show_warning %}
-                    <span class="block text-xs normal-case font-normal">(approximated)</span>
-                    {% endif %}
-                </div>
-                <div class="text-xs text-gray-400 mt-1">Excl. Real Estate</div>
-            </div>
+        <!-- Holdings -->
+        <div
+            class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 border-l-4 border-l-brand-blue hover:shadow-md transition-shadow">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">{{ _('Holdings') }}</p>
+            <p class="text-3xl font-extrabold text-slate-900 tracking-tight">{{ holdings|length }}</p>
+        </div>
 
-            <!-- Portfolio Growth -->
-            <div
-                class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32">
-                <div class="text-2xl font-bold text-gray-800 mb-1">{{ dual_metrics.lifetime.portfolio_growth }}%</div>
-                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Portfolio Growth</div>
-                <div class="text-xs text-gray-400 mt-1">Includes cash flows</div>
-            </div>
+        <!-- Liquid Assets -->
+        <div
+            class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 border-l-4 border-l-emerald-500 hover:shadow-md transition-shadow">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">{{ _('Liquid Assets') }}</p>
+            <p class="text-3xl font-extrabold text-slate-900 tracking-tight">¥{{ total_liquid_portfolio }}</p>
+        </div>
 
-            <!-- True TWR -->
-            <div
-                class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32">
-                <div class="text-2xl font-bold text-gray-800 mb-1">{{ dual_metrics.lifetime.twr }}%</div>
-                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">True TWR</div>
-                <div class="text-xs text-gray-400 mt-1">Cash flow adjusted</div>
-            </div>
-
-            <!-- Sharpe Ratio -->
-            <div
-                class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow duration-300 flex flex-col justify-center items-center text-center h-32">
-                <div class="text-2xl font-bold text-gray-800 mb-1">{{ dual_metrics.lifetime.sharpe }}</div>
-                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Sharpe Ratio</div>
-            </div>
+        <!-- Lifetime XIRR -->
+        <div
+            class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 border-l-4 border-l-indigo-500 hover:shadow-md transition-shadow">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">{{ _('Lifetime XIRR') }}</p>
+            <p class="text-3xl font-extrabold text-brand-blue tracking-tight">{{ dual_metrics.lifetime.xirr }}%</p>
         </div>
     </div>
 
     <!-- Trailing 12-Month Performance -->
-    <div class="mb-8">
-        <h3 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-            <i class="far fa-calendar-alt mr-2"></i> Trailing 12-Month Performance
-        </h3>
+    <div>
+        <h4 class="flex items-center gap-2 text-lg font-bold text-slate-900 mb-6">
+            <i class="fa-regular fa-calendar-days text-brand-blue"></i>
+            {{ _('Trailing 12-Month Performance') }}
+        </h4>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <!-- 12-Month XIRR -->
             <div
-                class="bg-gray-50 rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col justify-center items-center text-center h-32">
-                <div class="text-2xl font-bold text-gray-600 mb-1">
-                    {{ dual_metrics.trailing_12m.xirr }}
-                    {% if dual_metrics.trailing_12m.xirr != "N/A" %}%{% endif %}
-                </div>
-                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">12-Month XIRR</div>
-                <div class="text-xs text-gray-400 mt-1">Excl. Real Estate</div>
+                class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 text-center hover:shadow-md transition-shadow">
+                <p class="text-3xl font-extrabold text-slate-700 mb-2">
+                    {{ dual_metrics.trailing_12m.xirr }}{% if dual_metrics.trailing_12m.xirr != "N/A" %}%{% endif %}
+                </p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ _('12-Month XIRR') }}</p>
+                <p class="text-xs text-slate-400 mt-1">{{ _('Excl. Real Estate') }}</p>
             </div>
 
             <!-- 12-Month Growth -->
             <div
-                class="bg-gray-50 rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col justify-center items-center text-center h-32">
-                <div class="text-2xl font-bold text-gray-600 mb-1">
-                    {{ dual_metrics.trailing_12m.portfolio_growth }}
-                    {% if dual_metrics.trailing_12m.portfolio_growth != "N/A" %}%{% endif %}
-                </div>
-                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">12-Month Growth</div>
+                class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 text-center hover:shadow-md transition-shadow">
+                <p class="text-3xl font-extrabold text-slate-700 mb-2">
+                    {{ dual_metrics.trailing_12m.portfolio_growth }}{% if dual_metrics.trailing_12m.portfolio_growth !=
+                    "N/A" %}%{% endif %}
+                </p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ _('12-Month Growth') }}</p>
             </div>
 
             <!-- 12-Month TWR -->
             <div
-                class="bg-gray-50 rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col justify-center items-center text-center h-32">
-                <div class="text-2xl font-bold text-gray-600 mb-1">
-                    {{ dual_metrics.trailing_12m.twr }}
-                    {% if dual_metrics.trailing_12m.twr != "N/A" %}%{% endif %}
-                </div>
-                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">12-Month TWR</div>
+                class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 text-center hover:shadow-md transition-shadow">
+                <p class="text-3xl font-extrabold text-slate-700 mb-2">
+                    {{ dual_metrics.trailing_12m.twr }}{% if dual_metrics.trailing_12m.twr != "N/A" %}%{% endif %}
+                </p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ _('12-Month TWR') }}</p>
             </div>
 
             <!-- 12-Month Sharpe -->
             <div
-                class="bg-gray-50 rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col justify-center items-center text-center h-32">
-                <div class="text-2xl font-bold text-gray-600 mb-1">{{ dual_metrics.trailing_12m.sharpe }}</div>
-                <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold">12-Month Sharpe</div>
+                class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 text-center hover:shadow-md transition-shadow">
+                <p class="text-3xl font-extrabold text-slate-700 mb-2">{{ dual_metrics.trailing_12m.sharpe }}</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ _('12-Month Sharpe') }}</p>
             </div>
         </div>
     </div>
 
     <!-- Current Asset Allocation -->
-    <div class="mb-8">
-        <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-blue-500 pb-2 mb-6">Current Asset Allocation
-        </h2>
+    <div>
+        <h4 class="flex items-center gap-2 text-lg font-bold text-slate-900 mb-6">
+            <i class="fa-solid fa-chart-pie text-brand-blue"></i>
+            {{ _('Detailed Allocation') }}
+        </h4>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <h4 class="text-lg font-semibold text-gray-700 mb-4 text-center">Top-Level Asset Classes</h4>
-                <canvas id="topLevelChart" width="400" height="400"></canvas>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+                <h5 class="text-xs font-bold text-slate-400 uppercase tracking-widest text-center mb-6">Major Asset
+                    Classes</h5>
+                <div class="h-[350px] relative">
+                    <canvas id="topLevelChart"></canvas>
+                </div>
             </div>
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <h4 class="text-lg font-semibold text-gray-700 mb-4 text-center">Sub-Class Allocation</h4>
-                <canvas id="subClassChart" width="400" height="400"></canvas>
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+                <h5 class="text-xs font-bold text-slate-400 uppercase tracking-widest text-center mb-6">Sub-Class
+                    Breakdown</h5>
+                <div class="h-[350px] relative">
+                    <canvas id="subClassChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
 
-
-
     <!-- Performance by Asset Class -->
-    <div class="mb-8">
-        <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-blue-500 pb-2 mb-6">Performance by Asset
-            Class
-        </h2>
+    <div>
+        <h4 class="flex items-center gap-2 text-lg font-bold text-slate-900 mb-6">
+            <i class="fa-solid fa-chart-bar text-brand-blue"></i>
+            {{ _('Performance by Asset Class') }}
+        </h4>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <h4 class="text-lg font-semibold text-gray-700 mb-4 text-center">Top-Level Performance (XIRR)</h4>
-                <canvas id="topLevelPerfChart" width="400" height="400"></canvas>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+                <h5 class="text-xs font-bold text-slate-400 uppercase tracking-widest text-center mb-6">Top-Level
+                    Performance (XIRR)</h5>
+                <div class="h-[400px] relative">
+                    <canvas id="topLevelPerfChart"></canvas>
+                </div>
             </div>
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <h4 class="text-lg font-semibold text-gray-700 mb-4 text-center">Sub-Class Performance (XIRR)</h4>
-                <canvas id="subClassPerfChart" width="400" height="400"></canvas>
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+                <h5 class="text-xs font-bold text-slate-400 uppercase tracking-widest text-center mb-6">Sub-Class
+                    Performance (XIRR)</h5>
+                <div class="h-[400px] relative">
+                    <canvas id="subClassPerfChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Historical Performance Charts -->
-    <div class="mb-8">
-        <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-blue-500 pb-2 mb-6">Historical Performance
-        </h2>
+    <div>
+        <h4 class="flex items-center gap-2 text-lg font-bold text-slate-900 mb-6">
+            <i class="fa-solid fa-chart-line text-brand-blue"></i>
+            {{ _('Historical Performance') }}
+        </h4>
 
-        <div class="space-y-6">
-            <!-- Portfolio Growth -->
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <h4 class="text-lg font-semibold text-gray-700 mb-2 text-center">Portfolio Growth Over Time</h4>
-                <p class="text-sm text-gray-500 mb-4 text-center">Total portfolio value progression over historical
-                    periods</p>
-                <div class="relative h-96">
-                    <canvas id="portfolioGrowthChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Cash Flow Analysis -->
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <h4 class="text-lg font-semibold text-gray-700 mb-2 text-center">Monthly Cash Flow Analysis</h4>
-                <p class="text-sm text-gray-500 mb-4 text-center">Income, expenses, and investments breakdown over
-                    time
-                </p>
-                <div class="relative h-96">
-                    <canvas id="cashFlowChart"></canvas>
-                </div>
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+            <h5 class="text-xs font-bold text-slate-400 uppercase tracking-widest text-center mb-2">Monthly Cash Flow
+                Analysis</h5>
+            <p class="text-sm text-slate-500 mb-6 text-center">Income, expenses, and investments breakdown over time</p>
+            <div class="h-[400px] relative">
+                <canvas id="cashFlowChart"></canvas>
             </div>
         </div>
     </div>
 
     <!-- Realized vs. Unrealized Gains Analysis -->
     {% if gains_analysis_data is defined and gains_analysis_data %}
-    <div class="mb-8">
-        <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-green-500 pb-2 mb-6">
-            <i class="fas fa-coins mr-2"></i>{{ _('Realized vs. Unrealized Gains Analysis') }}
-        </h2>
+    <div>
+        <h4 class="flex items-center gap-2 text-lg font-bold text-slate-900 mb-6">
+            <i class="fa-solid fa-coins text-brand-blue"></i>
+            {{ _('Realized vs. Unrealized Gains Analysis') }}
+        </h4>
 
         <!-- KPI Cards Row -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div
-                class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl shadow-md p-6 border-t-4 border-green-500">
-                <div class="text-3xl font-bold text-green-700 mb-2">¥{{
-                    "{:,.0f}".format(gains_analysis_data.realized_gains) }}</div>
-                <div class="text-sm text-gray-600 font-semibold">{{ _('Total Realized Gains') }}</div>
-                <div class="text-xs text-gray-500 mt-1">Profits locked in from sales</div>
-            </div>
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl shadow-md p-6 border-t-4 border-blue-500">
-                <div class="text-3xl font-bold text-blue-700 mb-2">¥{{
-                    "{:,.0f}".format(gains_analysis_data.unrealized_gains) }}</div>
-                <div class="text-sm text-gray-600 font-semibold">{{ _('Total Unrealized Gains') }}</div>
-                <div class="text-xs text-gray-500 mt-1">Paper gains from current holdings</div>
+                class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 border-l-4 border-l-emerald-500 hover:shadow-md transition-shadow">
+                <p class="text-3xl font-extrabold text-emerald-500 tracking-tight mb-2">¥{{
+                    "{:,.0f}".format(gains_analysis_data.realized_gains) }}</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ _('Total Realized Gains')
+                    }}</p>
+                <p class="text-xs text-slate-400 mt-1">Profits locked in from sales</p>
             </div>
             <div
-                class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl shadow-md p-6 border-t-4 border-purple-500">
-                <div class="text-3xl font-bold text-purple-700 mb-2">¥{{
-                    "{:,.0f}".format(gains_analysis_data.total_gains) }}</div>
-                <div class="text-sm text-gray-600 font-semibold">{{ _('Total Gains') }}</div>
-                <div class="text-xs text-gray-500 mt-1">Realized + Unrealized</div>
+                class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 border-l-4 border-l-brand-blue hover:shadow-md transition-shadow">
+                <p class="text-3xl font-extrabold text-brand-blue tracking-tight mb-2">¥{{
+                    "{:,.0f}".format(gains_analysis_data.unrealized_gains) }}</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ _('Total Unrealized Gains')
+                    }}</p>
+                <p class="text-xs text-slate-400 mt-1">Paper gains from current holdings</p>
+            </div>
+            <div
+                class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 border-l-4 border-l-violet-500 hover:shadow-md transition-shadow">
+                <p class="text-3xl font-extrabold text-violet-600 tracking-tight mb-2">¥{{
+                    "{:,.0f}".format(gains_analysis_data.total_gains) }}</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ _('Total Gains') }}</p>
+                <p class="text-xs text-slate-400 mt-1">Realized + Unrealized</p>
             </div>
         </div>
 
         <!-- Sub-Class Breakdown Table -->
         {% if gains_analysis_data.subclass_breakdown %}
-        <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
-                <h4 class="text-lg font-semibold text-gray-700">Sub-Class Level Breakdown</h4>
-                <p class="text-sm text-gray-500 mt-1">Detailed gains analysis by asset sub-class</p>
-            </div>
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 overflow-hidden">
+            <h5 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Sub-Class Level Breakdown</h5>
+            <p class="text-sm text-slate-500 mb-6">Detailed gains analysis by asset sub-class</p>
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Sub-Class</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Realized Gains</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Unrealized Gains</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Total Gains</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Realization %</th>
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr
+                            class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                            <th class="px-4 py-3">{{ _('Sub-Class') }}</th>
+                            <th class="px-4 py-3 text-right">{{ _('Realized Gains') }}</th>
+                            <th class="px-4 py-3 text-right">{{ _('Unrealized Gains') }}</th>
+                            <th class="px-4 py-3 text-right">{{ _('Total Gains') }}</th>
+                            <th class="px-4 py-3 text-right">{{ _('Realization') }} %</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="divide-y divide-slate-100 text-sm">
                         {% for sub_class, data in gains_analysis_data.subclass_breakdown.items() %}
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ sub_class
-                                }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-green-600">
-                                ¥{{ "{:,.0f}".format(data.realized_gains) }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-blue-600">
-                                ¥{{ "{:,.0f}".format(data.unrealized_gains) }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">
-                                ¥{{ "{:,.0f}".format(data.total_gains) }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-right">
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-4 py-3 font-semibold text-slate-900">{{ sub_class }}</td>
+                            <td class="px-4 py-3 text-right text-emerald-500 font-medium">¥{{
+                                "{:,.0f}".format(data.realized_gains) }}</td>
+                            <td class="px-4 py-3 text-right text-brand-blue font-medium">¥{{
+                                "{:,.0f}".format(data.unrealized_gains) }}</td>
+                            <td class="px-4 py-3 text-right font-bold text-slate-900">¥{{
+                                "{:,.0f}".format(data.total_gains) }}</td>
+                            <td class="px-4 py-3 text-right text-slate-500">
                                 {% if data.total_gains != 0 %}
-                                {{ "{:.1f}".format((data.realized_gains / data.total_gains * 100) if
-                                data.total_gains !=
+                                {{ "{:.1f}".format((data.realized_gains / data.total_gains * 100) if data.total_gains !=
                                 0 else 0) }}%
                                 {% else %}
                                 N/A
@@ -302,693 +269,321 @@
         {% endif %}
     </div>
     {% endif %}
+</div>
+{% endblock %}
 
-    <!-- Lifetime Asset Performance -->
-    {% if lifetime_performance_data is defined and lifetime_performance_data %}
-    <div class="mb-8">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-indigo-500 pb-2">
-                <i class="fas fa-history mr-2"></i>{{ _('Lifetime Asset Performance') }}
-            </h2>
-            <button onclick="toggleLifetimeTable()"
-                class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded transition">
-                <i class="fas fa-table mr-1"></i> <span id="lifetimeToggleText">Show Table</span>
-            </button>
-        </div>
+{% block scripts %}
+<script>
+    // Parse allocation data for charts
+    const topLevelData = JSON.parse('{{ top_level_allocation_json | safe }}');
+    const subClassData = JSON.parse('{{ sub_class_allocation_json | safe }}');
 
-        <div id="lifetimePerformanceTable" style="display: none;" class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Asset Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Sub-Class</th>
-                            <th
-                                class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Status</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Total Invested</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Current Value</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Realized Gains</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Unrealized Gains</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Total Gains</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {{ _('Return') }} %</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {{ _('XIRR') }} %</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200 text-sm">
-                        {% for asset in lifetime_performance_data %}
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ asset.asset_name }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ asset.asset_sub_class }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-center">
-                                {% if asset.is_currently_held %}
-                                <span class="px-2 py-1 text-xs font-semibold rounded bg-green-100 text-green-800">{{
-                                    _('Active') }}</span>
-                                {% else %}
-                                <span class="px-2 py-1 text-xs font-semibold rounded bg-gray-100 text-gray-800">{{
-                                    _('Closed') }}</span>
-                                {% endif %}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-gray-900">¥{{
-                                "{:,.0f}".format(asset.total_amount_invested) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-gray-900">¥{{
-                                "{:,.0f}".format(asset.current_market_value) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-green-600">¥{{
-                                "{:,.0f}".format(asset.realized_pnl) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-blue-600">¥{{
-                                "{:,.0f}".format(asset.unrealized_pnl) }}</td>
-                            <td
-                                class="px-6 py-4 whitespace-nowrap text-right font-semibold {% if asset.total_pnl >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
-                                ¥{{ "{:,.0f}".format(asset.total_pnl) }}
-                            </td>
-                            <td
-                                class="px-6 py-4 whitespace-nowrap text-right {% if asset.total_return_pct >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
-                                {{ "{:.2f}".format(asset.total_return_pct) }}%
-                            </td>
-                            <td
-                                class="px-6 py-4 whitespace-nowrap text-right {% if asset.xirr_pct and asset.xirr_pct >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
-                                {% if asset.xirr_pct %}{{ "{:.2f}".format(asset.xirr_pct) }}%{% else %}N/A{% endif
-                                %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+    // SunnRayy Color Palette - Modern & Professional
+    const bgColors = [
+        '#D4AF37', // Gold (Equity)
+        '#0f172a', // Dark Navy (Fixed Income)
+        '#64748b', // Slate Gray (Cash)
+        '#0ea5e9', // Sky Blue (Alts)
+        '#b45309', // Dark Amber (Real Estate)
+        '#14b8a6', // Teal (Crypto)
+        '#6366f1', // Indigo (Commodities)
+        '#78716c', // Stone (Other)
+        '#f59e0b', // Amber
+        '#ec4899'  // Pink
+    ];
 
-    <script>
-        function toggleLifetimeTable() {
-            const table = document.getElementById('lifetimePerformanceTable');
-            const toggleText = document.getElementById('lifetimeToggleText');
-            if (table.style.display === 'none') {
-                table.style.display = 'block';
-                toggleText.textContent = 'Hide Table';
-            } else {
-                table.style.display = 'none';
-                toggleText.textContent = 'Show Table';
+    // Chart.js Global Defaults
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.color = '#64748b';
+    Chart.defaults.scale.grid.color = '#f1f5f9';
+
+    // Initialize Top Level Chart
+    const ctxTop = document.getElementById('topLevelChart').getContext('2d');
+    new Chart(ctxTop, {
+        type: 'doughnut',
+        data: {
+            labels: topLevelData.labels,
+            datasets: [{
+                data: topLevelData.values,
+                backgroundColor: bgColors,
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: { usePointStyle: true, boxWidth: 8, padding: 20, font: { size: 12 } }
+                },
+                title: { display: false }
             }
         }
-    </script>
-    {% endif %}
+    });
 
-    <!-- Asset Correlation & Risk Monitoring -->
-    {% if correlation_analysis is defined and correlation_analysis %}
-    <div class="mb-8">
-        <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-red-500 pb-2 mb-6">
-            <i class="fas fa-project-diagram mr-2"></i>{{ _('Asset Correlation & Risk Monitoring') }}
-        </h2>
+    // Initialize Sub Class Chart
+    const ctxSub = document.getElementById('subClassChart').getContext('2d');
+    new Chart(ctxSub, {
+        type: 'doughnut',
+        data: {
+            labels: subClassData.labels,
+            datasets: [{
+                data: subClassData.values,
+                backgroundColor: bgColors,
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: { usePointStyle: true, boxWidth: 8, padding: 20, font: { size: 12 } }
+                },
+                title: { display: false }
+            }
+        }
+    });
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <!-- Correlation Summary Card -->
-            <div class="lg:col-span-1 space-y-6">
-                <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-indigo-500">
-                    <h4 class="text-lg font-semibold text-gray-700 mb-4 text-center">Correlation Summary</h4>
-                    <div class="flex flex-col items-center justify-center py-4">
-                        <div class="text-4xl font-bold text-gray-800">{{
-                            "{:.2f}".format(correlation_analysis.avg_correlation) }}</div>
-                        <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold mt-1">Avg. Portfolio
-                            Correlation</div>
-                    </div>
-                    <div class="text-xs text-gray-500 text-center px-4 mt-2">
-                        Higher correlation means lower diversification benefits. Targets typically < 0.4. </div>
-                    </div>
+    // Parse performance data for charts
+    const topLevelPerfData = JSON.parse('{{ top_level_performance_json | safe }}');
+    const subClassPerfData = JSON.parse('{{ sub_class_performance_json | safe }}');
 
-                    {% if correlation_analysis.alerts %}
-                    <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-red-500">
-                        <h4 class="text-lg font-semibold text-red-700 mb-3">
-                            <i class="fas fa-exclamation-triangle mr-1"></i> Concentration Alerts
-                        </h4>
-                        <ul class="space-y-3">
-                            {% for alert in correlation_analysis.alerts %}
-                            <li class="p-3 bg-red-50 border-l-4 border-red-500 text-sm text-red-800 rounded">
-                                {{ alert }}
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <!-- Sub-Class Correlation Heatmap (Default) -->
-                <div class="lg:col-span-2">
-                    <div class="bg-white rounded-xl shadow-md p-6 h-full">
-                        <h4 class="text-lg font-semibold text-gray-700 mb-2 text-center">Sub-Class Correlation Heatmap
-                        </h4>
-                        <p class="text-sm text-gray-500 mb-6 text-center">Correlation between asset categories (90-day
-                            rolling)</p>
-                        {% if correlation_analysis.subclass_matrix %}
-                        <div class="relative overflow-x-auto">
-                            <table class="min-w-full text-xs border-collapse">
-                                <thead>
-                                    <tr>
-                                        <th class="p-2 border bg-gray-50"></th>
-                                        {% set subclass_assets = correlation_analysis.subclass_assets | default([]) %}
-                                        {% for asset_col in subclass_assets %}
-                                        <th class="p-2 border bg-gray-50 text-center font-medium"
-                                            style="writing-mode: vertical-lr; min-height: 80px;">{{ asset_col }}</th>
-                                        {% endfor %}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for asset_row in subclass_assets %}
-                                    <tr>
-                                        <td class="p-2 border bg-gray-50 font-medium whitespace-nowrap">{{ asset_row }}
-                                        </td>
-                                        {% for asset_col in subclass_assets %}
-                                        {% set val = correlation_analysis.subclass_matrix[asset_row][asset_col] %}
-                                        {% set bg_opacity = (val | abs) %}
-                                        {% if val > 0.8 %}
-                                        {% set bg_color = "rgba(239, 68, 68, " ~ bg_opacity ~ ")" %}
-                                        {% set text_color = "text-white" if val > 0.6 else "text-gray-800" %}
-                                        {% elif val > 0.5 %}
-                                        {% set bg_color = "rgba(249, 115, 22, " ~ bg_opacity ~ ")" %}
-                                        {% set text_color = "text-gray-900" %}
-                                        {% elif val > 0 %}
-                                        {% set bg_color = "rgba(34, 197, 94, " ~ (0.2 + 0.3 * bg_opacity) ~ ")" %}
-                                        {% set text_color = "text-gray-800" %}
-                                        {% else %}
-                                        {% set bg_color = "rgba(59, 130, 246, " ~ bg_opacity ~ ")" %}
-                                        {% set text_color = "text-gray-800" %}
-                                        {% endif %}
-                                        <td class="p-2 border text-center transition-colors {{ text_color }}"
-                                            style="background-color: {{ bg_color }}; min-width: 45px;"
-                                            title="{{ asset_row }} vs {{ asset_col }}: {{ '{:.2f}'.format(val) }}">
-                                            {{ "{:.2f}".format(val) }}
-                                        </td>
-                                        {% endfor %}
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        {% else %}
-                        <p class="text-center text-gray-500 py-8">Insufficient data for sub-class correlation analysis.
-                        </p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Asset-Level Correlation (Collapsible) -->
-        {% if correlation_analysis.asset_matrix %}
-        <div class="mb-6">
-            <button id="toggleAssetCorrelation" onclick="toggleSection('assetCorrelationSection')"
-                class="flex items-center gap-2 text-gray-600 hover:text-gray-900 font-semibold mb-4 cursor-pointer transition-colors">
-                <i class="fas fa-chevron-right text-sm transition-transform duration-200"
-                    id="assetCorrelationChevron"></i>
-                <span>Individual Asset Correlation ({{ correlation_analysis.asset_matrix.keys() | list | length }}
-                    assets)</span>
-            </button>
-            <div id="assetCorrelationSection" class="hidden">
-                <div class="bg-white rounded-xl shadow-md p-6">
-                    <h4 class="text-lg font-semibold text-gray-700 mb-2 text-center">Individual Asset Correlation
-                        Heatmap</h4>
-                    <p class="text-sm text-gray-500 mb-4 text-center">Detailed correlation between individual holdings
-                    </p>
-                    <div class="relative overflow-x-auto">
-                        <table class="min-w-full text-xs border-collapse">
-                            <thead>
-                                <tr>
-                                    <th class="p-2 border bg-gray-50"></th>
-                                    {% set asset_ids = correlation_analysis.asset_matrix.keys() | list | sort %}
-                                    {% set asset_names = correlation_analysis.asset_names | default({}) %}
-                                    {% for asset_col in asset_ids %}
-                                    <th class="p-2 border bg-gray-50 text-center font-medium"
-                                        style="writing-mode: vertical-lr; min-height: 80px;" title="{{ asset_col }}">{{
-                                        asset_names[asset_col] | default(asset_col) | truncate(12) }}</th>
-                                    {% endfor %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for asset_row in asset_ids %}
-                                <tr>
-                                    <td class="p-2 border bg-gray-50 font-medium whitespace-nowrap"
-                                        title="{{ asset_row }}">{{ asset_names[asset_row] | default(asset_row) |
-                                        truncate(15) }}
-                                    </td>
-                                    {% for asset_col in asset_ids %}
-                                    {% set val = correlation_analysis.asset_matrix[asset_row][asset_col] %}
-                                    {% set bg_opacity = (val | abs) %}
-                                    {% if val > 0.8 %}
-                                    {% set bg_color = "rgba(239, 68, 68, " ~ bg_opacity ~ ")" %}
-                                    {% set text_color = "text-white" if val > 0.6 else "text-gray-800" %}
-                                    {% elif val > 0.5 %}
-                                    {% set bg_color = "rgba(249, 115, 22, " ~ bg_opacity ~ ")" %}
-                                    {% set text_color = "text-gray-900" %}
-                                    {% elif val > 0 %}
-                                    {% set bg_color = "rgba(34, 197, 94, " ~ (0.2 + 0.3 * bg_opacity) ~ ")" %}
-                                    {% set text_color = "text-gray-800" %}
-                                    {% else %}
-                                    {% set bg_color = "rgba(59, 130, 246, " ~ bg_opacity ~ ")" %}
-                                    {% set text_color = "text-gray-800" %}
-                                    {% endif %}
-                                    <td class="p-2 border text-center transition-colors {{ text_color }}"
-                                        style="background-color: {{ bg_color }}; min-width: 45px;"
-                                        title="{{ asset_names[asset_row] | default(asset_row) }} vs {{ asset_names[asset_col] | default(asset_col) }}: {{ '{:.2f}'.format(val) }}">
-                                        {{ "{:.2f}".format(val) }}
-                                    </td>
-                                    {% endfor %}
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-        {% endif %}
-
-        <!-- Detailed Holdings Table -->
-        <div class="mb-8">
-            <h2 class="text-2xl font-semibold text-gray-800 border-b-4 border-blue-500 pb-2 mb-6">{{ _('Detailed
-                Holdings') }}</h2>
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ _('Top Class') }}</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ _('Sub-class') }}</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ _('Asset Name') }}</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ _('Asset Class') }}</th>
-                                <th
-                                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ _('Market Value') }}</th>
-                                <th
-                                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    %</th>
-                                <th
-                                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    P/L (¥)</th>
-                                <th
-                                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    P/L %</th>
-                                <th
-                                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    XIRR</th>
-                                <th
-                                    class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ _('Status') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200 text-sm">
-                            {% for holding in holdings %}
-                            {% if holding.is_subtotal %}
-                            {% if holding.subtotal_type == 'top_class' %}
-                            <tr class="bg-gray-100 font-bold text-gray-700">
-                                <td colspan="3" class="px-6 py-3">{{ holding.top_class }}</td>
-                                <td class="px-6 py-3"></td>
-                                <td class="px-6 py-3 text-right">¥{{ holding.market_value }}</td>
-                                <td class="px-6 py-3 text-right">{{ holding.portfolio_percentage }}%</td>
-                                <td class="px-6 py-3 text-right">
-                                    {% if holding.total_pnl %}
-                                    {% set pnl_value = holding.total_pnl | replace(',', '') | float %}
-                                    <span
-                                        class="{% if pnl_value > 0 %}text-green-600{% elif pnl_value < 0 %}text-red-600{% endif %}">
-                                        ¥{{ holding.total_pnl }}
-                                    </span>
-                                    {% else %}-{% endif %}
-                                </td>
-                                <td class="px-6 py-3 text-right">
-                                    {% if holding.pnl_percentage %}
-                                    {% set pnl_pct = holding.pnl_percentage | replace('%', '') | replace('+', '') |
-                                    float %}
-                                    <span
-                                        class="{% if pnl_pct > 0 %}text-green-600{% elif pnl_pct < 0 %}text-red-600{% endif %}">
-                                        {{ holding.pnl_percentage }}
-                                    </span>
-                                    {% else %}-{% endif %}
-                                </td>
-                                <td class="px-6 py-3"></td>
-                                <td class="px-6 py-3"></td>
-                            </tr>
-                            {% elif holding.subtotal_type == 'sub_class' %}
-                            <tr class="bg-gray-50 font-semibold text-gray-600">
-                                <td class="px-6 py-3"></td>
-                                <td colspan="2" class="px-6 py-3">{{ holding.sub_class }}</td>
-                                <td class="px-6 py-3"></td>
-                                <td class="px-6 py-3 text-right">¥{{ holding.market_value }}</td>
-                                <td class="px-6 py-3 text-right">{{ holding.portfolio_percentage }}%</td>
-                                <td class="px-6 py-3 text-right">
-                                    {% if holding.total_pnl %}
-                                    {% set pnl_value = holding.total_pnl | replace(',', '') | float %}
-                                    <span
-                                        class="{% if pnl_value > 0 %}text-green-600{% elif pnl_value < 0 %}text-red-600{% endif %}">
-                                        ¥{{ holding.total_pnl }}
-                                    </span>
-                                    {% else %}-{% endif %}
-                                </td>
-                                <td class="px-6 py-3 text-right">
-                                    {% if holding.pnl_percentage %}
-                                    {% set pnl_pct = holding.pnl_percentage | replace('%', '') | replace('+', '') |
-                                    float %}
-                                    <span
-                                        class="{% if pnl_pct > 0 %}text-green-600{% elif pnl_pct < 0 %}text-red-600{% endif %}">
-                                        {{ holding.pnl_percentage }}
-                                    </span>
-                                    {% else %}-{% endif %}
-                                </td>
-                                <td class="px-6 py-3"></td>
-                                <td class="px-6 py-3"></td>
-                            </tr>
-                            {% endif %}
-                            {% else %}
-                            <tr
-                                class="hover:bg-gray-50 {% if holding.status == 'Unmapped' %}bg-yellow-50{% elif holding.status == 'Non-Rebalanceable' %}bg-red-50{% endif %}">
-                                <td class="px-6 py-3">
-                                    {% if holding.top_class %}<span
-                                        class="px-2 py-1 text-xs font-semibold rounded bg-blue-100 text-blue-800">{{
-                                        holding.top_class }}</span>{% endif %}
-                                </td>
-                                <td class="px-6 py-3">
-                                    {% if holding.sub_class %}<span
-                                        class="px-2 py-1 text-xs font-semibold rounded bg-gray-200 text-gray-800">{{
-                                        holding.sub_class }}</span>{% endif %}
-                                </td>
-                                <td class="px-6 py-3 font-medium text-gray-900">{{ holding.asset_name }}</td>
-                                <td class="px-6 py-3 text-gray-500">{{ holding.asset_class }}</td>
-                                <td class="px-6 py-3 text-right">¥{{ holding.market_value }}</td>
-                                <td class="px-6 py-3 text-right">{{ holding.portfolio_percentage }}%</td>
-                                <td class="px-6 py-3 text-right">
-                                    {% if holding.total_pnl and holding.total_pnl != '0' %}
-                                    {% set pnl_value = holding.total_pnl | replace(',', '') | float %}
-                                    <span
-                                        class="{% if pnl_value > 0 %}text-green-600{% elif pnl_value < 0 %}text-red-600{% endif %}">
-                                        ¥{{ holding.total_pnl }}
-                                    </span>
-                                    {% else %}-{% endif %}
-                                </td>
-                                <td class="px-6 py-3 text-right">
-                                    {% if holding.pnl_percentage and holding.pnl_percentage != '+0.00%' %}
-                                    {% set pnl_pct = holding.pnl_percentage | replace('%', '') | replace('+', '') |
-                                    float %}
-                                    <span
-                                        class="{% if pnl_pct > 0 %}text-green-600{% elif pnl_pct < 0 %}text-red-600{% endif %}">
-                                        {{ holding.pnl_percentage }}
-                                    </span>
-                                    {% else %}-{% endif %}
-                                </td>
-                                <td class="px-6 py-3 text-right">
-                                    {% if holding.xirr is not none %}
-                                    {{ "{:.2f}".format(holding.xirr) }}%
-                                    {% else %}N/A{% endif %}
-                                </td>
-                                <td class="px-6 py-3 text-center">
-                                    {% if holding.status == 'Unmapped' %}
-                                    <span
-                                        class="px-2 py-1 text-xs font-semibold rounded bg-yellow-100 text-yellow-800">{{
-                                        holding.status }}</span>
-                                    {% elif holding.status == 'Non-Rebalanceable' %}
-                                    <span class="px-2 py-1 text-xs font-semibold rounded bg-red-100 text-red-800">{{
-                                        holding.status }}</span>
-                                    {% else %}
-                                    <span class="px-2 py-1 text-xs font-semibold rounded bg-green-100 text-green-800">{{
-                                        holding.status }}</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endif %}
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Chart Scripts -->
-    <script>
-        // Parse allocation data for charts
-        const topLevelData = JSON.parse('{{ top_level_allocation_json | safe }}');
-        const subClassData = JSON.parse('{{ sub_class_allocation_json | safe }}');
-
-        // Color palettes
-        const bgColors = [
-            'rgba(54, 162, 235, 0.7)',
-            'rgba(255, 99, 132, 0.7)',
-            'rgba(255, 206, 86, 0.7)',
-            'rgba(75, 192, 192, 0.7)',
-            'rgba(153, 102, 255, 0.7)',
-            'rgba(255, 159, 64, 0.7)',
-            'rgba(199, 199, 199, 0.7)',
-            'rgba(83, 102, 255, 0.7)',
-            'rgba(40, 159, 64, 0.7)',
-            'rgba(210, 99, 132, 0.7)',
-        ];
-
-        // Initialize Top Level Chart
-        const ctxTop = document.getElementById('topLevelChart').getContext('2d');
-        new Chart(ctxTop, {
-            type: 'doughnut',
-            data: {
-                labels: topLevelData.labels,
-                datasets: [{
-                    data: topLevelData.values,
-                    backgroundColor: bgColors,
-                    borderWidth: 1
-                }]
+    // Initialize Top Level Performance Chart
+    const ctxTopPerf = document.getElementById('topLevelPerfChart').getContext('2d');
+    new Chart(ctxTopPerf, {
+        type: 'bar',
+        data: {
+            labels: topLevelPerfData.labels,
+            datasets: [{
+                label: '{{ _("XIRR") }} (%)',
+                data: topLevelPerfData.values,
+                backgroundColor: bgColors,
+                borderRadius: 4,
+                barPercentage: 0.6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: { display: false }
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'right' },
-                    title: { display: false }
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { borderDash: [2, 2] },
+                    ticks: {
+                        callback: function (value) { return value + '%'; }
+                    }
+                },
+                x: {
+                    grid: { display: false }
                 }
             }
-        });
+        }
+    });
 
-        // Initialize Sub Class Chart
-        const ctxSub = document.getElementById('subClassChart').getContext('2d');
-        new Chart(ctxSub, {
-            type: 'doughnut',
-            data: {
-                labels: subClassData.labels,
-                datasets: [{
-                    data: subClassData.values,
-                    backgroundColor: bgColors,
-                    borderWidth: 1
-                }]
+    // Initialize Sub Class Performance Chart
+    const ctxSubPerf = document.getElementById('subClassPerfChart').getContext('2d');
+    new Chart(ctxSubPerf, {
+        type: 'bar',
+        data: {
+            labels: subClassPerfData.labels,
+            datasets: [{
+                label: '{{ _("XIRR") }} (%)',
+                data: subClassPerfData.values,
+                backgroundColor: bgColors,
+                borderRadius: 4,
+                barPercentage: 0.6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: { display: false }
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'right' },
-                    title: { display: false }
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { borderDash: [2, 2] },
+                    ticks: {
+                        callback: function (value) { return value + '%'; }
+                    }
+                },
+                x: {
+                    grid: { display: false }
                 }
             }
-        });
+        }
+    });
 
-
-
-        // Parse performance data for charts
-        const topLevelPerfData = JSON.parse('{{ top_level_performance_json | safe }}');
-        const subClassPerfData = JSON.parse('{{ sub_class_performance_json | safe }}');
-
-        // Initialize Top Level Performance Chart
-        const ctxTopPerf = document.getElementById('topLevelPerfChart').getContext('2d');
-        new Chart(ctxTopPerf, {
-            type: 'bar',
+    // Initialize Portfolio Growth Chart
+    const portfolioGrowthData = JSON.parse('{{ portfolio_growth_json | safe }}');
+    if (portfolioGrowthData && portfolioGrowthData.dates && portfolioGrowthData.dates.length > 0) {
+        const ctxGrowth = document.getElementById('portfolioGrowthChart').getContext('2d');
+        new Chart(ctxGrowth, {
+            type: 'line',
             data: {
-                labels: topLevelPerfData.labels,
+                labels: portfolioGrowthData.dates,
                 datasets: [{
-                    label: '{{ _("XIRR") }} (%)',
-                    data: topLevelPerfData.values,
-                    backgroundColor: bgColors,
-                    borderWidth: 1
+                    label: '{{ _("Portfolio Growth") }} (%)',
+                    data: portfolioGrowthData.growth_values,
+                    borderColor: '#10b981', // Emerald Primary
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    borderWidth: 2
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
                 plugins: {
                     legend: { display: false },
-                    title: { display: false }
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#1e293b',
+                        bodyColor: '#475569',
+                        borderColor: '#e2e8f0',
+                        borderWidth: 1,
+                        padding: 10,
+                        callbacks: {
+                            label: function (context) {
+                                return context.parsed.y.toFixed(2) + '%';
+                            }
+                        }
+                    }
                 },
                 scales: {
+                    x: {
+                        grid: { display: false }
+                    },
                     y: {
-                        beginAtZero: true,
+                        beginAtZero: false,
+                        grid: { borderDash: [4, 4], color: '#f1f5f9' },
                         ticks: {
-                            callback: function (value) {
-                                return value + '%';
-                            }
+                            callback: function (value) { return value + '%'; }
                         }
                     }
                 }
             }
         });
+    }
 
-        // Initialize Sub Class Performance Chart
-        const ctxSubPerf = document.getElementById('subClassPerfChart').getContext('2d');
-        new Chart(ctxSubPerf, {
+    // Initialize Cash Flow Chart
+    const cashFlowData = JSON.parse('{{ cash_flow_json | safe }}');
+    if (cashFlowData && cashFlowData.dates && cashFlowData.dates.length > 0) {
+        const ctxCashFlow = document.getElementById('cashFlowChart').getContext('2d');
+        new Chart(ctxCashFlow, {
             type: 'bar',
             data: {
-                labels: subClassPerfData.labels,
-                datasets: [{
-                    label: '{{ _("XIRR") }} (%)',
-                    data: subClassPerfData.values,
-                    backgroundColor: bgColors,
-                    borderWidth: 1
-                }]
+                labels: cashFlowData.dates,
+                datasets: [
+                    {
+                        label: '{{ _("Income") }}',
+                        data: cashFlowData.income,
+                        backgroundColor: '#10b981', // Emerald
+                        borderRadius: 4,
+                        barPercentage: 0.7
+                    },
+                    {
+                        label: '{{ _("Expenses") }}',
+                        data: cashFlowData.expenses,
+                        backgroundColor: '#f43f5e', // Rose
+                        borderRadius: 4,
+                        barPercentage: 0.7
+                    },
+                    {
+                        label: '{{ _("Investments") }}',
+                        data: cashFlowData.investments,
+                        backgroundColor: '#0ea5e9', // Sky
+                        borderRadius: 4,
+                        barPercentage: 0.7
+                    }
+                ]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
                 plugins: {
-                    legend: { display: false },
-                    title: { display: false }
+                    legend: {
+                        position: 'bottom',
+                        labels: { usePointStyle: true, boxWidth: 8, padding: 20 }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)', // White bg
+                        titleColor: '#1e293b', // Slate-800
+                        bodyColor: '#475569', // Slate-600
+                        borderColor: '#e2e8f0', // Slate-200
+                        borderWidth: 1,
+                        padding: 10,
+                        callbacks: {
+                            label: function (context) {
+                                return context.dataset.label + ': ¥' + Math.abs(context.parsed.y).toLocaleString();
+                            }
+                        }
+                    }
                 },
                 scales: {
+                    x: {
+                        stacked: true,
+                        grid: { display: false }
+                    },
                     y: {
+                        stacked: true,
                         beginAtZero: true,
+                        grid: { borderDash: [4, 4], color: '#f1f5f9' },
                         ticks: {
                             callback: function (value) {
-                                return value + '%';
+                                return '¥' + value.toLocaleString();
                             }
                         }
                     }
                 }
             }
         });
+    }
 
-        // Initialize Portfolio Growth Chart
-        const portfolioGrowthData = JSON.parse('{{ portfolio_growth_json | safe }}');
-        if (portfolioGrowthData && portfolioGrowthData.dates && portfolioGrowthData.dates.length > 0) {
-            const ctxGrowth = document.getElementById('portfolioGrowthChart').getContext('2d');
-            new Chart(ctxGrowth, {
-                type: 'line',
-                data: {
-                    labels: portfolioGrowthData.dates,
-                    datasets: [{
-                        label: '{{ _("Portfolio Growth") }} (%)',
-                        data: portfolioGrowthData.growth_values,
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                            callbacks: {
-                                label: function (context) {
-                                    return context.parsed.y.toFixed(2) + '%';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            ticks: {
-                                callback: function (value) {
-                                    return value + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
+    // Toggle collapsible sections
+    function toggleSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        const chevron = document.getElementById(sectionId.replace('Section', 'Chevron'));
 
-        // Initialize Cash Flow Chart
-        const cashFlowData = JSON.parse('{{ cash_flow_json | safe }}');
-        if (cashFlowData && cashFlowData.dates && cashFlowData.dates.length > 0) {
-            const ctxCashFlow = document.getElementById('cashFlowChart').getContext('2d');
-            new Chart(ctxCashFlow, {
-                type: 'bar',
-                data: {
-                    labels: cashFlowData.dates,
-                    datasets: [
-                        {
-                            label: '{{ _("Income") }}',
-                            data: cashFlowData.income,
-                            backgroundColor: 'rgba(75, 192, 192, 0.7)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: '{{ _("Expenses") }}',
-                            data: cashFlowData.expenses,
-                            backgroundColor: 'rgba(255, 99, 132, 0.7)',
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: '{{ _("Investments") }}',
-                            data: cashFlowData.investments,
-                            backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: true },
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    return '¥' + Math.abs(context.parsed.y).toLocaleString();
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            stacked: true,
-                        },
-                        y: {
-                            stacked: true,
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function (value) {
-                                    return '¥' + value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Toggle collapsible sections
-        function toggleSection(sectionId) {
-            const section = document.getElementById(sectionId);
-            const chevron = document.getElementById(sectionId.replace('Section', 'Chevron'));
-            if (section) {
-                section.classList.toggle('hidden');
+        if (section) {
+            if (section.style.display === 'none' || getComputedStyle(section).display === 'none') {
+                section.style.display = 'block';
                 if (chevron) {
-                    chevron.classList.toggle('rotate-90');
+                    chevron.classList.remove('fa-chevron-right');
+                    chevron.classList.add('fa-chevron-down');
+                }
+            } else {
+                section.style.display = 'none';
+                if (chevron) {
+                    chevron.classList.remove('fa-chevron-down');
+                    chevron.classList.add('fa-chevron-right');
                 }
             }
         }
-    </script>
-    {% endblock %}
+    }
+</script>
+{% endblock %}

@@ -1,56 +1,174 @@
 {% extends "base.html" %}
+{% from 'macros/components.html' import metric_card, badge, button, page_header %}
 
-{% block title %}Dashboard - Investment System{% endblock %}
+{% block title %}Dashboard - WealthOS{% endblock %}
+
+{% block header_title %}
+<div class="flex justify-between items-center w-full">
+    <div>
+        <h1 class="dashboard-title">Welcome back, <strong>Ray</strong></h1>
+        <p class="dashboard-subtitle">Here's your financial overview for today.</p>
+    </div>
+    <div class="flex items-center gap-3">
+        <span class="text-sm text-gray-500">Period</span>
+        <select class="form-select text-sm border-gray-300 rounded-md py-1 px-3">
+            <option>1M</option>
+            <option>3M</option>
+            <option>YTD</option>
+            <option>1Y</option>
+            <option>All</option>
+        </select>
+    </div>
+</div>
+{% endblock %}
 
 {% block content %}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <!-- Total Value Card -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-700">Total Value</h3>
-            <i class="fas fa-wallet text-blue-500 text-2xl"></i>
+
+<!-- Hero Card: Net Worth -->
+<div class="hero-card relative">
+    <div class="flex flex-col md:flex-row justify-between items-end mb-6 relative z-10">
+        <div>
+            <div class="hero-card__label">NET WORTH</div>
+            <div class="hero-card__value" id="hero-net-worth">Loading...</div>
+            <div class="hero-card__change positive text-base">
+                <i class="fas fa-arrow-up"></i>
+                <span id="hero-change-val">+$23,456</span>
+                <span id="hero-change-pct" class="ml-1">(+2.1%)</span>
+                <span class="text-gray-400 ml-1 font-normal">this month</span>
+            </div>
         </div>
-        <p class="text-3xl font-bold text-gray-900" id="total-value">Loading...</p>
-        <p class="text-sm text-gray-500 mt-2">Updated: <span id="last-updated">-</span></p>
+        <!-- Period selector was moved to header as per mock-up/design choice, but kept layout clean -->
     </div>
 
-    <!-- Holdings Count Card -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-700">Active Holdings</h3>
-            <i class="fas fa-layer-group text-green-500 text-2xl"></i>
-        </div>
-        <p class="text-3xl font-bold text-gray-900" id="holdings-count">Loading...</p>
-    </div>
-
-    <!-- Historical Records Card -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-700">History Points</h3>
-            <i class="fas fa-history text-purple-500 text-2xl"></i>
-        </div>
-        <p class="text-3xl font-bold text-gray-900" id="history-count">Loading...</p>
+    <!-- Hero Chart Area -->
+    <div style="height: 220px; width: 100%; margin-top: -40px;">
+        <canvas id="networthHeroChart"></canvas>
     </div>
 </div>
 
-<!-- Charts Section -->
+<!-- Metrics Row -->
+<div class="dashboard-metrics-grid">
+    <div class="metric-card metric-card--accent">
+        <h3>YTD Return</h3>
+        <div class="metric-value text-green-500" id="metric-ytd">+15.3%</div>
+    </div>
+
+    <div class="metric-card metric-card--accent">
+        <h3>Holdings</h3>
+        <div class="metric-value" id="metric-holdings">47</div>
+    </div>
+
+    <div class="metric-card metric-card--accent">
+        <h3>Cash</h3>
+        <div class="metric-value" id="metric-cash">$45,000</div>
+    </div>
+
+    <div class="metric-card metric-card--accent">
+        <h3>XIRR</h3>
+        <div class="metric-value text-blue-500" id="metric-xirr">12.4%</div>
+    </div>
+</div>
+
+<!-- Bottom Section: Allocation & Activity -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold text-gray-700 mb-4">Asset Allocation</h3>
-        <div class="relative h-64">
-            <canvas id="allocationChart"></canvas>
+
+    <!-- Allocation Breakdown -->
+    <div class="card h-full">
+        <div class="card-header border-b-0 pb-0">
+            <h3 class="uppercase text-xs font-bold text-gray-500 tracking-wider">Allocation Breakdown</h3>
+        </div>
+        <div class="card-body flex flex-col items-center justify-center relative" style="min-height: 360px;">
+            <div style="height: 260px; width: 260px; position: relative;">
+                <canvas id="allocationDonutChart"></canvas>
+                <!-- Center Text Overlay -->
+                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span class="text-xs text-gray-500 font-medium">Total Portfolio</span>
+                    <span class="text-xl font-bold text-gray-900">100%</span>
+                </div>
+            </div>
+            <!-- Custom Legend Container -->
+            <div id="allocation-legend" class="flex flex-wrap justify-center gap-4 mt-6 w-full">
+                <!-- Populated by JS -->
+            </div>
         </div>
     </div>
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold text-gray-700 mb-4">Portfolio Trend</h3>
-        <div class="relative h-64">
-            <canvas id="trendChart"></canvas>
+
+    <!-- Recent Activity -->
+    <div class="card h-full">
+        <div class="card-header">
+            <h3 class="uppercase text-xs font-bold text-gray-500 tracking-wider">Recent Activity</h3>
+        </div>
+        <div class="card-body pt-0">
+            <ul class="activity-list">
+                <!-- Example Data (mock) -->
+                <li class="activity-item">
+                    <div class="activity-icon buy">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div class="activity-details">
+                        <div class="activity-title">Apple Inc. (AAPL)</div>
+                        <div class="activity-subtitle">Buy</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="activity-amount negative">-$1,200.00</div>
+                        <span class="activity-date">May 15, 2024</span>
+                    </div>
+                </li>
+
+                <li class="activity-item">
+                    <div class="activity-icon deposit">
+                        <i class="fas fa-upload"></i>
+                    </div>
+                    <div class="activity-details">
+                        <div class="activity-title">Deposit from Bank</div>
+                        <div class="activity-subtitle">Deposit</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="activity-amount positive">+$5,000.00</div>
+                        <span class="activity-date">May 14, 2024</span>
+                    </div>
+                </li>
+
+                <li class="activity-item">
+                    <div class="activity-icon dividend">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="activity-details">
+                        <div class="activity-title">Microsoft Corp. (MSFT)</div>
+                        <div class="activity-subtitle">Dividend</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="activity-amount positive">+$85.50</div>
+                        <span class="activity-date">May 12, 2024</span>
+                    </div>
+                </li>
+
+                <li class="activity-item">
+                    <div class="activity-icon withdrawal">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div class="activity-details">
+                        <div class="activity-title">Rent Payment</div>
+                        <div class="activity-subtitle">Withdrawal</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="activity-amount negative">-$2,500.00</div>
+                        <span class="activity-date">May 10, 2024</span>
+                    </div>
+                </li>
+            </ul>
+            <div class="text-center mt-4 pt-2 border-t border-gray-100">
+                <a href="#" class="text-sm font-semibold text-blue-600 hover:text-blue-700">View All</a>
+            </div>
         </div>
     </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         fetchPortfolioData();
     });
 
@@ -58,92 +176,117 @@
         try {
             const response = await fetch('/api/portfolio_overview');
             const result = await response.json();
-            
+
             if (result.status === 'success') {
                 const data = result.data;
-                
-                // Update cards
-                document.getElementById('total-value').textContent = formatCurrency(data.total_portfolio_value);
-                document.getElementById('holdings-count').textContent = data.current_holdings_count;
-                document.getElementById('history-count').textContent = data.historical_records;
-                document.getElementById('last-updated').textContent = new Date(data.generated_at).toLocaleTimeString();
-                
-                // Initialize charts (mock data for now as API doesn't return full chart data yet)
-                initCharts(data);
+                updateDashboard(data);
             }
         } catch (error) {
-            console.error('Error fetching portfolio data:', error);
+            console.error('Error fetching dashboard data:', error);
         }
+    }
+
+    function updateDashboard(data) {
+        // --- 1. Update Hero Card ---
+        document.getElementById('hero-net-worth').textContent = formatCurrency(data.total_portfolio_value);
+        // Note: Change data is mocked for now as API might not return period change yet
+        // In real impl, use data.period_change
+
+        // --- 2. Update Metrics ---
+        // Mocked specific metrics for visual alignment with design
+        // Real implementation should calculate these from data
+        document.getElementById('metric-holdings').textContent = data.current_holdings_count;
+        document.getElementById('metric-cash').textContent = formatCurrency(45000); // Mock
+
+        // --- 3. Charts ---
+        initHeroChart(data);
+        initAllocationChart(data);
     }
 
     function formatCurrency(value) {
-        return new Intl.NumberFormat('zh-CN', { style: 'currency', currency: 'CNY' }).format(value);
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
     }
 
-    function initCharts(data) {
-        // Allocation Chart
-        const ctxAlloc = document.getElementById('allocationChart').getContext('2d');
-        
-        // Prepare allocation data
-        let allocLabels = [];
-        let allocValues = [];
-        if (data.allocation) {
-            allocLabels = Object.keys(data.allocation);
-            allocValues = Object.values(data.allocation);
-        } else {
-            // Fallback mock data if empty
-            allocLabels = ['Equity', 'Fixed Income', 'Cash', 'Alternative'];
-            allocValues = [60, 20, 10, 10];
-        }
+    // --- Chart Implementations ---
 
-        new Chart(ctxAlloc, {
-            type: 'doughnut',
-            data: {
-                labels: allocLabels,
-                datasets: [{
-                    data: allocValues,
-                    backgroundColor: [
-                        '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', 
-                        '#EC4899', '#6366F1', '#14B8A6', '#F43F5E'
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
+    function initHeroChart(data) {
+        const ctx = document.getElementById('networthHeroChart').getContext('2d');
 
-        // Trend Chart
-        const ctxTrend = document.getElementById('trendChart').getContext('2d');
-        
-        // Prepare trend data
-        let trendLabels = [];
-        let trendValues = [];
-        if (data.trend && data.trend.dates && data.trend.values) {
-            trendLabels = data.trend.dates;
-            trendValues = data.trend.values;
-        } else {
-             // Fallback mock data
-            trendLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-            trendValues = [100000, 102000, 101500, 105000, 108000, 110000];
-        }
+        // Mock Series Data similar to screenshot
+        const labels = Array.from({ length: 30 }, (_, i) => i);
+        const values = labels.map(i => 1200000 + (Math.sin(i / 3) * 50000) + (i * 2000));
 
-        new Chart(ctxTrend, {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(212, 175, 55, 0.4)'); // Gold low opacity
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+        new Chart(ctx, {
             type: 'line',
             data: {
-                labels: trendLabels,
+                labels: labels,
                 datasets: [{
-                    label: 'Portfolio Value',
-                    data: trendValues,
-                    borderColor: '#3B82F6',
+                    data: values,
+                    borderColor: '#D4AF37', // Brand Gold
+                    borderWidth: 2,
+                    backgroundColor: gradient,
+                    fill: true,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
                     tension: 0.4
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { enabled: true } },
+                scales: {
+                    x: { display: false },
+                    y: { display: false, min: Math.min(...values) * 0.99 } // Zoom in slightly
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
             }
+        });
+    }
+
+    function initAllocationChart(data) {
+        const ctx = document.getElementById('allocationDonutChart').getContext('2d');
+
+        const labels = ['Stocks', 'Bonds', 'Alternatives'];
+        const values = [60, 30, 10]; // Mocking 60/30/10 for strict visual matching first
+        const bgColors = ['#3B82F6', '#D4AF37', '#10B981']; // Blue, Gold, Green(ish) for now
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: bgColors,
+                    borderWidth: 0,
+                    cutout: '75%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }, // We use custom legend
+                    tooltip: { enabled: true }
+                }
+            }
+        });
+
+        // Generate Legend
+        const legendContainer = document.getElementById('allocation-legend');
+        legendContainer.innerHTML = '';
+        labels.forEach((label, index) => {
+            const item = document.createElement('div');
+            item.className = 'flex items-center text-xs font-medium text-gray-700';
+            item.innerHTML = `<span class="w-3 h-3 rounded-full mr-2" style="background-color: ${bgColors[index]}"></span> ${label}: ${values[index]}%`;
+            legendContainer.appendChild(item);
         });
     }
 </script>

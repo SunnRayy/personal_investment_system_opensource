@@ -1,0 +1,777 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Data Workbench') }} - WealthOS{% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <div class="page-header">
+        <div>
+            <h1>{{ _('Data Workbench') }}</h1>
+            <p class="subtitle">{{ _('Import, clean, and promote data to the production system.') }}</p>
+        </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tabs-container">
+        <div class="tabs-header">
+            <button id="stagingTab" onclick="switchMainTab('staging')" class="tab-btn active">
+                {{ _('Staging Area') }}
+            </button>
+            <button id="historyTab" onclick="switchMainTab('history')" class="tab-btn">
+                {{ _('Import History') }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Staging Area Content -->
+    <div id="stagingContent" class="tab-pane">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Left Panel: Upload & Actions -->
+            <div class="space-y-4">
+                <!-- Upload Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>{{ _('Import Data') }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="uploadForm" enctype="multipart/form-data" onsubmit="uploadFile(event)">
+                            <div class="mb-4">
+                                <label for="fileInput" class="form-label">{{ _('Select Excel/CSV File') }}</label>
+                                <input class="form-input" type="file" id="fileInput" name="file"
+                                    accept=".xlsx,.xls,.csv">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-full" id="uploadBtn">
+                                <svg class="animate-spin h-5 w-5 hidden" id="uploadSpinner"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
+                                </svg>
+                                <span>{{ _('Upload & Process') }}</span>
+                            </button>
+                        </form>
+                        <!-- Upload Result Info (Hidden by default) -->
+                        <div id="uploadResultInfo" class="mt-4 hidden">
+                            <div class="alert alert-info">
+                                <p class="font-medium">{{ _('Import Details') }}</p>
+                                <div class="mt-2 space-y-1">
+                                    <p><strong>{{ _('Source') }}:</strong> <span id="detectedSource">-</span> |
+                                        <strong>{{ _('Currency') }}:</strong> <span id="detectedCurrency">-</span>
+                                    </p>
+                                    <p><strong>{{ _('Imported') }}:</strong> <span id="detailTotalRows">-</span>
+                                        {{ _('rows') }}</p>
+                                    <p><strong>{{ _('Valid') }}:</strong> <span id="detailValidRows"
+                                            class="text-success">-</span> |
+                                        <strong>{{ _('Errors') }}:</strong> <span id="detailErrorRows"
+                                            class="text-danger">-</span> |
+                                        <strong>{{ _('Skipped') }}:</strong> <span id="detailSkippedRows"
+                                            class="text-muted">-</span>
+                                    </p>
+                                    <details class="mt-2">
+                                        <summary class="cursor-pointer text-primary">{{ _('Column Mapping') }}</summary>
+                                        <div id="columnMappingDetail" class="mt-2 p-3 rounded bg-primary-subtle"></div>
+                                    </details>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>{{ _('Actions') }}</h3>
+                    </div>
+                    <div class="card-body space-y-3">
+                        <button class="btn btn-success w-full" id="promoteBtn" onclick="promoteData()">
+                            {{ _('Promote Valid Records') }}
+                        </button>
+                        <button class="btn btn-danger w-full" id="clearBtn" onclick="clearData()">
+                            {{ _('Clear Staging Area') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Data Grid -->
+            <div class="md:col-span-2">
+                <div class="card" style="height: 100%; display: flex; flex-direction: column;">
+                    <div class="card-header">
+                        <h3>{{ _('Staging Data') }}</h3>
+                        <div class="flex gap-2">
+                            <span class="badge badge-neutral" id="totalCount">0 {{ _('Total') }}</span>
+                            <span class="badge badge-success" id="validCount">0 {{ _('Valid') }}</span>
+                            <span class="badge badge-danger" id="errorCount">0 {{ _('Errors') }}</span>
+                        </div>
+                    </div>
+                    <div style="flex: 1; overflow: auto; max-height: 70vh;">
+                        <!-- Batch Actions Bar (hidden by default) -->
+                        <div id="batchActionsBar" class="hidden alert alert-info mb-0 flex justify-between items-center"
+                            style="border-radius: 0;">
+                            <span id="selectedCountText" class="font-medium"
+                                data-selected-text="{{ _('rows selected') }}">0 {{ _('rows selected') }}</span>
+                            <div class="flex gap-2">
+                                <button onclick="openBatchResolveModal()" class="btn btn-primary btn-sm">
+                                    {{ _('Batch Resolve') }}
+                                </button>
+                                <button onclick="clearSelection()" class="btn btn-secondary btn-sm">
+                                    {{ _('Clear Selection') }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <table class="table" id="stagingTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;">
+                                        <input type="checkbox" id="selectAllCheckbox" onclick="toggleSelectAll()">
+                                    </th>
+                                    <th>{{ _('Status') }}</th>
+                                    <th>{{ _('Date') }}</th>
+                                    <th>{{ _('Asset ID') }}</th>
+                                    <th>{{ _('Type') }}</th>
+                                    <th class="text-right">{{ _('Amount') }}</th>
+                                    <th>{{ _('Errors') }}</th>
+                                    <th>{{ _('Actions') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stagingTableBody">
+                                <!-- Data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resolve Error Modal -->
+        <div id="resolveModal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="card-header">
+                    <h3>{{ _('Resolve Unknown Asset') }}</h3>
+                    <button onclick="closeResolveModal()" class="btn-icon">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs-container mb-0" style="padding: 0 var(--space-5);">
+                    <div class="tabs-header">
+                        <button id="mapTab" onclick="switchTab('map')" class="tab-btn active">
+                            {{ _('Map to Existing Asset') }}
+                        </button>
+                        <button id="createTab" onclick="switchTab('create')" class="tab-btn">
+                            {{ _('Create New Asset') }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Map to Existing -->
+                <div id="mapContent" class="card-body">
+                    <div class="mb-4">
+                        <label class="form-label">{{ _('Search for Asset') }}</label>
+                        <input type="text" id="assetSearchInput" class="form-input"
+                            placeholder="{{ _('Type asset name or ID...') }}" oninput="searchAssets(this.value)">
+                    </div>
+                    <div id="searchResults" class="card" style="max-height: 256px; overflow-y: auto;">
+                        <p class="text-muted p-4">{{ _('Start typing to search...') }}</p>
+                    </div>
+                    <div class="mt-4 flex justify-end">
+                        <button onclick="closeResolveModal()" class="btn btn-secondary">
+                            {{ _('Cancel') }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Create New -->
+                <div id="createContent" class="card-body hidden">
+                    <form id="createAssetForm" onsubmit="submitNewAsset(event)">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="form-label">{{ _('Asset Name') }} *</label>
+                                <input type="text" id="newAssetName" required class="form-input">
+                            </div>
+                            <div>
+                                <label class="form-label">{{ _('Asset Type') }} *</label>
+                                <select id="newAssetType" required class="form-select">
+                                    <option value="Stock">Stock</option>
+                                    <option value="Bond">Bond</option>
+                                    <option value="Fund">Fund</option>
+                                    <option value="ETF">ETF</option>
+                                    <option value="Crypto">Crypto</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">{{ _('Asset Class') }} ({{ _('Optional') }})</label>
+                                <input type="text" id="newAssetClass" class="form-input"
+                                    placeholder="e.g., Equity, Fixed_Income, Alternative">
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end gap-3">
+                            <button type="button" onclick="closeResolveModal()" class="btn btn-secondary">
+                                {{ _('Cancel') }}
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                {{ _('Create & Resolve') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import History Content (hidden by default) -->
+    <div id="historyContent" class="tab-pane hidden">
+        <div class="card">
+            <div class="card-header">
+                <h3>{{ _('Import History') }}</h3>
+            </div>
+            <div style="overflow: auto; max-height: 80vh;">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>{{ _('Batch ID') }}</th>
+                            <th>{{ _('Filename') }}</th>
+                            <th>{{ _('Uploaded') }}</th>
+                            <th class="text-center">{{ _('Total') }}</th>
+                            <th class="text-center">{{ _('Valid') }}</th>
+                            <th class="text-center">{{ _('Errors') }}</th>
+                            <th class="text-center">{{ _('Promoted') }}</th>
+                            <th>{{ _('Status') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Modal Overlay - specific to Data Workbench */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 100;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 80px;
+        overflow-y: auto;
+    }
+
+    .modal-content {
+        background: var(--bg-container);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        width: 100%;
+        max-width: 640px;
+        margin-bottom: var(--space-8);
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    /* Spinner animation */
+    .animate-spin {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Search result items */
+    .search-result-item {
+        padding: var(--space-3);
+        border-bottom: 1px solid var(--border-tertiary);
+        cursor: pointer;
+        transition: var(--transition-base);
+    }
+
+    .search-result-item:hover {
+        background: var(--bg-container-hover);
+    }
+
+    .search-result-item:last-child {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Inline JavaScript to ensure it loads and executes
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('Workbench initialized');
+        loadStagingData();
+    });
+
+    function switchMainTab(tab) {
+        const stagingTab = document.getElementById('stagingTab');
+        const historyTab = document.getElementById('historyTab');
+        const stagingContent = document.getElementById('stagingContent');
+        const historyContent = document.getElementById('historyContent');
+
+        if (tab === 'staging') {
+            stagingTab.classList.add('active');
+            historyTab.classList.remove('active');
+            stagingContent.classList.remove('hidden');
+            historyContent.classList.add('hidden');
+        } else {
+            historyTab.classList.add('active');
+            stagingTab.classList.remove('active');
+            historyContent.classList.remove('hidden');
+            stagingContent.classList.add('hidden');
+            loadImportHistory();
+        }
+    }
+
+    function loadImportHistory() {
+        fetch('/workbench/api/import-history')
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('historyTableBody');
+                if (!tbody) return;
+
+                tbody.innerHTML = '';
+
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">No import history</td></tr>';
+                    return;
+                }
+
+                data.forEach(record => {
+                    const tr = document.createElement('tr');
+
+                    const uploadDate = record.uploaded_at ? new Date(record.uploaded_at).toLocaleString() : '-';
+
+                    let statusBadge = 'badge-neutral';
+                    if (record.status === 'promoted') {
+                        statusBadge = 'badge-success';
+                    } else if (record.status === 'cleared') {
+                        statusBadge = 'badge-danger';
+                    } else if (record.status === 'uploaded') {
+                        statusBadge = 'badge-primary';
+                    }
+
+                    tr.innerHTML = `
+                        <td class="font-medium" style="font-family: var(--font-mono);">${record.batch_id}</td>
+                        <td>${record.filename || '-'}</td>
+                        <td class="text-muted">${uploadDate}</td>
+                        <td class="text-center">${record.total_rows}</td>
+                        <td class="text-center text-success">${record.valid_rows}</td>
+                        <td class="text-center text-danger">${record.error_rows}</td>
+                        <td class="text-center text-primary">${record.promoted_rows}</td>
+                        <td><span class="badge ${statusBadge}">${record.status}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(error => console.error('Error loading import history:', error));
+    }
+
+
+    function uploadFile(event) {
+        event.preventDefault();
+        console.log('Upload started');
+
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const spinner = document.getElementById('uploadSpinner');
+
+        if (!fileInput.files[0]) {
+            alert('Please select a file');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        uploadBtn.disabled = true;
+        if (spinner) spinner.classList.remove('hidden');
+
+        fetch('/workbench/upload', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Upload response:', data);
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    // Display success message
+                    alert(data.message);
+
+                    // Show upload result details
+                    displayUploadResults(data);
+
+                    // Reload staging data
+                    loadStagingData();
+                    fileInput.value = ''; // Clear input
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Upload failed: ' + error);
+            })
+            .finally(() => {
+                uploadBtn.disabled = false;
+                if (spinner) spinner.classList.add('hidden');
+            });
+    }
+
+    function displayUploadResults(data) {
+        const resultDiv = document.getElementById('uploadResultInfo');
+
+        // Populate fields
+        document.getElementById('detectedSource').textContent = data.file_source || 'unknown';
+        document.getElementById('detectedCurrency').textContent = data.detected_currency || 'N/A';
+        document.getElementById('detailTotalRows').textContent = data.total_rows || 0;
+        document.getElementById('detailValidRows').textContent = data.valid_rows || 0;
+        document.getElementById('detailErrorRows').textContent = data.error_rows || 0;
+        document.getElementById('detailSkippedRows').textContent = data.skipped_rows || 0;
+
+        // Display column mapping
+        const mappingDiv = document.getElementById('columnMappingDetail');
+        if (data.column_mapping && Object.keys(data.column_mapping).length > 0) {
+            let mappingHtml = '<ul style="list-style: disc; padding-left: 1.5rem;">';
+            for (const [standardField, actualColumn] of Object.entries(data.column_mapping)) {
+                mappingHtml += `<li><strong>${standardField}</strong> → ${actualColumn}</li>`;
+            }
+            mappingHtml += '</ul>';
+            mappingDiv.innerHTML = mappingHtml;
+        } else {
+            mappingDiv.innerHTML = '<p class="text-muted">No column mapping detected</p>';
+        }
+
+        // Show the results
+        resultDiv.classList.remove('hidden');
+    }
+
+    function promoteData() {
+        if (!confirm('Are you sure you want to promote all VALID records to production?')) return;
+
+        fetch('/workbench/api/promote', {
+            method: 'POST'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    alert(data.message);
+                    loadStagingData();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function clearData() {
+        if (!confirm('Are you sure you want to clear ALL staging data? This cannot be undone.')) return;
+
+        fetch('/workbench/api/clear', {
+            method: 'POST'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    loadStagingData();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function loadStagingData() {
+        fetch('/workbench/api/staging-data?t=' + new Date().getTime())
+            .then(response => response.json())
+            .then(data => {
+                console.log('Loaded data:', data);
+                const tbody = document.getElementById('stagingTableBody');
+                if (!tbody) return;
+
+                tbody.innerHTML = '';
+
+                let validCount = 0;
+                let errorCount = 0;
+
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">No data in staging</td></tr>';
+                }
+
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+
+                    let statusBadge = 'badge-neutral';
+                    if (row.status === 'VALID') {
+                        statusBadge = 'badge-success';
+                        validCount++;
+                    } else if (row.status === 'ERROR') {
+                        statusBadge = 'badge-danger';
+                        errorCount++;
+                    } else if (row.status === 'PROMOTED') {
+                        statusBadge = 'badge-primary';
+                    }
+
+
+                    // Add Resolve button for ERROR rows
+                    const actionButton = row.status === 'ERROR'
+                        ? `<button onclick="openResolveModal(${row.id}, '${row.asset_id || ''}')" class="btn btn-outline btn-sm">Resolve</button>`
+                        : '-';
+
+                    // Add checkbox for ERROR rows only
+                    const checkboxCell = row.status === 'ERROR'
+                        ? `<input type="checkbox" class="row-checkbox" data-id="${row.id}" onchange="toggleRowSelection(${row.id})">`
+                        : '';
+
+                    tr.innerHTML = `
+                        <td>${checkboxCell}</td>
+                        <td><span class="badge ${statusBadge}">${row.status}</span></td>
+                        <td class="text-muted">${row.date || '-'}</td>
+                        <td class="font-medium">${row.asset_id || '-'}</td>
+                        <td class="text-muted">${row.transaction_type || '-'}</td>
+                        <td class="text-right">${row.amount ? row.amount.toFixed(2) : '-'}</td>
+                        <td class="text-danger">${row.validation_errors ? row.validation_errors.join(', ') : ''}</td>
+                        <td>${actionButton}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById('totalCount').textContent = `${data.length} Total`;
+                document.getElementById('validCount').textContent = `${validCount} Valid`;
+                document.getElementById('errorCount').textContent = `${errorCount} Errors`;
+
+                // Reset selection after reload
+                selectedStagingIds.clear();
+                updateBatchActionsBar();
+            })
+            .catch(error => console.error('Error loading data:', error));
+    }
+
+    // Batch selection state
+    const selectedStagingIds = new Set();
+
+    function toggleRowSelection(id) {
+        if (selectedStagingIds.has(id)) {
+            selectedStagingIds.delete(id);
+        } else {
+            selectedStagingIds.add(id);
+        }
+        updateBatchActionsBar();
+        updateSelectAllCheckbox();
+    }
+
+    function toggleSelectAll() {
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+
+        rowCheckboxes.forEach(checkbox => {
+            const id = parseInt(checkbox.dataset.id);
+            if (selectAllCheckbox.checked) {
+                selectedStagingIds.add(id);
+                checkbox.checked = true;
+            } else {
+                selectedStagingIds.delete(id);
+                checkbox.checked = false;
+            }
+        });
+
+        updateBatchActionsBar();
+    }
+
+    function updateSelectAllCheckbox() {
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+        const allChecked = rowCheckboxes.length > 0 &&
+            Array.from(rowCheckboxes).every(cb => cb.checked);
+        selectAllCheckbox.checked = allChecked;
+    }
+
+    function updateBatchActionsBar() {
+        const bar = document.getElementById('batchActionsBar');
+        const countText = document.getElementById('selectedCountText');
+
+        if (selectedStagingIds.size > 0) {
+            bar.classList.remove('hidden');
+            countText.textContent = `${selectedStagingIds.size} row${selectedStagingIds.size > 1 ? 's' : ''} selected`;
+        } else {
+            bar.classList.add('hidden');
+        }
+    }
+
+    function clearSelection() {
+        selectedStagingIds.clear();
+        document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+        document.getElementById('selectAllCheckbox').checked = false;
+        updateBatchActionsBar();
+    }
+
+    function openBatchResolveModal() {
+        if (selectedStagingIds.size === 0) {
+            alert('Please select at least one row');
+            return;
+        }
+
+        // Use existing modal but flag it as batch mode
+        currentStagingId = Array.from(selectedStagingIds); // Store array instead of single ID
+        document.getElementById('resolveModal').classList.remove('hidden');
+        document.getElementById('assetSearchInput').focus();
+    }
+
+    // Modal state
+    let currentStagingId = null;
+
+    function openResolveModal(stagingId, currentAssetId) {
+        currentStagingId = stagingId;
+        document.getElementById('resolveModal').classList.remove('hidden');
+        document.getElementById('assetSearchInput').value = currentAssetId || '';
+        document.getElementById('assetSearchInput').focus();
+    }
+
+    function closeResolveModal() {
+        document.getElementById('resolveModal').classList.add('hidden');
+        currentStagingId = null;
+        document.getElementById('assetSearchInput').value = '';
+        document.getElementById('searchResults').innerHTML = '<p class="text-muted p-4">Start typing to search...</p>';
+        document.getElementById('createAssetForm').reset();
+    }
+
+    function switchTab(tab) {
+        const mapTab = document.getElementById('mapTab');
+        const createTab = document.getElementById('createTab');
+        const mapContent = document.getElementById('mapContent');
+        const createContent = document.getElementById('createContent');
+
+        if (tab === 'map') {
+            mapTab.classList.add('active');
+            createTab.classList.remove('active');
+            mapContent.classList.remove('hidden');
+            createContent.classList.add('hidden');
+        } else {
+            createTab.classList.add('active');
+            mapTab.classList.remove('active');
+            createContent.classList.remove('hidden');
+            mapContent.classList.add('hidden');
+        }
+    }
+
+    let searchTimeout;
+    function searchAssets(query) {
+        clearTimeout(searchTimeout);
+
+        if (!query || query.length < 2) {
+            document.getElementById('searchResults').innerHTML = '<p class="text-muted p-4">Start typing to search...</p>';
+            return;
+        }
+
+        searchTimeout = setTimeout(() => {
+            fetch(`/workbench/api/search-assets?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(assets => {
+                    const resultsDiv = document.getElementById('searchResults');
+                    if (assets.length === 0) {
+                        resultsDiv.innerHTML = '<p class="text-muted p-4">No assets found</p>';
+                    } else {
+                        resultsDiv.innerHTML = assets.map(asset => `
+                            <div class="search-result-item" onclick="selectAsset('${asset.asset_id}')">
+                                <div class="font-medium">${asset.asset_name}</div>
+                                <div class="text-muted" style="font-size: 0.875rem;">ID: ${asset.asset_id} | Type: ${asset.asset_type || 'N/A'}</div>
+                            </div>
+                        `).join('');
+                    }
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    document.getElementById('searchResults').innerHTML = '<p class="text-danger p-4">Error searching assets</p>';
+                });
+        }, 300);
+    }
+
+    function selectAsset(assetId) {
+        if (!currentStagingId) return;
+
+        // Check if batch mode (currentStagingId is an array)
+        const isBatchMode = Array.isArray(currentStagingId);
+        const endpoint = isBatchMode ? '/workbench/api/batch-resolve-error' : '/workbench/api/resolve-error';
+        const payload = isBatchMode
+            ? { staging_ids: currentStagingId, asset_id: assetId }
+            : { staging_id: currentStagingId, asset_id: assetId };
+
+        fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    const message = isBatchMode
+                        ? `Successfully resolved ${data.updated_count} records!`
+                        : 'Error resolved successfully!';
+                    alert(message);
+                    closeResolveModal();
+                    loadStagingData();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to resolve error');
+            });
+    }
+
+    function submitNewAsset(event) {
+        event.preventDefault();
+
+        if (!currentStagingId) return;
+
+        const name = document.getElementById('newAssetName').value.trim();
+        const type = document.getElementById('newAssetType').value;
+        const assetClass = document.getElementById('newAssetClass').value.trim();
+
+        fetch('/workbench/api/create-asset', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                staging_id: currentStagingId,
+                asset_name: name,
+                asset_type: type,
+                asset_class: assetClass
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    alert('Asset created and error resolved successfully!');
+                    closeResolveModal();
+                    loadStagingData();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to create asset');
+            });
+    }
+</script>
+{% endblock %}

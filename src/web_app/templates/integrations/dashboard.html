@@ -1,152 +1,150 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Data Integrations') }}{% endblock %}
+{% block title %}{{ _('Data Integrations') }} - WealthOS{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
+<div class="page-content">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="page-header">
         <div>
-            <h1 class="h3 mb-0">{{ _('Data Integrations') }}</h1>
-            <p class="text-muted mb-0">{{ _('Manage your connected data sources') }}</p>
+            <h1 class="page-title">{{ _('Data Integrations') }}</h1>
+            <p class="text-secondary">{{ _('Manage your connected data sources') }}</p>
         </div>
-        <div>
-            <form action="{{ url_for('integrations.sync_all') }}" method="post" class="d-inline">
+        <div class="flex gap-2">
+            <form action="{{ url_for('integrations.sync_all') }}" method="post" class="inline">
                 <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-arrow-repeat"></i> {{ _('Sync All') }}
+                    <i class="fa-solid fa-rotate"></i> {{ _('Sync All') }}
                 </button>
             </form>
-            <a href="{{ url_for('integrations.settings') }}" class="btn btn-outline-secondary ms-2">
-                <i class="bi bi-gear"></i> {{ _('Settings') }}
+            <a href="{{ url_for('integrations.settings') }}" class="btn btn-secondary">
+                <i class="fa-solid fa-gear"></i> {{ _('Settings') }}
             </a>
         </div>
     </div>
 
     <!-- Quick Actions -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body text-center py-4">
-                    <div class="rounded-circle bg-warning bg-opacity-10 d-inline-flex p-3 mb-3">
-                        <i class="bi bi-currency-bitcoin text-warning fs-3"></i>
-                    </div>
-                    <h5>{{ _('Crypto Exchanges') }}</h5>
-                    <p class="text-muted small mb-3">{{ _('Connect Binance, Coinbase, Kraken, and more') }}</p>
-                    <a href="{{ url_for('integrations.crypto_exchanges') }}" class="btn btn-outline-warning btn-sm">
-                        {{ _('Manage') }} <i class="bi bi-chevron-right"></i>
-                    </a>
-                </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Crypto -->
+        <div class="card p-6 flex flex-col items-center text-center">
+            <div class="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center mb-4 text-yellow-600">
+                <i class="fa-brands fa-bitcoin text-xl"></i>
             </div>
+            <h3 class="text-lg font-semibold mb-2">{{ _('Crypto Exchanges') }}</h3>
+            <p class="text-secondary text-sm mb-4">{{ _('Connect Binance, Coinbase, Kraken, and more') }}</p>
+            <a href="{{ url_for('integrations.crypto_exchanges') }}" class="btn btn-sm btn-outline-warning">
+                {{ _('Manage') }} <i class="fa-solid fa-chevron-right ml-1"></i>
+            </a>
         </div>
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body text-center py-4">
-                    <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex p-3 mb-3">
-                        <i class="bi bi-bank text-success fs-3"></i>
-                    </div>
-                    <h5>{{ _('Brokers') }}</h5>
-                    <p class="text-muted small mb-3">{{ _('Connect Schwab, Interactive Brokers') }}</p>
-                    <a href="{{ url_for('integrations.brokers') }}" class="btn btn-outline-success btn-sm">
-                        {{ _('Manage') }} <i class="bi bi-chevron-right"></i>
-                    </a>
-                </div>
+
+        <!-- Brokers -->
+        <div class="card p-6 flex flex-col items-center text-center">
+            <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center mb-4 text-green-600">
+                <i class="fa-solid fa-landmark text-xl"></i>
             </div>
+            <h3 class="text-lg font-semibold mb-2">{{ _('Brokers') }}</h3>
+            <p class="text-secondary text-sm mb-4">{{ _('Connect Schwab, Interactive Brokers') }}</p>
+            <a href="{{ url_for('integrations.brokers') }}" class="btn btn-sm btn-outline-success">
+                {{ _('Manage') }} <i class="fa-solid fa-chevron-right ml-1"></i>
+            </a>
         </div>
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body text-center py-4">
-                    <div class="rounded-circle bg-info bg-opacity-10 d-inline-flex p-3 mb-3">
-                        <i class="bi bi-clock-history text-info fs-3"></i>
-                    </div>
-                    <h5>{{ _('Import History') }}</h5>
-                    <p class="text-muted small mb-3">{{ _('View past sync operations and logs') }}</p>
-                    <a href="{{ url_for('integrations.import_history') }}" class="btn btn-outline-info btn-sm">
-                        {{ _('View') }} <i class="bi bi-chevron-right"></i>
-                    </a>
-                </div>
+
+        <!-- History -->
+        <div class="card p-6 flex flex-col items-center text-center">
+            <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mb-4 text-blue-600">
+                <i class="fa-solid fa-clock-rotate-left text-xl"></i>
             </div>
+            <h3 class="text-lg font-semibold mb-2">{{ _('Import History') }}</h3>
+            <p class="text-secondary text-sm mb-4">{{ _('View past sync operations and logs') }}</p>
+            <a href="{{ url_for('integrations.import_history') }}" class="btn btn-sm btn-outline-primary">
+                {{ _('View') }} <i class="fa-solid fa-chevron-right ml-1"></i>
+            </a>
         </div>
     </div>
 
     <!-- Connected Sources -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-transparent border-0">
-            <h5 class="mb-0">{{ _('Connected Sources') }}</h5>
+    <div class="card">
+        <div class="card-header border-b border-gray-100 p-4">
+            <h3 class="text-lg font-semibold">{{ _('Connected Sources') }}</h3>
         </div>
-        <div class="card-body p-0">
+        <div class="table-responsive">
             {% if sources %}
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>{{ _('Source') }}</th>
-                            <th>{{ _('Type') }}</th>
-                            <th>{{ _('Status') }}</th>
-                            <th>{{ _('Last Sync') }}</th>
-                            <th>{{ _('Records') }}</th>
-                            <th class="text-end">{{ _('Actions') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for source in sources %}
-                        <tr>
-                            <td>
-                                <strong>{{ source.name }}</strong>
-                            </td>
-                            <td>
-                                {% if source.type == 'crypto' %}
-                                <span class="badge bg-warning text-dark">{{ _('Crypto') }}</span>
-                                {% elif source.type == 'broker' %}
-                                <span class="badge bg-success">{{ _('Broker') }}</span>
-                                {% else %}
-                                <span class="badge bg-secondary">{{ source.type }}</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if source.status == 'connected' %}
-                                <span class="text-success"><i class="bi bi-check-circle-fill"></i> {{ _('Connected')
-                                    }}</span>
-                                {% elif source.status == 'error' %}
-                                <span class="text-danger"><i class="bi bi-x-circle-fill"></i> {{ _('Error') }}</span>
-                                {% else %}
-                                <span class="text-muted"><i class="bi bi-dash-circle"></i> {{ source.status }}</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if source.last_sync %}
-                                {{ source.last_sync.strftime('%Y-%m-%d %H:%M') }}
-                                {% else %}
-                                <span class="text-muted">{{ _('Never') }}</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ source.records or 0 }}</td>
-                            <td class="text-end">
-                                <form
-                                    action="{{ url_for('integrations.sync_' + source.type + '_exchange' if source.type == 'crypto' else 'integrations.sync_broker', **{('exchange_id' if source.type == 'crypto' else 'broker_id'): source.id}) }}"
-                                    method="post" class="d-inline">
-                                    <button type="submit" class="btn btn-sm btn-outline-primary"
-                                        title="{{ _('Sync Now') }}">
-                                        <i class="bi bi-arrow-repeat"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            <table class="table w-full">
+                <thead>
+                    <tr>
+                        <th class="text-left py-3 px-4">{{ _('Source') }}</th>
+                        <th class="text-left py-3 px-4">{{ _('Type') }}</th>
+                        <th class="text-left py-3 px-4">{{ _('Status') }}</th>
+                        <th class="text-left py-3 px-4">{{ _('Last Sync') }}</th>
+                        <th class="text-left py-3 px-4">{{ _('Records') }}</th>
+                        <th class="text-right py-3 px-4">{{ _('Actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for source in sources %}
+                    <tr class="border-t border-gray-50 hover:bg-gray-50">
+                        <td class="py-3 px-4 font-medium text-gray-900">{{ source.name }}</td>
+                        <td class="py-3 px-4">
+                            {% if source.type == 'crypto' %}
+                            <span class="badge bg-yellow-100 text-yellow-800">{{ _('Crypto') }}</span>
+                            {% elif source.type == 'broker' %}
+                            <span class="badge bg-green-100 text-green-800">{{ _('Broker') }}</span>
+                            {% else %}
+                            <span class="badge bg-gray-100 text-gray-800">{{ source.type }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4">
+                            {% if source.status == 'connected' %}
+                            <span class="flex items-center text-green-600 text-sm">
+                                <i class="fa-solid fa-circle-check mr-2"></i> {{ _('Connected') }}
+                            </span>
+                            {% elif source.status == 'error' %}
+                            <span class="flex items-center text-red-600 text-sm">
+                                <i class="fa-solid fa-circle-xmark mr-2"></i> {{ _('Error') }}
+                            </span>
+                            {% else %}
+                            <span class="flex items-center text-gray-500 text-sm">
+                                <i class="fa-solid fa-circle-minus mr-2"></i> {{ source.status }}
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4 text-sm text-gray-600">
+                            {% if source.last_sync %}
+                            {{ source.last_sync.strftime('%Y-%m-%d %H:%M') }}
+                            {% else %}
+                            <span class="text-gray-400">{{ _('Never') }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4 text-sm text-gray-600">{{ source.records or 0 }}</td>
+                        <td class="py-3 px-4 text-right">
+                            <form
+                                action="{{ url_for('integrations.sync_' + source.type + '_exchange' if source.type == 'crypto' else 'integrations.sync_broker', **{('exchange_id' if source.type == 'crypto' else 'broker_id'): source.id}) }}"
+                                method="post" class="inline">
+                                <button type="submit" class="btn btn-sm btn-outline-primary"
+                                    title="{{ _('Sync Now') }}">
+                                    <i class="fa-solid fa-rotate"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
             {% else %}
-            <div class="text-center py-5">
-                <i class="bi bi-plug text-muted" style="font-size: 3rem;"></i>
-                <p class="mt-3 text-muted">{{ _('No data sources connected yet') }}</p>
-                <p class="small text-muted mb-4">{{ _('Connect your first data source to start syncing automatically')
-                    }}</p>
-                <a href="{{ url_for('integrations.crypto_exchanges') }}" class="btn btn-primary me-2">
-                    {{ _('Connect Crypto Exchange') }}
-                </a>
-                <a href="{{ url_for('integrations.brokers') }}" class="btn btn-outline-primary">
-                    {{ _('Connect Broker') }}
-                </a>
+            <div class="text-center py-12">
+                <div class="text-gray-300 mb-4">
+                    <i class="fa-solid fa-plug text-4xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">{{ _('No data sources connected yet') }}</h3>
+                <p class="text-secondary mb-6">{{ _('Connect your first data source to start syncing automatically') }}
+                </p>
+                <div class="flex justify-center gap-4">
+                    <a href="{{ url_for('integrations.crypto_exchanges') }}" class="btn btn-primary">
+                        {{ _('Connect Crypto Exchange') }}
+                    </a>
+                    <a href="{{ url_for('integrations.brokers') }}" class="btn btn-secondary">
+                        {{ _('Connect Broker') }}
+                    </a>
+                </div>
             </div>
             {% endif %}
         </div>

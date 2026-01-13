@@ -9,11 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **UX/UI Redesign (Phase 1)**:
+- **UX/UI Redesign (Phase 1-4, 7)**:
   - **Design System**: Created `design-tokens.css` with SunnRayy palette (Champagne Gold + Tech Blue) and Inter font.
   - **Components**: Added reusable Jinja2 macros (Buttons, Badges, Metrics, Alerts) in `src/web_app/templates/macros/components.html`.
   - **Layout**: Complete rewrite of `base.html` featuring a modern Sidebar navigation and responsive Top Bar.
   - **Verification**: Added temporary `/test-components` route to verify UI elements.
+  - **Data Workbench Wizard**: Multi-step import wizard UI with 5-step flow (Select Type → Upload → Map → Validate → Publish).
+  - **CSS Utilities**: Added 140+ utility classes to `style.css` for SunnRayy design system (colors, borders, spacing, responsive grid).
+  - **SPA Architecture (Phase 7)**: React/Vite-based Single Page Application structure.
+    - Project setup with `vite.config.ts`, TypeScript, and `react-router-dom`.
+    - Unified types in `src/types/index.ts`.
+    - Migrated pages: `Dashboard.tsx`, `DataWorkbench.tsx`, `Portfolio.tsx`.
+    - Reusable `Layout.tsx` with sidebar navigation.
+
+### Fixed
+
+- **Portfolio Report Charts**: Resolved `Chart is not defined` error by moving chart scripts to `{% block scripts %}` (loads after Chart.js library).
+- **Translation Format Error**: Fixed "incomplete format" 500 error by moving `%` outside `_()` translation calls.
+- **Report Loading Performance**: Identified SARIMA forecast as performance bottleneck causing multi-minute load times. Disabled synchronous forecast generation in `wealth_service.py` to restore fast report loading.
 
 - **Automated Data Integrations**: API-based portfolio sync replacing manual Excel/CSV workflows
   - **Base Connector Framework** (`src/data_manager/connectors/`)

@@ -1,98 +1,97 @@
 {% extends "base.html" %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ title }} - WealthOS{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <!-- Header -->
-            <nav aria-label="breadcrumb" class="mb-3">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('integrations.dashboard') }}">{{ _('Integrations')
-                            }}</a></li>
-                    <li class="breadcrumb-item"><a href="{{ url_for('integrations.crypto_exchanges') }}">{{ _('Crypto')
-                            }}</a></li>
-                    <li class="breadcrumb-item active">{{ _('Connect') }}</li>
-                </ol>
-            </nav>
+<div class="page-content">
+    <div class="max-w-2xl mx-auto">
+        <!-- Breadcrumb -->
+        <nav class="flex text-sm text-secondary mb-4">
+            <a href="{{ url_for('integrations.dashboard') }}" class="hover:text-primary transition-colors">{{
+                _('Integrations') }}</a>
+            <span class="mx-2">/</span>
+            <a href="{{ url_for('integrations.crypto_exchanges') }}" class="hover:text-primary transition-colors">{{
+                _('Crypto') }}</a>
+            <span class="mx-2">/</span>
+            <span class="text-gray-900 font-medium">{{ _('Connect') }}</span>
+        </nav>
 
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-transparent border-0 pb-0">
-                    <div class="d-flex align-items-center">
-                        <div class="rounded-circle bg-warning bg-opacity-10 p-2 me-3">
-                            <i class="bi bi-currency-exchange text-warning fs-5"></i>
-                        </div>
-                        <div>
-                            <h4 class="mb-0">{{ _('Connect %(exchange)s', exchange=exchange_info.name) }}</h4>
-                            <p class="text-muted small mb-0">{{ _('Enter your API credentials') }}</p>
-                        </div>
-                    </div>
+        <div class="card p-8">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center mr-4 text-yellow-600">
+                    <i class="fa-solid fa-coins text-xl"></i>
                 </div>
-                <div class="card-body pt-4">
-                    <form method="post">
-                        <div class="mb-3">
-                            <label for="api_key" class="form-label">{{ _('API Key') }} <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="api_key" name="api_key" required
-                                placeholder="{{ _('Enter your API key') }}">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="api_secret" class="form-label">{{ _('API Secret') }} <span
-                                    class="text-danger">*</span></label>
-                            <input type="password" class="form-control" id="api_secret" name="api_secret" required
-                                placeholder="{{ _('Enter your API secret') }}">
-                        </div>
-
-                        {% if exchange_info.requires_password %}
-                        <div class="mb-3">
-                            <label for="password" class="form-label">{{ _('API Passphrase') }} <span
-                                    class="text-danger">*</span></label>
-                            <input type="password" class="form-control" id="password" name="password" required
-                                placeholder="{{ _('Enter your API passphrase') }}">
-                            <div class="form-text">{{ _('Required by %(exchange)s for additional security',
-                                exchange=exchange_info.name) }}</div>
-                        </div>
-                        {% endif %}
-
-                        <div class="alert alert-info mb-4">
-                            <i class="bi bi-lightbulb me-2"></i>
-                            {{ exchange_info.notes }}
-                            {% if exchange_info.docs_url %}
-                            <br><a href="{{ exchange_info.docs_url }}" target="_blank" class="alert-link">
-                                {{ _('View API setup guide') }} <i class="bi bi-box-arrow-up-right"></i>
-                            </a>
-                            {% endif %}
-                        </div>
-
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary flex-grow-1">
-                                <i class="bi bi-plug"></i> {{ _('Connect Exchange') }}
-                            </button>
-                            <a href="{{ url_for('integrations.crypto_exchanges') }}" class="btn btn-outline-secondary">
-                                {{ _('Cancel') }}
-                            </a>
-                        </div>
-                    </form>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">{{ _('Connect %(exchange)s',
+                        exchange=exchange_info.name) }}</h1>
+                    <p class="text-secondary">{{ _('Enter your API credentials') }}</p>
                 </div>
             </div>
 
-            <!-- Security Note -->
-            <div class="card border-0 bg-light mt-4">
-                <div class="card-body">
-                    <div class="d-flex">
-                        <i class="bi bi-shield-check text-success fs-4 me-3"></i>
-                        <div>
-                            <h6>{{ _('Security Best Practices') }}</h6>
-                            <ul class="small text-muted mb-0 ps-3">
-                                <li>{{ _('Use read-only API keys (no trading/withdrawal permissions)') }}</li>
-                                <li>{{ _('Enable IP whitelist if your exchange supports it') }}</li>
-                                <li>{{ _('Your credentials are encrypted before storage') }}</li>
-                                <li>{{ _('You can disconnect at any time') }}</li>
-                            </ul>
+            <form method="post" class="space-y-6">
+                <div>
+                    <label for="api_key" class="form-label">{{ _('API Key') }} <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" class="form-input w-full" id="api_key" name="api_key" required
+                        placeholder="{{ _('Enter your API key') }}">
+                </div>
+
+                <div>
+                    <label for="api_secret" class="form-label">{{ _('API Secret') }} <span
+                            class="text-red-500">*</span></label>
+                    <input type="password" class="form-input w-full" id="api_secret" name="api_secret" required
+                        placeholder="{{ _('Enter your API secret') }}">
+                </div>
+
+                {% if exchange_info.requires_password %}
+                <div>
+                    <label for="password" class="form-label">{{ _('API Passphrase') }} <span
+                            class="text-red-500">*</span></label>
+                    <input type="password" class="form-input w-full" id="password" name="password" required
+                        placeholder="{{ _('Enter your API passphrase') }}">
+                    <p class="text-xs text-secondary mt-1">{{ _('Required by %(exchange)s for additional security',
+                        exchange=exchange_info.name) }}</p>
+                </div>
+                {% endif %}
+
+                <div class="bg-blue-50 border border-blue-100 rounded-lg p-4 flex items-start">
+                    <i class="fa-solid fa-lightbulb text-blue-500 mt-1 mr-3 flex-shrink-0"></i>
+                    <div class="text-sm text-blue-800">
+                        {{ exchange_info.notes }}
+                        {% if exchange_info.docs_url %}
+                        <div class="mt-2">
+                            <a href="{{ exchange_info.docs_url }}" target="_blank" class="font-medium hover:underline">
+                                {{ _('View API setup guide') }} <i
+                                    class="fa-solid fa-arrow-up-right-from-square ml-1 text-xs"></i>
+                            </a>
                         </div>
+                        {% endif %}
                     </div>
+                </div>
+
+                <div class="flex gap-4 pt-2">
+                    <button type="submit" class="btn btn-primary flex-grow justify-center">
+                        <i class="fa-solid fa-plug mr-2"></i> {{ _('Connect Exchange') }}
+                    </button>
+                    <a href="{{ url_for('integrations.crypto_exchanges') }}" class="btn btn-secondary">
+                        {{ _('Cancel') }}
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Security Note -->
+        <div class="card bg-gray-50 border border-gray-100 p-6 mt-6">
+            <div class="flex">
+                <i class="fa-solid fa-shield-halved text-green-600 text-xl mr-3 flex-shrink-0"></i>
+                <div>
+                    <h6 class="font-semibold text-gray-900 mb-2">{{ _('Security Best Practices') }}</h6>
+                    <ul class="text-sm text-gray-600 list-disc ml-4 space-y-1">
+                        <li>{{ _('Use read-only API keys (no trading/withdrawal permissions)') }}</li>
+                        <li>{{ _('Enable IP whitelist if your exchange supports it') }}</li>
+                        <li>{{ _('Your credentials are encrypted before storage') }}</li>
+                        <li>{{ _('You can disconnect at any time') }}</li>
+                    </ul>
                 </div>
             </div>
         </div>

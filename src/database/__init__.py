@@ -26,7 +26,7 @@ from .models import (
     InsurancePremium,
     MarketDataNAV,
 )
-from .staging_models import StagingTransaction, ImportHistory
+from .staging_models import StagingTransaction, ImportHistory, ImportSession
 from .logic_models import Taxonomy, Tag, AssetTag, CalculationStrategy, ClassificationRule, RiskProfile, TargetAllocation
 
 __all__ = [
@@ -57,6 +57,7 @@ __all__ = [
     'ConfigHistory',
     'StagingTransaction',
     'ImportHistory',
+    'ImportSession',
     # Logic Layer models
     'Taxonomy',
     'Tag',

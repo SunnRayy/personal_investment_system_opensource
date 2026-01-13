@@ -538,26 +538,30 @@ class WealthService:
     def _generate_forecast_data(self) -> Dict[str, Any]:
         """
         Generate 12-month financial forecast using SARIMA.
+        DISABLED for performance. Returns empty structure or placeholder.
         """
         try:
-            from src.financial_analysis.cash_flow_forecaster import CashFlowForecaster
-            forecaster = CashFlowForecaster(self.analyzer.data_manager)
-            forecaster.fetch_and_process_historical_data()
-            forecaster.fit_sarima_models(seasonal_period=12)
-            forecast_df = forecaster.forecast(periods=12, alpha=0.10)
+            # from src.financial_analysis.cash_flow_forecaster import CashFlowForecaster
+            # forecaster = CashFlowForecaster(self.analyzer.data_manager)
+            # forecaster.fetch_and_process_historical_data()
+            # forecaster.fit_sarima_models(seasonal_period=12)
+            # forecast_df = forecaster.forecast(periods=12, alpha=0.10)
             
-            # Formatting dates for labels
-            dates = [d.strftime('%Y-%m') for d in forecast_df.index]
+            # # Formatting dates for labels
+            # dates = [d.strftime('%Y-%m') for d in forecast_df.index]
             
-            return {
-                'labels': dates,
-                'income': forecast_df['Income_Forecast'].round(0).tolist(),
-                'expense': forecast_df['Expenses_Forecast'].round(0).tolist(),
-                'investment': forecast_df['Investment_Forecast'].round(0).tolist(),
-                'net_cf': forecast_df['Net_Cash_Flow_Forecast'].round(0).tolist(),
-                'income_ci': [forecast_df['Income_Lower_CI'].round(0).tolist(), forecast_df['Income_Upper_CI'].round(0).tolist()],
-                'expense_ci': [forecast_df['Expenses_Lower_CI'].round(0).tolist(), forecast_df['Expenses_Upper_CI'].round(0).tolist()]
-            }
+            # return {
+            #     'labels': dates,
+            #     'income': forecast_df['Income_Forecast'].round(0).tolist(),
+            #     'expense': forecast_df['Expenses_Forecast'].round(0).tolist(),
+            #     'investment': forecast_df['Investment_Forecast'].round(0).tolist(),
+            #     'net_cf': forecast_df['Net_Cash_Flow_Forecast'].round(0).tolist(),
+            #     'income_ci': [forecast_df['Income_Lower_CI'].round(0).tolist(), forecast_df['Income_Upper_CI'].round(0).tolist()],
+            #     'expense_ci': [forecast_df['Expenses_Lower_CI'].round(0).tolist(), forecast_df['Expenses_Upper_CI'].round(0).tolist()]
+            # }
+            
+            logger.info("Forecast generation skipped for performance.")
+            return {} # Return empty dict to indicate no forecast available
         except Exception as e:
             logger.error(f"Error generating forecast: {e}")
             return {'error': str(e)}

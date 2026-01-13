@@ -2,44 +2,65 @@
 
 > This file tracks current development progress and provides context for session handoffs or context window refreshes.
 
-## Current Status - 2026-01-11
+## Current Status - 2026-01-13
 
-### Active Work: UX/UI Redesign (Phase 1 Complete)
+### Active Work: UX/UI Redesign (WIP - Blocked on Workflow Issues)
 
-**Status**: Design System Foundation established. Ready to start Phase 2 (Dashboard).
+**Status**: Phase 1-4 complete. Phase 7 (SPA Refactor) complete. **BLOCKED** on mockup-to-implementation workflow.
 
 ### Completed (This Session)
 
-- **Phase 1: Design System Foundation**:
-  - Created `design-tokens.css` with SunnRayy palette.
-  - Implemented Sidebar layout in `base.html`.
-  - Created reusable component macros.
-  - Verified visual implementation with `/test-components` page.
+- **SPA Architecture Refactor (Phase 7)**:
+  - Created React SPA structure with Vite (`src/components/`, `src/pages/`, `src/types/`).
+  - Migrated templates to React: `Dashboard.tsx`, `DataWorkbench.tsx`, `Portfolio.tsx`.
+  - Unified TypeScript types in `src/types/index.ts`.
+  - Configured routing with `react-router-dom` in `App.tsx`.
 
-### Known Issues
+- **Template Migrations**:
+  - Cashflow report Tailwind → SunnRayy CSS migration complete.
+  - Data Workbench Import Wizard UI implemented (wizard.html, wizard.css).
 
-- Logic Studio layout is legacy (will be updated in Phase 2).
-- Dashboard charts use old colors (will be updated in Phase 2).
+- **Report Performance Fixes**:
+  - SARIMA forecast disabled in both `wealth_service.py` and `real_report.py`.
+
+### Current Blockers
+
+#### CRITICAL: Redesign Workflow Not Working
+
+- **Issue**: Mockup designs do not translate cleanly to implementation.
+- **Root Cause**: WealthOS templates reference data props (VIX, Treasury rates, etc.) not available in backend.
+- **Example**: Compass report redesign failed with 500 errors due to Jinja2/Markup incompatibilities.
+- **Documentation**: See `docs/ux-ui-redesign/post-mortem-2026-01-13.md`
+
+#### Visuals Not Matching Mockups
+
+- **Gap**: Converted templates look different from WealthOS mockups.
+- **Reasons**:
+  1. Missing data fields require placeholder/fallback handling.
+  2. CSS class translations from Tailwind to SunnRayy incomplete.
+  3. Flask template caching prevents rapid iteration.
 
 ### Files Modified (This Session)
 
 ```
-src/web_app/static/css/design-tokens.css  # [NEW]
-src/web_app/static/css/style.css          # [MOD] Imported tokens, layout styles
-src/web_app/templates/base.html           # [MOD] Sidebar layout
-src/web_app/templates/macros/components.html # [NEW]
-src/web_app/templates/test_components.html   # [NEW]
-src/web_app/blueprints/main/routes.py     # [MOD] Added test route
-docs/design-framework.md                  # [NEW] Specs
-docs/ux-ui-redesign/                      # [NEW] Plan docs
+src/pages/*.tsx                # [NEW] React page components
+src/components/*.tsx           # [NEW] Reusable React components
+src/App.tsx, src/main.tsx      # [NEW] SPA routing and entry point
+vite.config.ts, package.json   # [NEW] Build configuration
+docs/ux-ui-redesign/task_plan.md  # [MOD] Updated blockers
+docs/ux-ui-redesign/post-mortem-2026-01-13.md # [NEW] Incident documentation
 ```
 
 ### Next Steps
 
-1. **Commit Phase 1**: Feature branch `feature/ux-ui-redesign`.
-2. **Phase 2 Execution**: Redesign Dashboard and Wealth Overview.
+1. **SDM Review**: Get Principal SDM review on mockup-to-implementation process.
+2. **Define Data Contract**: Align mockup data requirements with backend capabilities.
+3. **Template Caching**: Implement Flask template auto-reload in dev mode.
+4. **Resume Migrations**: After workflow fixed, continue Compass/Simulation reports.
 
 ### Important Context
 
-- **Branch Strategy**: `feature/ux-ui-redesign` will NOT be merged to `main` until entire redesign is complete.
-- **Visuals**: SunnRayy palette (Gold/Blue) is now the single source of truth in `design-tokens.css`.
+- **SPA available at**: `npm run dev` (Vite dev server on localhost:5173).
+- **Flask backend**: Still required for API endpoints (`python main.py run-web --port 5001`).
+- **Mockup source**: `templates/wealthos-*/` folders contain reference HTML.
+- **SunnRayy Design System**: CSS in `design-tokens.css` and `style.css`.

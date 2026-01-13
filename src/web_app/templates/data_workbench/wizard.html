@@ -1,0 +1,614 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Import Wizard') }} - WealthOS{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/wizard.css') }}">
+
+<div class="page-content wizard-container">
+    <input type="hidden" id="importSessionId" value="">
+    <input type="hidden" id="currentStep" value="1">
+
+    <!-- STEP 1: SELECTION SCREEN -->
+    <div id="step1" class="wizard-panel">
+        <div class="wizard-header">
+            <h1 class="wizard-title-lg">{{ _('Data Workbench') }}</h1>
+            <p class="wizard-subtitle">{{ _('Choose data to import into your portfolio') }}</p>
+        </div>
+
+        <div class="option-grid">
+            <!-- Pending Import (Yellow Card) -->
+            <div class="option-card pending" onclick="resumePendingImport()">
+                <div class="pending-badge">{{ _('Pending') }}</div>
+                <div class="card-icon-wrapper">
+                    <i class="fas fa-history"></i>
+                </div>
+                <div class="card-content">
+                    <h3>{{ _('Resume pending import') }}</h3>
+                    <p>{{ _('Continue your last import session exactly where you left off.') }}</p>
+                </div>
+            </div>
+
+            <!-- Transactions -->
+            <div class="option-card standard" onclick="selectImportType('transactions', this)">
+                <div class="card-icon-wrapper">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="card-content">
+                    <h3>{{ _('Import Transactions') }}</h3>
+                    <p>{{ _('Upload trade logs via CSV or connect directly to broker APIs.') }}</p>
+                </div>
+            </div>
+
+            <!-- Holdings -->
+            <div class="option-card standard" onclick="selectImportType('holdings', this)">
+                <div class="card-icon-wrapper">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="card-content">
+                    <h3>{{ _('Import Holdings') }}</h3>
+                    <p>{{ _('Update current portfolio positions, real estate, and private equity.') }}</p>
+                </div>
+            </div>
+
+            <!-- Accounts -->
+            <div class="option-card standard" onclick="selectImportType('accounts', this)">
+                <div class="card-icon-wrapper">
+                    <i class="fas fa-university"></i>
+                </div>
+                <div class="card-content">
+                    <h3>{{ _('Import Accounts') }}</h3>
+                    <p>{{ _('Bulk configure multiple banking and custodial accounts.') }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: var(--space-8);">
+            <a href="#"
+                style="color: var(--wizard-text-sub); font-size: 0.875rem; display: inline-flex; align-items: center; gap: 6px;">
+                <i class="far fa-question-circle"></i> {{ _('Need help with data formats? View Documentation') }}
+            </a>
+        </div>
+    </div>
+
+    <!-- WIZARD FLOW CONTAINER (Steps 2-5) -->
+    <div id="wizard-flow" class="hidden">
+
+        <!-- Progress Line Tracker -->
+        <div class="progress-container">
+            <div class="progress-line-bg"></div>
+            <div class="progress-line-active" id="progressLineActive" style="width: 0%;"></div>
+
+            <div class="progress-steps">
+                <!-- Step 1 (Source) -->
+                <div class="progress-step completed">
+                    <div class="step-circle"><i class="fas fa-check"></i></div>
+                    <div class="step-label">{{ _('Source') }}</div>
+                </div>
+
+                <!-- Step 2 (Upload) -->
+                <div class="progress-step active" id="progress-step-2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">{{ _('Upload') }}</div>
+                </div>
+
+                <!-- Step 3 (Map) -->
+                <div class="progress-step" id="progress-step-3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">{{ _('Map') }}</div>
+                </div>
+
+                <!-- Step 4 (Review) -->
+                <div class="progress-step" id="progress-step-4">
+                    <div class="step-circle">4</div>
+                    <div class="step-label">{{ _('Review') }}</div>
+                </div>
+
+                <!-- Step 5 (Done) -->
+                <div class="progress-step" id="progress-step-5">
+                    <div class="step-circle">5</div>
+                    <div class="step-label">{{ _('Done') }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 2: UPLOAD -->
+        <div id="step2" class="wizard-panel">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 2rem;">
+                <div>
+                    <h2 class="wizard-title-lg" style="font-size: 1.5rem;">{{ _('Upload Workflow') }}</h2>
+                    <p class="wizard-subtitle" style="margin-bottom: 0;">{{ _('Step 2 of 5: Import your CSV data') }}
+                    </p>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <div class="mode-toggle">
+                    <button class="toggle-btn active" onclick="switchUploadMode('file')">{{ _('Upload CSV') }}</button>
+                    <button class="toggle-btn" onclick="switchUploadMode('paste')">{{ _('Copy & Paste') }}</button>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 20px;">
+                <!-- Left: Configuration -->
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div>
+                        <label class="form-label">{{ _('Column Separator') }}</label>
+                        <select id="columnSeparator" class="form-select">
+                            <option value=",">{{ _('Comma (,)') }}</option>
+                            <option value=";">{{ _('Semicolon (;)') }}</option>
+                            <option value="\t">{{ _('Tab') }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">{{ _('Target Account') }}</label>
+                        <select id="targetAccount" class="form-select">
+                            <option value="multi">{{ _('Multi-account import') }}</option>
+                            <option value="savings">{{ _('Personal Savings - *8842') }}</option>
+                            <option value="invest">{{ _('Investment Portfolio - *9921') }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Right: Dropzone -->
+                <div>
+                    <div class="upload-zone" id="dropzone" onclick="document.getElementById('wizardFileInput').click()">
+                        <input type="file" id="wizardFileInput" accept=".csv,.xls,.xlsx" class="hidden"
+                            onchange="handleFileSelect(event)">
+                        <div style="font-size: 3rem; color: var(--wizard-primary); margin-bottom: 1rem;">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h3 style="font-weight: 600; margin-bottom: 4px;">{{ _('Click to upload or drag and drop') }}
+                        </h3>
+                        <p style="color: var(--wizard-text-sub); font-size: 0.875rem;">{{ _('SVG, PNG, JPG or GIF (max.
+                            800x400px)') }}</p>
+                        <div style="margin-top: 1rem;">
+                            <span
+                                style="background: white; border: 1px solid var(--wizard-border); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;">
+                                {{ _('Supported formats: .csv, .xls, .xlsx') }}
+                            </span>
+                        </div>
+                    </div>
+                    <div id="selectedFileName" class="mt-2 text-center text-primary fw-bold hidden"></div>
+                </div>
+            </div>
+
+            <div class="wizard-footer">
+                <button class="btn-wizard-back" onclick="goToStep(1)">{{ _('Cancel') }}</button>
+                <button class="btn-wizard-next" id="nextStep2Btn" onclick="uploadAndProceed()" disabled>
+                    {{ _('Continue to Mapping') }} <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- STEP 3: MAPPING -->
+        <div id="step3" class="wizard-panel hidden">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 2rem;">
+                <div>
+                    <h2 class="wizard-title-lg" style="font-size: 1.5rem;">{{ _('Map CSV Columns') }}</h2>
+                    <p class="wizard-subtitle" style="margin-bottom: 0;">{{ _('Match your file columns to SunnRayy\'s
+                        data structure.') }}</p>
+                </div>
+                <!-- Magic Map Button -->
+                <button class="btn-magic-map">
+                    <i class="fas fa-magic"></i> {{ _('Magic Map') }}
+                </button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 40px;">
+                <!-- Left: Preview Table -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="font-weight: 600; font-size: 0.875rem; color: var(--wizard-text-sub);">
+                            <i class="fas fa-table me-1"></i> {{ _('CSV Preview') }}
+                        </span>
+                        <span
+                            style="font-family: monospace; font-size: 0.75rem; background: var(--bg-container-inset); padding: 2px 6px; border-radius: 4px;">
+                            export_2023.csv
+                        </span>
+                    </div>
+                    <div
+                        style="overflow-x: auto; border: 1px solid var(--wizard-border); border-radius: var(--radius-lg);">
+                        <table class="table-validation" id="previewTable">
+                            <!-- Populated by JS -->
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Right: Configuration Form -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="font-weight: 600; font-size: 0.875rem; color: var(--wizard-text-sub);">
+                            <i class="fas fa-sliders-h me-1"></i> {{ _('Configuration') }}
+                        </span>
+                    </div>
+                    <div id="columnMappingForm"
+                        style="display: flex; flex-direction: column; gap: 16px; background: var(--bg-container-inset); padding: 20px; border-radius: var(--radius-lg);">
+                        <!-- Fields injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="wizard-footer">
+                <button class="btn-wizard-back" onclick="goToStep(2)">{{ _('Back') }}</button>
+                <button class="btn-wizard-next" onclick="configureAndValidate()">
+                    {{ _('Next Step') }} <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- STEP 4: REVIEW & VALIDATE -->
+        <div id="step4" class="wizard-panel hidden">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 2rem;">
+                <div>
+                    <h2 class="wizard-title-lg" style="font-size: 1.5rem;">
+                        {{ _('Review & Fix Errors') }}
+                        <span class="status-badge status-error ms-2 hidden" id="errorBadge">{{ _('Errors Found')
+                            }}</span>
+                    </h2>
+                    <p class="wizard-subtitle" style="margin-bottom: 0;">{{ _('Please review the parsed data.
+                        Highlighted rows require attention.') }}</p>
+                </div>
+            </div>
+
+            <div
+                style="background: var(--bg-container); border: 1px solid var(--wizard-border); border-radius: var(--radius-lg); overflow: hidden;">
+                <!-- Toolbar -->
+                <div
+                    style="padding: 12px 16px; border-bottom: 1px solid var(--wizard-border); background: var(--bg-container-inset); display: flex; justify-content: space-between;">
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" placeholder="Filter transactions..." class="form-input"
+                            style="padding: 4px 10px; font-size: 0.875rem;">
+                        <button class="btn btn-sm btn-outline"><i class="fas fa-filter"></i> {{ _('Filter Errors')
+                            }}</button>
+                    </div>
+                    <div class="text-xs text-muted d-flex align-items-center">
+                        <i class="fas fa-info-circle text-primary me-1"></i> {{ _('Cells are editable. Click to
+                        modify.') }}
+                    </div>
+                </div>
+
+                <!-- Validation Table Container -->
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <div id="errorList" class="hidden p-3 bg-red-50 text-red-600 text-sm"></div>
+                    <!-- Reuse preview table structure for now, ideally strictly typed rows -->
+                </div>
+
+                <!-- Summary Footer -->
+                <div
+                    style="padding: 12px 16px; border-top: 1px solid var(--wizard-border); background: var(--bg-container-inset); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; gap: 20px; font-size: 0.875rem;">
+                        <span class="text-success fw-bold"><i class="fas fa-circle" style="font-size: 8px;"></i> <span
+                                id="validRowCount">0</span> {{ _('rows ready') }}</span>
+                        <span class="text-danger fw-bold"><i class="fas fa-circle" style="font-size: 8px;"></i> <span
+                                id="errorRowCount">0</span> {{ _('rows need attention') }}</span>
+                    </div>
+                    <div>
+                        <button class="btn-wizard-next" onclick="publishData()">
+                            <span id="importBtnText">{{ _('Import Transactions') }}</span> <i
+                                class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wizard-footer border-0 pt-0 mt-4">
+                <button class="btn-wizard-back" onclick="goToStep(3)">{{ _('Back') }}</button>
+            </div>
+        </div>
+
+        <!-- STEP 5: DONE -->
+        <div id="step5" class="wizard-panel hidden" style="text-align: center; padding: 60px;">
+            <div style="font-size: 4rem; color: var(--wizard-success); margin-bottom: 1rem;">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 class="wizard-title-lg">{{ _('Import Complete!') }}</h2>
+            <p class="wizard-subtitle">{{ _('Your data has been successfully imported and processed.') }}</p>
+
+            <div style="margin-top: 40px;">
+                <a href="{{ url_for('dashboard.index') }}" class="btn-wizard-next" style="text-decoration: none;">
+                    {{ _('Go to Dashboard') }}
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Wizard State
+    let wizardState = {
+        importId: null,
+        importType: null,
+        step: 1,
+        headers: [],
+        preview: [],
+        detectedMapping: {},
+        validRows: 0,
+        errorRows: 0,
+        errors: []
+    };
+
+    // Step Navigation
+    function goToStep(step) {
+        if (step === 1) {
+            document.getElementById('step1').classList.remove('hidden');
+            document.getElementById('wizard-flow').classList.add('hidden');
+        } else {
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('wizard-flow').classList.remove('hidden');
+
+            document.querySelectorAll('.wizard-panel').forEach(el => {
+                if (el.id !== 'step1') el.classList.add('hidden');
+            });
+            document.getElementById('step' + step).classList.remove('hidden');
+
+            updateProgressBar(step);
+        }
+
+        wizardState.step = step;
+        document.getElementById('currentStep').value = step;
+        window.scrollTo(0, 0);
+    }
+
+    function updateProgressBar(currentStep) {
+        // Line Width Calculation: (Step - 2) / 3 * 100 because Step 2 is 0%, Step 5 is 100%
+        // Actually Step 2 to 5 are indices 2,3,4,5. 
+        // Steps are: Source(1, Done), Upload(2), Map(3), Review(4), Done(5).
+        // If current is 2, width should be ~25%? 
+        // Let's simplified: 3 steps between 1 and 5.
+
+        let pct = 0;
+        if (currentStep >= 2) pct = 25;
+        if (currentStep >= 3) pct = 50;
+        if (currentStep >= 4) pct = 75;
+        if (currentStep >= 5) pct = 100;
+
+        document.getElementById('progressLineActive').style.width = String(pct) + '%';
+
+        for (let i = 2; i <= 5; i++) {
+            const stepEl = document.getElementById('progress-step-' + i);
+            if (!stepEl) continue;
+
+            stepEl.classList.remove('active', 'completed');
+
+            if (i < currentStep) {
+                stepEl.classList.add('completed');
+                stepEl.querySelector('.step-circle').innerHTML = '<i class="fas fa-check"></i>';
+            } else if (i === currentStep) {
+                stepEl.classList.add('active');
+                stepEl.querySelector('.step-circle').innerHTML = i;
+            } else {
+                stepEl.querySelector('.step-circle').innerHTML = i;
+            }
+        }
+    }
+
+    // --- Backend Integration Logic (Reused) ---
+
+    async function selectImportType(type, cardEl) {
+        // Visual feedback
+        document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected')); // Just in case we add selected style
+
+        wizardState.importType = type;
+
+        // Show loading spinner on card if feasible, or just modal
+        const originalContent = cardEl.innerHTML;
+        // cardEl.innerHTML = '<div style="text-align:center; padding: 20px;"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
+
+        try {
+            const response = await fetch('/workbench/api/imports', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: type })
+            });
+
+            if (!response.ok) throw new Error('Failed to create import session');
+
+            const data = await response.json();
+            wizardState.importId = data.import_id;
+            document.getElementById('importSessionId').value = data.import_id;
+
+            goToStep(2);
+        } catch (error) {
+            console.error(error);
+            alert('Error creating session');
+            // cardEl.innerHTML = originalContent; 
+        }
+    }
+
+    function resumePendingImport() {
+        alert("Resume logic would go here - not implemented in demo.");
+    }
+
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const display = document.getElementById('selectedFileName');
+            display.textContent = 'Selected: ' + file.name;
+            display.classList.remove('hidden');
+            document.getElementById('nextStep2Btn').disabled = false;
+        }
+    }
+
+    function switchUploadMode(mode) {
+        document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        // Logic to switch UI... not implemented in HTML part fully, assuming upload only for now
+    }
+
+    // Drag & Drop
+    const dropzone = document.getElementById('dropzone');
+    if (dropzone) {
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.style.borderColor = 'var(--wizard-primary)';
+            dropzone.style.background = '#EFF6FF';
+        });
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.style.borderColor = 'var(--brand-blue-light)'; // Reset
+            dropzone.style.background = 'linear-gradient(180deg, var(--wizard-primary-light) 0%, rgba(255,255,255,0) 100%)';
+        });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('wizardFileInput').files = files;
+                handleFileSelect({ target: { files: files } });
+            }
+        });
+    }
+
+    async function uploadAndProceed() {
+        const fileInput = document.getElementById('wizardFileInput');
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+        const separator = document.getElementById('columnSeparator').value;
+        const impId = document.getElementById('importSessionId').value;
+
+        const btn = document.getElementById('nextStep2Btn');
+        const oldText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(`/workbench/api/imports/${impId}/upload?separator=${encodeURIComponent(separator)}`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) throw new Error('Upload failed');
+
+            const data = await response.json();
+            wizardState.headers = data.headers;
+            wizardState.preview = data.preview;
+            wizardState.detectedMapping = data.detected_mapping || {};
+
+            renderMappingForm();
+            renderPreviewTable(data.preview, data.headers); // Helper
+            goToStep(3);
+        } catch (error) {
+            console.error(error);
+            alert('Upload failed: ' + error.message);
+        } finally {
+            btn.innerHTML = oldText;
+            btn.disabled = false;
+        }
+    }
+
+    function renderMappingForm() {
+        const container = document.getElementById('columnMappingForm');
+        container.innerHTML = '';
+
+        // Define fields based on common transaction structure
+        const fields = [
+            { id: 'date', label: 'Date', required: true, icon: 'fa-calendar' },
+            { id: 'amount', label: 'Amount', required: true, icon: 'fa-dollar-sign' },
+            { id: 'description', label: 'Description', required: true, icon: 'fa-file-alt' },
+            { id: 'symbol', label: 'Ticker / Symbol', required: false, icon: 'fa-chart-line' }
+        ];
+
+        fields.forEach(f => {
+            const div = document.createElement('div');
+            // Check detected mapping
+            const detected = wizardState.detectedMapping[f.id] || '';
+            const isAuto = detected !== '';
+
+            div.innerHTML = `
+                <div style="background: white; padding: 12px; border: 1px solid var(--wizard-border); border-radius: var(--radius-md); margin-bottom: 8px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 4px;">
+                        <label style="font-size: 0.875rem; font-weight: 600; color: var(--wizard-text-main);">
+                            <i class="fas ${f.icon} text-muted me-1"></i> ${f.label} ${f.required ? '<span class="text-danger">*</span>' : ''}
+                        </label>
+                        ${isAuto ? '<span class="text-success" style="font-size: 0.7rem; font-weight: 700; background: var(--wizard-success-bg); padding: 1px 6px; border-radius: 4px;">AUTO</span>' : ''}
+                    </div>
+                    <select id="map_${f.id}" class="form-select w-100" style="font-size: 0.875rem;">
+                        <option value="">-- Select Column --</option>
+                        ${wizardState.headers.map(h => `<option value="${h}" ${h === detected ? 'selected' : ''}>${h}</option>`).join('')}
+                    </select>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function renderPreviewTable(rows, headers) {
+        // Used in Step 3 and Step 4 (initially)
+        const table = document.getElementById('previewTable');
+        if (!rows || rows.length === 0) return;
+
+        let html = '<thead><tr>';
+        headers.forEach(h => html += `<th>${h}</th>`);
+        html += '</tr></thead><tbody>';
+
+        rows.slice(0, 5).forEach(row => {
+            html += '<tr>';
+            headers.forEach(h => html += `<td>${row[h] || ''}</td>`);
+            html += '</tr>';
+        });
+        html += '</tbody>';
+        table.innerHTML = html;
+    }
+
+    function configureAndValidate() {
+        const mapping = {};
+        let missing = false;
+        ['date', 'amount', 'description'].forEach(f => {
+            const el = document.getElementById('map_' + f);
+            if (el && !el.value) missing = true;
+            if (el) mapping[f] = el.value;
+        });
+
+        if (missing) {
+            alert('Please map all required fields.');
+            return;
+        }
+
+        const impId = document.getElementById('importSessionId').value;
+
+        // Optimistic UI interaction
+        fetch(`/workbench/api/imports/${impId}/configure`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mapping: mapping })
+        })
+            .then(() => fetch(`/workbench/api/imports/${impId}/validate`, { method: 'POST' }))
+            .then(res => res.json())
+            .then(data => {
+                wizardState.validRows = data.valid_count;
+                wizardState.errorRows = data.error_count;
+                wizardState.errors = data.errors || [];
+
+                document.getElementById('validRowCount').textContent = wizardState.validRows;
+                document.getElementById('errorRowCount').textContent = wizardState.errorRows;
+
+                if (wizardState.errorRows > 0) {
+                    document.getElementById('errorBadge').classList.remove('hidden');
+                    document.getElementById('errorList').classList.remove('hidden');
+                    document.getElementById('errorList').innerHTML = wizardState.errors.map(e => `<div>• ${e}</div>`).join('');
+                } else {
+                    document.getElementById('errorBadge').classList.add('hidden');
+                    document.getElementById('errorList').classList.add('hidden');
+                }
+
+                document.getElementById('importBtnText').textContent = `Import ${wizardState.validRows} Rows`;
+                goToStep(4);
+            })
+            .catch(err => alert('Validation failed'));
+    }
+
+    function publishData() {
+        const impId = document.getElementById('importSessionId').value;
+
+        fetch(`/workbench/api/imports/${impId}/publish`, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                goToStep(5);
+            })
+            .catch(err => alert('Publish failed'));
+    }
+</script>
+{% endblock %}

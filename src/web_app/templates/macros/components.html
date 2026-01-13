@@ -6,7 +6,7 @@ Usage: {% from 'macros/components.html' import metric_card, badge, button %}
 
 {# --- Metric Card --- #}
 {% macro metric_card(label, value, change=None, trend='neutral', icon=None, tooltip=None) %}
-<div class="metric-card">
+<div class="metric-card" {{ kwargs|xmlattr }}>
     <h3>
         {% if icon %}<i class="{{ icon }}"></i>{% endif %}
         {{ label }}
@@ -30,18 +30,18 @@ Usage: {% from 'macros/components.html' import metric_card, badge, button %}
 {# --- Badge --- #}
 {% macro badge(text, variant='primary') %}
 {# Variants: primary, success, warning, error, neutral #}
-<span class="badge badge-{{ variant }}">{{ text }}</span>
+<span class="badge badge-{{ variant }}" {{ kwargs|xmlattr }}>{{ text }}</span>
 {% endmacro %}
 
 {# --- Button --- #}
 {% macro button(text, variant='primary', size='md', type='button', icon=None, href=None, class='') %}
 {# Variants: primary, secondary, danger, outline #}
 {% if href %}
-<a href="{{ href }}" class="btn btn-{{ variant }} btn-{{ size }} {{ class }}">
+<a href="{{ href }}" class="btn btn-{{ variant }} btn-{{ size }} {{ class }}" {{ kwargs|xmlattr }}>
     {% if icon %}<i class="{{ icon }} mr-2"></i>{% endif %}{{ text }}
 </a>
 {% else %}
-<button type="{{ type }}" class="btn btn-{{ variant }} btn-{{ size }} {{ class }}">
+<button type="{{ type }}" class="btn btn-{{ variant }} btn-{{ size }} {{ class }}" {{ kwargs|xmlattr }}>
     {% if icon %}<i class="{{ icon }} mr-2"></i>{% endif %}{{ text }}
 </button>
 {% endif %}

@@ -897,58 +897,60 @@ def build_real_data_dict(
     forecast_json = '{"dates": [], "income_forecast": [], "expenses_forecast": [], "investments_forecast": [], "net_cash_flow": [], "message": "Forecast not generated"}'
     
     # Build forecast data with 90% confidence intervals (balanced performance/accuracy)
-    try:
-        logger.info("📅 Generating 12-month financial forecast (90% confidence level)...")
-        forecast_start = time.perf_counter()
-        
-        # Import forecaster
-        from src.financial_analysis.cash_flow_forecaster import CashFlowForecaster
-        
-        # Initialize forecaster with data manager
-        forecaster = CashFlowForecaster(data_manager)
-        
-        # Fetch and process historical data
-        logger.debug("  Fetching historical monthly cash flow data...")
-        forecaster.fetch_and_process_historical_data()
-        
-        # Fit SARIMA models
-        logger.debug("  Fitting SARIMA models...")
-        forecaster.fit_sarima_models(seasonal_period=12)
-        
-        # Generate forecast with 90% confidence intervals (alpha=0.10)
-        logger.debug("  Generating forecasts with 90% CI...")
-        forecast_df = forecaster.forecast(periods=12, alpha=0.10, confidence_level='90')
-        
-        # Convert to JSON for template (using keys expected by template)
-        forecast_data = {
-            'dates': [date.strftime('%Y-%m-%d') for date in forecast_df.index],
-            'income_forecast': forecast_df['Income_Forecast'].round(2).tolist(),
-            'income_lower': forecast_df['Income_Lower_CI'].round(2).tolist(),
-            'income_upper': forecast_df['Income_Upper_CI'].round(2).tolist(),
-            'expenses_forecast': forecast_df['Expenses_Forecast'].round(2).tolist(),
-            'expenses_lower': forecast_df['Expenses_Lower_CI'].round(2).tolist(),
-            'expenses_upper': forecast_df['Expenses_Upper_CI'].round(2).tolist(),
-            'investments_forecast': forecast_df['Investment_Forecast'].round(2).tolist(),
-            'investments_lower': forecast_df['Investment_Lower_CI'].round(2).tolist(),
-            'investments_upper': forecast_df['Investment_Upper_CI'].round(2).tolist(),
-            'net_cash_flow': forecast_df['Net_Cash_Flow_Forecast'].round(2).tolist(),
-            'net_cash_flow_lower': forecast_df['Net_Cash_Flow_Lower_CI'].round(2).tolist(),
-            'net_cash_flow_upper': forecast_df['Net_Cash_Flow_Upper_CI'].round(2).tolist(),
-            'confidence_level': '90',
-            'method': 'SARIMA'
-        }
-        forecast_data = _sanitize_forecast_data_for_json(forecast_data)
-        forecast_json = json.dumps(forecast_data, allow_nan=False)
-        
-        forecast_time = time.perf_counter() - forecast_start
-        logger.info(f"✅ 12-month forecast completed in {forecast_time:.2f}s")
-        
-    except Exception as e:
-        logger.warning(f"⚠️  Could not generate forecast: {e}")
-        import traceback
-        traceback.print_exc()
-        # Fallback to empty forecast
-        forecast_json = '{"dates": [], "income_forecast": [], "expenses_forecast": [], "investments_forecast": [], "net_cash_flow": [], "message": "Forecast generation failed"}'
+    # Build forecast data with 90% confidence intervals (balanced performance/accuracy)
+    # PERFORMANCE FIX: Temporarily disabled SARIMA forecast due to slow loading (2025-01-12)
+    # try:
+    #     logger.info("📅 Generating 12-month financial forecast (90% confidence level)...")
+    #     forecast_start = time.perf_counter()
+    #     
+    #     # Import forecaster
+    #     from src.financial_analysis.cash_flow_forecaster import CashFlowForecaster
+    #     
+    #     # Initialize forecaster with data manager
+    #     forecaster = CashFlowForecaster(data_manager)
+    #     
+    #     # Fetch and process historical data
+    #     logger.debug("  Fetching historical monthly cash flow data...")
+    #     forecaster.fetch_and_process_historical_data()
+    #     
+    #     # Fit SARIMA models
+    #     logger.debug("  Fitting SARIMA models...")
+    #     forecaster.fit_sarima_models(seasonal_period=12)
+    #     
+    #     # Generate forecast with 90% confidence intervals (alpha=0.10)
+    #     logger.debug("  Generating forecasts with 90% CI...")
+    #     forecast_df = forecaster.forecast(periods=12, alpha=0.10, confidence_level='90')
+    #     
+    #     # Convert to JSON for template (using keys expected by template)
+    #     forecast_data = {
+    #         'dates': [date.strftime('%Y-%m-%d') for date in forecast_df.index],
+    #         'income_forecast': forecast_df['Income_Forecast'].round(2).tolist(),
+    #         'income_lower': forecast_df['Income_Lower_CI'].round(2).tolist(),
+    #         'income_upper': forecast_df['Income_Upper_CI'].round(2).tolist(),
+    #         'expenses_forecast': forecast_df['Expenses_Forecast'].round(2).tolist(),
+    #         'expenses_lower': forecast_df['Expenses_Lower_CI'].round(2).tolist(),
+    #         'expenses_upper': forecast_df['Expenses_Upper_CI'].round(2).tolist(),
+    #         'investments_forecast': forecast_df['Investment_Forecast'].round(2).tolist(),
+    #         'investments_lower': forecast_df['Investment_Lower_CI'].round(2).tolist(),
+    #         'investments_upper': forecast_df['Investment_Upper_CI'].round(2).tolist(),
+    #         'net_cash_flow': forecast_df['Net_Cash_Flow_Forecast'].round(2).tolist(),
+    #         'net_cash_flow_lower': forecast_df['Net_Cash_Flow_Lower_CI'].round(2).tolist(),
+    #         'net_cash_flow_upper': forecast_df['Net_Cash_Flow_Upper_CI'].round(2).tolist(),
+    #         'confidence_level': '90',
+    #         'method': 'SARIMA'
+    #     }
+    #     forecast_data = _sanitize_forecast_data_for_json(forecast_data)
+    #     forecast_json = json.dumps(forecast_data, allow_nan=False)
+    #     
+    #     forecast_time = time.perf_counter() - forecast_start
+    #     logger.info(f"✅ 12-month forecast completed in {forecast_time:.2f}s")
+    #     
+    # except Exception as e:
+    #     logger.warning(f"⚠️  Could not generate forecast: {e}")
+    #     import traceback
+    #     traceback.print_exc()
+    #     # Fallback to empty forecast
+    #     forecast_json = '{"dates": [], "income_forecast": [], "expenses_forecast": [], "investments_forecast": [], "net_cash_flow": [], "message": "Forecast generation failed"}'
     
     # Build TWR data
     logger.info("📈 Building Time-Weighted Return data...")

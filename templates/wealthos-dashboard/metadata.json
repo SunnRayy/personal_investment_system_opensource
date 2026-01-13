@@ -1,0 +1,5 @@
+{
+  "name": "WealthOS Dashboard",
+  "description": "A high-performance financial management dashboard featuring real-time portfolio analytics, net worth tracking, and AI-driven wealth insights powered by Gemini.",
+  "requestFramePermissions": []
+}

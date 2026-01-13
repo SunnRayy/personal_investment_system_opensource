@@ -2,9 +2,10 @@ from flask import render_template, request, jsonify, current_app
 from werkzeug.utils import secure_filename
 import pandas as pd
 import os
+import uuid
 from datetime import datetime
 from sqlalchemy import or_
-from src.database import get_session, StagingTransaction, Transaction, Asset, ImportHistory
+from src.database import get_session, StagingTransaction, Transaction, Asset, ImportHistory, ImportSession
 from . import data_workbench_bp
 from .data_mapper import (
     detect_column_mapping, normalize_transaction_type, 
@@ -24,6 +25,15 @@ logger = logging.getLogger(__name__)
 @data_workbench_bp.route('/')
 def index():
     return render_template('data_workbench/index.html')
+
+@data_workbench_bp.route('/wizard')
+def wizard():
+    """
+    Render the multi-step import wizard.
+    """
+    # Create a new session ID if one doesn't exist?
+    # For now, just render the template. JS will handle session creation.
+    return render_template('data_workbench/wizard.html')
 
 @data_workbench_bp.route('/upload', methods=['POST'])
 def upload_file():
@@ -560,3 +570,506 @@ def get_import_history():
         return jsonify({'error': str(e)}), 500
     finally:
         session.close()
+
+
+# =============================================================================
+# IMPORT WIZARD API ENDPOINTS (Multi-step flow)
+# =============================================================================
+
+@data_workbench_bp.route('/api/imports', methods=['POST'])
+def create_import_session():
+    """
+    Step 1: Create a new import wizard session.
+    
+    POST /workbench/api/imports
+    Body: { "type": "transactions" | "holdings" | "accounts" }
+    """
+    data = request.json or {}
+    import_type = data.get('type', 'transactions')
+    
+    if import_type not in ('transactions', 'holdings', 'accounts'):
+        return jsonify({'error': 'Invalid import type. Use: transactions, holdings, accounts'}), 400
+    
+    session_db = get_session()
+    try:
+        # Create new import session
+        import_session = ImportSession(
+            id=str(uuid.uuid4()),
+            import_type=import_type,
+            current_step=1,
+            status='pending'
+        )
+        session_db.add(import_session)
+        session_db.commit()
+        
+        logger.info(f"Created import session {import_session.id} for type {import_type}")
+        
+        return jsonify({
+            'import_id': import_session.id,
+            'type': import_type,
+            'step': 1,
+            'status': 'pending'
+        }), 201
+    except Exception as e:
+        session_db.rollback()
+        logger.error(f"Error creating import session: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        session_db.close()
+
+
+@data_workbench_bp.route('/api/imports/<import_id>', methods=['GET'])
+def get_import_session(import_id):
+    """Get current state of an import session."""
+    session_db = get_session()
+    try:
+        import_session = session_db.query(ImportSession).filter_by(id=import_id).first()
+        if not import_session:
+            return jsonify({'error': 'Import session not found'}), 404
+        
+        return jsonify({
+            'import_id': import_session.id,
+            'type': import_session.import_type,
+            'step': import_session.current_step,
+            'status': import_session.status,
+            'filename': import_session.filename,
+            'detected_headers': import_session.detected_headers,
+            'column_mapping': import_session.column_mapping,
+            'total_rows': import_session.total_rows,
+            'valid_rows': import_session.valid_rows,
+            'error_rows': import_session.error_rows,
+            'created_at': import_session.created_at.isoformat() if import_session.created_at else None
+        })
+    finally:
+        session_db.close()
+
+
+@data_workbench_bp.route('/api/imports/<import_id>/upload', methods=['POST'])
+def wizard_upload_file(import_id):
+    """
+    Step 2: Upload file and get preview with auto-detected column mapping.
+    
+    POST /workbench/api/imports/{id}/upload
+    Body: multipart form with 'file'
+    """
+    session_db = get_session()
+    try:
+        # Find import session
+        import_session = session_db.query(ImportSession).filter_by(id=import_id).first()
+        if not import_session:
+            return jsonify({'error': 'Import session not found'}), 404
+        
+        if import_session.status == 'completed':
+            return jsonify({'error': 'Import session already completed'}), 400
+        
+        # Validate file
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file part'}), 400
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No selected file'}), 400
+        if not allowed_file(file.filename):
+            return jsonify({'error': 'Invalid file type. Use: xlsx, xls, csv'}), 400
+        
+        # Save file
+        filename = secure_filename(file.filename)
+        project_root = os.path.abspath(os.path.join(current_app.root_path, '..', '..'))
+        upload_folder = os.path.join(project_root, 'data', 'uploads')
+        os.makedirs(upload_folder, exist_ok=True)
+        filepath = os.path.join(upload_folder, f"{import_id}_{filename}")
+        file.save(filepath)
+        
+        logger.info(f"Wizard: File saved to {filepath}")
+        
+        # Parse file
+        if filepath.endswith('.csv'):
+            df = pd.read_csv(filepath)
+        else:
+            # Read first sheet only
+            df = pd.read_excel(filepath, sheet_name=0)
+        
+        df.columns = [str(c).strip() for c in df.columns]
+        headers = df.columns.tolist()
+        
+        # Get preview (first 5 rows)
+        preview_rows = df.head(5).fillna('').to_dict('records')
+        
+        # Auto-detect column mapping
+        detected_mapping = detect_column_mapping(headers)
+        
+        # Update session
+        import_session.filename = filename
+        import_session.file_path = filepath
+        import_session.detected_headers = headers
+        import_session.preview_data = preview_rows
+        import_session.total_rows = len(df)
+        import_session.column_mapping = detected_mapping
+        import_session.current_step = 2
+        import_session.status = 'processing'
+        
+        session_db.commit()
+        
+        return jsonify({
+            'import_id': import_id,
+            'step': 2,
+            'filename': filename,
+            'headers': headers,
+            'total_rows': len(df),
+            'preview': preview_rows,
+            'detected_mapping': detected_mapping
+        })
+    except Exception as e:
+        session_db.rollback()
+        logger.error(f"Error in wizard upload: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        session_db.close()
+
+
+@data_workbench_bp.route('/api/imports/<import_id>/configure', methods=['POST'])
+def wizard_configure(import_id):
+    """
+    Step 3: Configure column mapping and formats.
+    
+    POST /workbench/api/imports/{id}/configure
+    Body: {
+        "column_mapping": { "date": "Trade Date", "amount": "Total", ... },
+        "date_format": "MM/DD/YYYY",
+        "number_format": "us"
+    }
+    """
+    session_db = get_session()
+    try:
+        import_session = session_db.query(ImportSession).filter_by(id=import_id).first()
+        if not import_session:
+            return jsonify({'error': 'Import session not found'}), 404
+        
+        data = request.json or {}
+        
+        # Update configuration
+        if 'column_mapping' in data:
+            import_session.column_mapping = data['column_mapping']
+        if 'date_format' in data:
+            import_session.date_format = data['date_format']
+        if 'number_format' in data:
+            import_session.number_format = data['number_format']
+        
+        import_session.current_step = 3
+        session_db.commit()
+        
+        return jsonify({
+            'import_id': import_id,
+            'step': 3,
+            'status': 'configured',
+            'column_mapping': import_session.column_mapping
+        })
+    except Exception as e:
+        session_db.rollback()
+        logger.error(f"Error in wizard configure: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        session_db.close()
+
+
+@data_workbench_bp.route('/api/imports/<import_id>/validate', methods=['POST'])
+def wizard_validate(import_id):
+    """
+    Step 4: Validate data and identify errors.
+    
+    POST /workbench/api/imports/{id}/validate
+    """
+    session_db = get_session()
+    try:
+        import_session = session_db.query(ImportSession).filter_by(id=import_id).first()
+        if not import_session:
+            return jsonify({'error': 'Import session not found'}), 404
+        
+        if not import_session.file_path or not os.path.exists(import_session.file_path):
+            return jsonify({'error': 'No file uploaded'}), 400
+        
+        # Re-parse file
+        filepath = import_session.file_path
+        if filepath.endswith('.csv'):
+            df = pd.read_csv(filepath)
+        else:
+            df = pd.read_excel(filepath, sheet_name=0)
+        
+        df.columns = [str(c).strip() for c in df.columns]
+        column_map = import_session.column_mapping or {}
+        
+        valid_count = 0
+        error_count = 0
+        errors = []
+        
+        preview_rows = []
+        
+        for idx, row in df.iterrows():
+            row_errors = []
+            
+            # Validate date
+            date_col = column_map.get('date')
+            if date_col and date_col in row:
+                date_val = parse_flexible_date(row.get(date_col))
+                if not date_val:
+                    row_errors.append({'field': 'date', 'message': 'Invalid date format'})
+            else:
+                row_errors.append({'field': 'date', 'message': 'Missing date'})
+            
+            # Validate asset_id
+            asset_col = column_map.get('asset_id')
+            if asset_col and asset_col in row:
+                asset_id = normalize_asset_id(row.get(asset_col))
+                if asset_id:
+                    # Check if asset exists
+                    asset = session_db.query(Asset).filter_by(asset_id=asset_id).first()
+                    if not asset:
+                        row_errors.append({'field': 'asset_id', 'message': f'Unknown asset: {asset_id}'})
+            
+            if row_errors:
+                error_count += 1
+                errors.append({
+                    'row': idx + 1,
+                    'errors': row_errors
+                })
+            else:
+                valid_count += 1
+            
+            if len(preview_rows) < 100:
+                row_data = {k: str(row.get(v, '')) for k, v in column_map.items() if v}
+                preview_rows.append({
+                    'index': idx + 1,
+                    'data': row_data,
+                    'errors': [e['message'] for e in row_errors],
+                    'valid': not bool(row_errors)
+                })
+        
+        # Update session
+        import_session.valid_rows = valid_count
+        import_session.error_rows = error_count
+        import_session.validation_errors = errors
+        import_session.current_step = 4
+        
+        session_db.commit()
+        
+        return jsonify({
+            'import_id': import_id,
+            'step': 4,
+            'total_rows': len(df),
+            'valid_rows': valid_count,
+            'error_rows': error_count,
+            'errors': errors[:50],  # Limit errors returned in summary
+            'preview_rows': preview_rows # Limit to 100 for table display
+        })
+    except Exception as e:
+        session_db.rollback()
+        logger.error(f"Error in wizard validate: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        session_db.close()
+
+
+@data_workbench_bp.route('/api/imports/<import_id>/update-row', methods=['POST'])
+def wizard_update_row(import_id):
+    """
+    Update a single cell in the uploaded file (for fixing errors).
+    POST /workbench/api/imports/{id}/update-row
+    Body: { "row_index": 1, "field": "amount", "value": "100.00" }
+    """
+    session_db = get_session()
+    try:
+        data = request.json
+        row_idx = int(data.get('row_index')) - 1 # 1-based to 0-based
+        field = data.get('field') # mapped field name (e.g. 'amount')
+        value = data.get('value')
+        
+        import_session = session_db.query(ImportSession).filter_by(id=import_id).first()
+        if not import_session or not import_session.file_path:
+            return jsonify({'error': 'Session not found'}), 404
+            
+        # Load File
+        filepath = import_session.file_path
+        is_csv = filepath.endswith('.csv')
+        
+        if is_csv:
+            df = pd.read_csv(filepath)
+        else:
+            df = pd.read_excel(filepath)
+            
+        # Map logical field to actual column name
+        col_map = import_session.column_mapping or {}
+        actual_col = col_map.get(field)
+        
+        if not actual_col:
+            return jsonify({'error': f'Field {field} is not mapped'}), 400
+            
+        if actual_col not in df.columns:
+             return jsonify({'error': f'Column {actual_col} not found in file'}), 400
+             
+        # Update Value
+        df.at[row_idx, actual_col] = value
+        
+        # Save back to file
+        if is_csv:
+            df.to_csv(filepath, index=False)
+        else:
+            df.to_excel(filepath, index=False)
+            
+        # Re-validate this specific row (lightweight validation)
+        row = df.iloc[row_idx]
+        row_errors = []
+        
+        # Basic validation reuse
+        if field == 'date':
+             val = parse_flexible_date(value)
+             if not val: row_errors.append('Invalid date format')
+        elif field == 'asset_id':
+             aid = normalize_asset_id(value)
+             asset = session_db.query(Asset).filter_by(asset_id=aid).first()
+             if not asset: row_errors.append(f'Unknown asset: {aid}')
+             
+        return jsonify({
+            'success': True, 
+            'row_index': data.get('row_index'),
+            'new_errors': row_errors
+        })
+
+    except Exception as e:
+        logger.error(f"Error updating row: {e}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        session_db.close()
+
+
+@data_workbench_bp.route('/api/imports/<import_id>/publish', methods=['POST'])
+def wizard_publish(import_id):
+    """
+    Step 5: Publish valid rows to production.
+    
+    POST /workbench/api/imports/{id}/publish
+    """
+    session_db = get_session()
+    try:
+        import_session = session_db.query(ImportSession).filter_by(id=import_id).first()
+        if not import_session:
+            return jsonify({'error': 'Import session not found'}), 404
+        
+        if import_session.status == 'completed':
+            return jsonify({'error': 'Import already completed'}), 400
+        
+        if not import_session.file_path or not os.path.exists(import_session.file_path):
+            return jsonify({'error': 'No file to publish'}), 400
+        
+        # Re-parse and import valid rows
+        filepath = import_session.file_path
+        if filepath.endswith('.csv'):
+            df = pd.read_csv(filepath)
+        else:
+            df = pd.read_excel(filepath, sheet_name=0)
+        
+        df.columns = [str(c).strip() for c in df.columns]
+        column_map = import_session.column_mapping or {}
+        
+        batch_id = f"wizard_{import_id[:8]}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+        imported_count = 0
+        
+        for idx, row in df.iterrows():
+            # Parse fields
+            date_val = parse_flexible_date(row.get(column_map.get('date'))) if column_map.get('date') else None
+            asset_id_val = normalize_asset_id(row.get(column_map.get('asset_id'))) if column_map.get('asset_id') else None
+            
+            if not date_val or not asset_id_val:
+                continue  # Skip invalid rows
+            
+            # Check asset exists
+            asset = session_db.query(Asset).filter_by(asset_id=asset_id_val).first()
+            if not asset:
+                continue
+            
+            # Get other fields
+            raw_txn_type = row.get(column_map.get('transaction_type')) if column_map.get('transaction_type') else None
+            transaction_type_val = normalize_transaction_type(raw_txn_type) or 'Buy'
+            amount_val = clean_currency_value(row.get(column_map.get('amount'))) if column_map.get('amount') else None
+            shares_val = clean_currency_value(row.get(column_map.get('shares'))) if column_map.get('shares') else None
+            price_val = clean_currency_value(row.get(column_map.get('price'))) if column_map.get('price') else None
+            
+            # Create Transaction
+            txn = Transaction(
+                transaction_id=f"txn_{batch_id}_{idx}",
+                date=date_val.date() if hasattr(date_val, 'date') else date_val,
+                asset_id=asset_id_val,
+                asset_name=asset.asset_name,
+                transaction_type=transaction_type_val,
+                shares=shares_val,
+                price=price_val,
+                amount=amount_val,
+                currency='CNY',
+                source=import_session.filename,
+                created_by='import_wizard'
+            )
+            session_db.add(txn)
+            imported_count += 1
+        
+        # Update session
+        import_session.batch_id = batch_id
+        import_session.imported_count = imported_count
+        import_session.current_step = 5
+        import_session.status = 'completed'
+        import_session.completed_at = datetime.utcnow()
+        
+        # Create ImportHistory record
+        import_record = ImportHistory(
+            batch_id=batch_id,
+            filename=import_session.filename,
+            total_rows=import_session.total_rows or 0,
+            valid_rows=import_session.valid_rows or 0,
+            error_rows=import_session.error_rows or 0,
+            promoted_rows=imported_count,
+            status='promoted',
+            promoted_at=datetime.utcnow()
+        )
+        session_db.add(import_record)
+        
+        session_db.commit()
+        
+        logger.info(f"Wizard import completed: {imported_count} records imported")
+        
+        return jsonify({
+            'import_id': import_id,
+            'step': 5,
+            'status': 'completed',
+            'imported_count': imported_count,
+            'batch_id': batch_id
+        })
+    except Exception as e:
+        session_db.rollback()
+        logger.error(f"Error in wizard publish: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        session_db.close()
+
+
+@data_workbench_bp.route('/api/imports/<import_id>', methods=['DELETE'])
+def cancel_import_session(import_id):
+    """Cancel/abandon an import session."""
+    session_db = get_session()
+    try:
+        import_session = session_db.query(ImportSession).filter_by(id=import_id).first()
+        if not import_session:
+            return jsonify({'error': 'Import session not found'}), 404
+        
+        # Delete uploaded file if exists
+        if import_session.file_path and os.path.exists(import_session.file_path):
+            os.remove(import_session.file_path)
+        
+        # Mark as abandoned
+        import_session.status = 'abandoned'
+        session_db.commit()
+        
+        return jsonify({'message': 'Import session cancelled', 'import_id': import_id})
+    except Exception as e:
+        session_db.rollback()
+        logger.error(f"Error cancelling import: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        session_db.close()
+

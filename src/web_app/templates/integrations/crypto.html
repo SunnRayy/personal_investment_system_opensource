@@ -1,101 +1,100 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Crypto Exchanges') }}{% endblock %}
+{% block title %}{{ _('Crypto Exchanges') }} - WealthOS{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
+<div class="page-content">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="page-header">
         <div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item"><a href="{{ url_for('integrations.dashboard') }}">{{ _('Integrations')
-                            }}</a></li>
-                    <li class="breadcrumb-item active">{{ _('Crypto Exchanges') }}</li>
-                </ol>
+            <nav class="flex text-sm text-secondary mb-1">
+                <a href="{{ url_for('integrations.dashboard') }}" class="hover:text-primary transition-colors">{{
+                    _('Integrations') }}</a>
+                <!-- Separator -->
+                <span class="mx-2">/</span>
+                <span class="text-gray-900 font-medium">{{ _('Crypto') }}</span>
             </nav>
-            <h1 class="h3 mb-0">{{ _('Crypto Exchanges') }}</h1>
+            <h1 class="page-title">{{ _('Crypto Exchanges') }}</h1>
         </div>
     </div>
 
     <!-- Exchange Cards -->
-    <div class="row g-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {% for exchange in exchanges %}
-        <div class="col-md-6 col-lg-4">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle bg-warning bg-opacity-10 p-2 me-3">
-                            <i class="bi bi-currency-exchange text-warning fs-5"></i>
-                        </div>
-                        <div>
-                            <h5 class="mb-0">{{ exchange.name }}</h5>
-                            {% if exchange.enabled %}
-                            <span class="badge bg-success">{{ _('Connected') }}</span>
-                            {% else %}
-                            <span class="badge bg-secondary">{{ _('Not Connected') }}</span>
-                            {% endif %}
-                        </div>
+        <div class="card p-6 h-full flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center">
+                    <div
+                        class="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center mr-3 text-yellow-600">
+                        <i class="fa-brands fa-bitcoin"></i>
                     </div>
-
-                    {% if exchange.enabled %}
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between text-muted small mb-1">
-                            <span>{{ _('Last Sync') }}</span>
-                            <span>{{ exchange.last_sync.strftime('%Y-%m-%d %H:%M') if exchange.last_sync else _('Never')
-                                }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between text-muted small">
-                            <span>{{ _('Status') }}</span>
-                            <span
-                                class="{% if exchange.status == 'connected' %}text-success{% elif exchange.status == 'error' %}text-danger{% endif %}">
-                                {{ exchange.status|capitalize }}
-                            </span>
-                        </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">{{ exchange.name }}</h3>
+                        {% if exchange.enabled %}
+                        <span class="badge bg-green-100 text-green-800 text-xs">{{ _('Connected') }}</span>
+                        {% else %}
+                        <span class="badge bg-gray-100 text-gray-600 text-xs">{{ _('Not Connected') }}</span>
+                        {% endif %}
                     </div>
-                    <div class="d-flex gap-2">
-                        <form action="{{ url_for('integrations.sync_crypto_exchange', exchange_id=exchange.id) }}"
-                            method="post" class="flex-grow-1">
-                            <button type="submit" class="btn btn-primary btn-sm w-100">
-                                <i class="bi bi-arrow-repeat"></i> {{ _('Sync') }}
-                            </button>
-                        </form>
-                        <form action="{{ url_for('integrations.disconnect_crypto_exchange', exchange_id=exchange.id) }}"
-                            method="post">
-                            <button type="submit" class="btn btn-outline-danger btn-sm"
-                                onclick="return confirm('{{ _('Are you sure?') }}')">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
-                        </form>
-                    </div>
-                    {% else %}
-                    <p class="text-muted small mb-3">
-                        {{ _('Connect your %(exchange)s account to automatically sync holdings and transactions.',
-                        exchange=exchange.name) }}
-                    </p>
-                    <a href="{{ url_for('integrations.connect_crypto_exchange', exchange_id=exchange.id) }}"
-                        class="btn btn-outline-primary btn-sm w-100">
-                        <i class="bi bi-plug"></i> {{ _('Connect') }}
-                    </a>
-                    {% endif %}
                 </div>
             </div>
+
+            {% if exchange.enabled %}
+            <div class="bg-gray-50 rounded-lg p-3 mb-4 flex-grow">
+                <div class="flex justify-between text-sm mb-1">
+                    <span class="text-secondary">{{ _('Last Sync') }}</span>
+                    <span class="font-medium text-gray-900">{{ exchange.last_sync.strftime('%Y-%m-%d %H:%M') if
+                        exchange.last_sync else _('Never') }}</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-secondary">{{ _('Status') }}</span>
+                    <span
+                        class="font-medium {% if exchange.status == 'connected' %}text-green-600{% elif exchange.status == 'error' %}text-red-600{% else %}text-gray-600{% endif %}">
+                        {{ exchange.status|capitalize }}
+                    </span>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <form action="{{ url_for('integrations.sync_crypto_exchange', exchange_id=exchange.id) }}" method="post"
+                    class="flex-grow">
+                    <button type="submit" class="btn btn-primary btn-sm w-full">
+                        <i class="fa-solid fa-rotate mr-1"></i> {{ _('Sync') }}
+                    </button>
+                </form>
+                <form action="{{ url_for('integrations.disconnect_crypto_exchange', exchange_id=exchange.id) }}"
+                    method="post">
+                    <button type="submit" class="btn btn-outline-danger btn-sm"
+                        onclick="return confirm('{{ _('Are you sure?') }}')" title="{{ _('Disconnect') }}">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </form>
+            </div>
+            {% else %}
+            <p class="text-secondary text-sm mb-4 flex-grow">
+                {{ _('Connect your %(exchange)s account to automatically sync holdings and transactions.',
+                exchange=exchange.name) }}
+            </p>
+            <a href="{{ url_for('integrations.connect_crypto_exchange', exchange_id=exchange.id) }}"
+                class="btn btn-outline-primary btn-sm w-full mt-auto">
+                <i class="fa-solid fa-plug mr-1"></i> {{ _('Connect') }}
+            </a>
+            {% endif %}
         </div>
         {% endfor %}
     </div>
 
     <!-- Info Card -->
-    <div class="card border-0 bg-light mt-4">
-        <div class="card-body">
-            <div class="d-flex">
-                <i class="bi bi-info-circle text-primary fs-4 me-3"></i>
-                <div>
-                    <h6>{{ _('Security Note') }}</h6>
-                    <p class="small text-muted mb-0">
-                        {{ _('Always use read-only API keys when connecting exchanges. Never share API keys that have
-                        withdrawal permissions. Your credentials are encrypted and stored securely.') }}
-                    </p>
-                </div>
+    <div class="card p-6 bg-blue-50 border border-blue-100">
+        <div class="flex">
+            <div class="mr-3 text-blue-600">
+                <i class="fa-solid fa-circle-info text-xl"></i>
+            </div>
+            <div>
+                <h6 class="font-semibold text-blue-900 mb-1">{{ _('Security Note') }}</h6>
+                <p class="text-sm text-blue-800">
+                    {{ _('Always use read-only API keys when connecting exchanges. Never share API keys that have
+                    withdrawal permissions. Your credentials are encrypted and stored securely.') }}
+                </p>
             </div>
         </div>
     </div>

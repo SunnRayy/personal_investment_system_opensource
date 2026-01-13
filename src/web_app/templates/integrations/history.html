@@ -1,91 +1,104 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Import History') }}{% endblock %}
+{% block title %}{{ _('Import History') }} - WealthOS{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
+<div class="page-content">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="page-header">
         <div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item"><a href="{{ url_for('integrations.dashboard') }}">{{ _('Integrations')
-                            }}</a></li>
-                    <li class="breadcrumb-item active">{{ _('Import History') }}</li>
-                </ol>
+            <nav class="flex text-sm text-secondary mb-1">
+                <a href="{{ url_for('integrations.dashboard') }}" class="hover:text-primary transition-colors">{{
+                    _('Integrations') }}</a>
+                <span class="mx-2">/</span>
+                <span class="text-gray-900 font-medium">{{ _('History') }}</span>
             </nav>
-            <h1 class="h3 mb-0">{{ _('Import History') }}</h1>
+            <h1 class="page-title">{{ _('Import History') }}</h1>
         </div>
     </div>
 
     <!-- History Table -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-0">
+    <div class="card">
+        <div class="table-responsive">
             {% if jobs %}
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>{{ _('Job ID') }}</th>
-                            <th>{{ _('Source') }}</th>
-                            <th>{{ _('Started') }}</th>
-                            <th>{{ _('Duration') }}</th>
-                            <th>{{ _('Status') }}</th>
-                            <th>{{ _('Records') }}</th>
-                            <th class="text-end">{{ _('Actions') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for job in jobs %}
-                        <tr>
-                            <td>
-                                <code>{{ job.job_id[:8] }}</code>
-                            </td>
-                            <td>
-                                <strong>{{ job.source_id }}</strong>
-                                <br><small class="text-muted">{{ job.source_type }}</small>
-                            </td>
-                            <td>
-                                {{ job.started_at.strftime('%Y-%m-%d %H:%M') }}
-                            </td>
-                            <td>
-                                {{ job.duration_seconds|round(1) }}s
-                            </td>
-                            <td>
-                                {% if job.status == 'success' %}
-                                <span class="badge bg-success">{{ _('Success') }}</span>
-                                {% elif job.status == 'partial' %}
-                                <span class="badge bg-warning text-dark">{{ _('Partial') }}</span>
-                                {% elif job.status == 'failed' %}
-                                <span class="badge bg-danger">{{ _('Failed') }}</span>
-                                {% elif job.status == 'running' %}
-                                <span class="badge bg-primary">{{ _('Running') }}</span>
-                                {% else %}
-                                <span class="badge bg-secondary">{{ job.status }}</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <span class="text-success">+{{ job.records_imported }}</span>
-                                {% if job.records_updated %}
-                                <span class="text-muted">/ ~{{ job.records_updated }}</span>
-                                {% endif %}
-                            </td>
-                            <td class="text-end">
-                                <a href="{{ url_for('integrations.import_job_detail', job_id=job.job_id) }}"
-                                    class="btn btn-sm btn-outline-secondary">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            <table class="table w-full">
+                <thead>
+                    <tr>
+                        <th
+                            class="text-left py-3 px-4 bg-gray-50 border-b border-gray-100 font-medium text-gray-500 uppercase text-xs tracking-wider">
+                            {{ _('Job ID') }}</th>
+                        <th
+                            class="text-left py-3 px-4 bg-gray-50 border-b border-gray-100 font-medium text-gray-500 uppercase text-xs tracking-wider">
+                            {{ _('Source') }}</th>
+                        <th
+                            class="text-left py-3 px-4 bg-gray-50 border-b border-gray-100 font-medium text-gray-500 uppercase text-xs tracking-wider">
+                            {{ _('Started') }}</th>
+                        <th
+                            class="text-left py-3 px-4 bg-gray-50 border-b border-gray-100 font-medium text-gray-500 uppercase text-xs tracking-wider">
+                            {{ _('Duration') }}</th>
+                        <th
+                            class="text-left py-3 px-4 bg-gray-50 border-b border-gray-100 font-medium text-gray-500 uppercase text-xs tracking-wider">
+                            {{ _('Status') }}</th>
+                        <th
+                            class="text-left py-3 px-4 bg-gray-50 border-b border-gray-100 font-medium text-gray-500 uppercase text-xs tracking-wider">
+                            {{ _('Records') }}</th>
+                        <th
+                            class="text-right py-3 px-4 bg-gray-50 border-b border-gray-100 font-medium text-gray-500 uppercase text-xs tracking-wider">
+                            {{ _('Actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for job in jobs %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="py-3 px-4 text-sm font-mono text-gray-600">
+                            {{ job.job_id[:8] }}
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="font-medium text-gray-900">{{ job.source_id }}</div>
+                            <div class="text-xs text-secondary">{{ job.source_type }}</div>
+                        </td>
+                        <td class="py-3 px-4 text-sm text-gray-600">
+                            {{ job.started_at.strftime('%Y-%m-%d %H:%M') }}
+                        </td>
+                        <td class="py-3 px-4 text-sm text-gray-600">
+                            {{ job.duration_seconds|round(1) }}s
+                        </td>
+                        <td class="py-3 px-4">
+                            {% if job.status == 'success' %}
+                            <span class="badge bg-green-100 text-green-800 text-xs">{{ _('Success') }}</span>
+                            {% elif job.status == 'partial' %}
+                            <span class="badge bg-yellow-100 text-yellow-800 text-xs">{{ _('Partial') }}</span>
+                            {% elif job.status == 'failed' %}
+                            <span class="badge bg-red-100 text-red-800 text-xs">{{ _('Failed') }}</span>
+                            {% elif job.status == 'running' %}
+                            <span class="badge bg-blue-100 text-blue-800 text-xs">{{ _('Running') }}</span>
+                            {% else %}
+                            <span class="badge bg-gray-100 text-gray-800 text-xs">{{ job.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4 text-sm">
+                            <span class="text-green-600 font-medium">+{{ job.records_imported }}</span>
+                            {% if job.records_updated %}
+                            <span class="text-secondary ml-1">/ ~{{ job.records_updated }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            <a href="{{ url_for('integrations.import_job_detail', job_id=job.job_id) }}"
+                                class="btn btn-sm btn-icon btn-ghost text-secondary hover:text-primary">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
             {% else %}
-            <div class="text-center py-5">
-                <i class="bi bi-clock-history text-muted" style="font-size: 3rem;"></i>
-                <p class="mt-3 text-muted">{{ _('No import history yet') }}</p>
-                <p class="small text-muted">{{ _('Connect a data source and run a sync to see history here') }}</p>
+            <div class="text-center py-12">
+                <div class="text-gray-300 mb-4">
+                    <i class="fa-solid fa-clock-rotate-left text-4xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">{{ _('No import history yet') }}</h3>
+                <p class="text-secondary mb-0">{{ _('Connect a data source and run a sync to see history here') }}</p>
             </div>
             {% endif %}
         </div>

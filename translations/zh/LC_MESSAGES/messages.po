@@ -465,7 +465,7 @@ msgstr ""
 #: src/html_reporter/templates/portfolio_report.html:430
 #: src/web_app/templates/reports/portfolio.html:28
 msgid "Total Portfolio Value"
-msgstr "% of Portfolio"
+msgstr "组合总价值"
 
 #: src/html_reporter/templates/action_compass.html:863
 msgid "Non-Rebalanceable Assets"
