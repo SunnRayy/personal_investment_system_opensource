@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **API Integration Layer** (Phase 1 of revised UX/UI plan):
+  - `src/api/client.ts`: Type-safe fetch wrapper with error handling, timeout support, and dev logging.
+  - `src/api/endpoints.ts`: Centralized endpoint constants for all Flask backend routes.
+  - `src/api/types/`: TypeScript interfaces mirroring Flask API response structures.
+  - `src/hooks/usePortfolio.ts`: React Query hooks for portfolio data (`usePortfolioOverview`, `useAssetsList`, `useDataQuality`).
+  - `src/hooks/useReports.ts`: React Query hooks for reports (`useUnifiedAnalysis`, `useWealthSummary`, `useCashFlow`, `useCorrelation`).
+  - Dashboard.tsx now fetches real data from Flask `/api/portfolio_overview` endpoint.
+  - Added loading states, error handling, and refresh functionality to Dashboard.
+  - Integrated `@tanstack/react-query` for data fetching with caching and retry logic.
+
 - **UX/UI Redesign (Phase 1-4, 7)**:
   - **Design System**: Created `design-tokens.css` with SunnRayy palette (Champagne Gold + Tech Blue) and Inter font.
   - **Components**: Added reusable Jinja2 macros (Buttons, Badges, Metrics, Alerts) in `src/web_app/templates/macros/components.html`.
@@ -21,6 +31,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Unified types in `src/types/index.ts`.
     - Migrated pages: `Dashboard.tsx`, `DataWorkbench.tsx`, `Portfolio.tsx`.
     - Reusable `Layout.tsx` with sidebar navigation.
+
+- **Reports Migration (Phase 10-11)**:
+  - **Portfolio Report** (`/portfolio`): Interactive stacked area charts for asset allocation and performance history.
+  - **Cash Flow Analysis** (`/cashflow`): Sankey-like capital flow diagram and income/expense trends.
+  - **Investment Compass** (`/compass`): Market regime indicators, fear/greed gauge, and rebalancing drift analysis.
+  - **Monte Carlo Simulation** (`/simulation`): Forward-looking wealth projection with confidence intervals and success probability.
+  - **Lifetime Performance** (`/performance`): New report featuring "Gains Analysis" (Realized vs Unrealized) and detailed "Asset Performance Table" (Scorecard).
+  - **Logic Studio** (`/logic-studio`): React SPA implementation with tabbed interface for Classification Rules, Strategy Tiers, and Risk Profiles. Includes Add Rule modal, tier descriptions, and allocation sliders with 100% validation.
+  - **Design System Enforcement**: Strict adherence to SunnRayy palette (Gray scale, Blue primary, Gold for Equity/Gains).
 
 ### Fixed
 

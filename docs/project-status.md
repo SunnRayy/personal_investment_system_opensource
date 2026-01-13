@@ -4,63 +4,66 @@
 
 ## Current Status - 2026-01-13
 
-### Active Work: UX/UI Redesign (WIP - Blocked on Workflow Issues)
+### Active Work: UX/UI Redesign - Phase 11 (Remaining Pages)
 
-**Status**: Phase 1-4 complete. Phase 7 (SPA Refactor) complete. **BLOCKED** on mockup-to-implementation workflow.
+**Status**: Phase 11 IN PROGRESS. Logic Studio React SPA COMPLETE. Preparing for Git commit.
 
 ### Completed (This Session)
 
-- **SPA Architecture Refactor (Phase 7)**:
-  - Created React SPA structure with Vite (`src/components/`, `src/pages/`, `src/types/`).
-  - Migrated templates to React: `Dashboard.tsx`, `DataWorkbench.tsx`, `Portfolio.tsx`.
-  - Unified TypeScript types in `src/types/index.ts`.
-  - Configured routing with `react-router-dom` in `App.tsx`.
+- **Logic Studio React SPA** (`/logic-studio`):
+  - Tab navigation (Classification Rules | Strategy Tiers | Risk Profiles)
+  - Classification Rules: Table with Add Rule modal, delete functionality
+  - Strategy Tiers: Grid cards with editable descriptions (empty state handling)
+  - Risk Profiles: Accordion with allocation sliders, 100% validation
+  - Added sidebar navigation link in `Layout.tsx`
+  - Integrated with existing Flask backend APIs (`/logic-studio/api/*`)
 
-- **Template Migrations**:
-  - Cashflow report Tailwind → SunnRayy CSS migration complete.
-  - Data Workbench Import Wizard UI implemented (wizard.html, wizard.css).
+- **New Files Created**:
+  - `src/pages/LogicStudio.tsx` - Main page component
+  - `src/components/logic_studio/ClassificationRules.tsx`
+  - `src/components/logic_studio/StrategyTiers.tsx`
+  - `src/components/logic_studio/RiskProfiles.tsx`
+  - `src/api/types/logic_studio.ts` - TypeScript interfaces
 
-- **Report Performance Fixes**:
-  - SARIMA forecast disabled in both `wealth_service.py` and `real_report.py`.
+- **Files Modified**:
+  - `src/api/endpoints.ts` - Added Logic Studio API endpoints
+  - `src/components/Layout.tsx` - Added Logic Studio nav item
+  - `src/App.tsx` - Registered `/logic-studio` route
 
-### Current Blockers
+### Previous Session Work (2026-01-13 Earlier)
 
-#### CRITICAL: Redesign Workflow Not Working
-
-- **Issue**: Mockup designs do not translate cleanly to implementation.
-- **Root Cause**: WealthOS templates reference data props (VIX, Treasury rates, etc.) not available in backend.
-- **Example**: Compass report redesign failed with 500 errors due to Jinja2/Markup incompatibilities.
-- **Documentation**: See `docs/ux-ui-redesign/post-mortem-2026-01-13.md`
-
-#### Visuals Not Matching Mockups
-
-- **Gap**: Converted templates look different from WealthOS mockups.
-- **Reasons**:
-  1. Missing data fields require placeholder/fallback handling.
-  2. CSS class translations from Tailwind to SunnRayy incomplete.
-  3. Flask template caching prevents rapid iteration.
-
-### Files Modified (This Session)
-
-```
-src/pages/*.tsx                # [NEW] React page components
-src/components/*.tsx           # [NEW] Reusable React components
-src/App.tsx, src/main.tsx      # [NEW] SPA routing and entry point
-vite.config.ts, package.json   # [NEW] Build configuration
-docs/ux-ui-redesign/task_plan.md  # [MOD] Updated blockers
-docs/ux-ui-redesign/post-mortem-2026-01-13.md # [NEW] Incident documentation
-```
+- **Lifetime Performance Report** (`/performance`): New React page with Gains Analysis and Asset Scorecard.
+- **Simulation Report** (`/simulation`): Monte Carlo simulation with confidence intervals.
+- **Authentication (Phase 9)**: AuthContext, Login page, ProtectedRoute complete.
+- **API Integration (Phase 8)**: React Query hooks, type-safe API client.
+- **SPA Architecture (Phase 7)**: React/Vite project structure.
 
 ### Next Steps
 
-1. **SDM Review**: Get Principal SDM review on mockup-to-implementation process.
-2. **Define Data Contract**: Align mockup data requirements with backend capabilities.
-3. **Template Caching**: Implement Flask template auto-reload in dev mode.
-4. **Resume Migrations**: After workflow fixed, continue Compass/Simulation reports.
+1. **Stage & Commit** current changes to Git (UX/UI Phase 11 progress)
+2. **Phase 11 Remaining**:
+   - Wealth Overview (`/wealth`) - Not yet in React SPA
+   - Settings (`/settings`) - Not yet implemented
+3. **Phase 12: Final Polish**:
+   - Dark mode toggle
+   - WCAG 2.1 AA accessibility audit
+   - Code splitting with React.lazy()
+   - Deprecate unused Flask templates
 
 ### Important Context
 
-- **SPA available at**: `npm run dev` (Vite dev server on localhost:5173).
-- **Flask backend**: Still required for API endpoints (`python main.py run-web --port 5001`).
-- **Mockup source**: `templates/wealthos-*/` folders contain reference HTML.
-- **SunnRayy Design System**: CSS in `design-tokens.css` and `style.css`.
+- **React SPA**: `npm run dev` (Vite dev server on localhost:3000)
+- **Flask backend**: `python main.py run-web --port 5001`
+- **Logic Studio APIs**: Backend already exists at `/logic-studio/api/*`
+- **Data Note**: Strategy Tiers and Risk Profiles require taxonomy data in DB
+
+### Key Files Reference
+
+```
+src/pages/LogicStudio.tsx          # Main Logic Studio page
+src/components/logic_studio/       # Logic Studio components
+src/api/types/logic_studio.ts      # Logic Studio types
+src/api/endpoints.ts               # API endpoint constants
+src/components/Layout.tsx          # Sidebar with nav links
+docs/ux-ui-redesign/task_plan.md   # Full development plan
+```

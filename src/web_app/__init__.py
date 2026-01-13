@@ -49,7 +49,15 @@ def create_app(config_object=None):
         app.config.update(config_object)
         
     # Initialize extensions
-    CORS(app)
+    # Configure CORS for React SPA development (localhost:3000 and 3001)
+    # In development, allow credentials (cookies) for session-based auth
+    default_origins = 'http://localhost:3000,http://localhost:3001'
+    cors_origins = os.environ.get('CORS_ORIGINS', default_origins).split(',')
+    CORS(app, 
+         origins=cors_origins,
+         supports_credentials=True,
+         allow_headers=['Content-Type', 'Authorization'],
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
     
     # Initialize Login Manager
     login_manager = LoginManager()

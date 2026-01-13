@@ -68,8 +68,8 @@ const WorkbenchDashboard: React.FC<{ onNext: () => void }> = ({ onNext }) => {
     return (
         <div className="max-w-5xl mx-auto py-12">
             <div className="text-center mb-12">
-                <h1 className="text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Data Workbench</h1>
-                <p className="text-lg text-slate-500">Choose data to import into your portfolio</p>
+                <h1 className="text-4xl font-extrabold text-gray-900 mb-2 tracking-tight">Data Workbench</h1>
+                <p className="text-lg text-gray-500">Choose data to import into your portfolio</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -101,7 +101,7 @@ const WorkbenchDashboard: React.FC<{ onNext: () => void }> = ({ onNext }) => {
             </div>
 
             <div className="mt-16 text-center">
-                <button className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-blue-600 transition-colors">
+                <button className="inline-flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-blue-600 transition-colors">
                     <HelpCircle size={18} />
                     Need help with data formats? View Documentation
                 </button>
@@ -120,8 +120,8 @@ const WorkbenchCard: React.FC<{
     <button
         onClick={onClick}
         className={cn(
-            "group relative flex items-start p-6 text-left bg-white border-2 rounded-2xl transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/60 w-full",
-            pending ? 'border-amber-400 bg-amber-50/20' : 'border-slate-100 hover:border-blue-500/50'
+            "group relative flex items-start p-6 text-left bg-white border-2 rounded-2xl transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/60 w-full",
+            pending ? 'border-amber-400 bg-amber-50/20' : 'border-gray-100 hover:border-blue-500/50'
         )}
     >
         {pending && (
@@ -136,8 +136,8 @@ const WorkbenchCard: React.FC<{
             <Icon size={24} />
         </div>
         <div>
-            <h3 className={cn("text-lg font-bold mb-1 transition-colors", pending ? 'text-amber-900 group-hover:text-amber-700' : 'text-slate-900 group-hover:text-blue-600')}>{title}</h3>
-            <p className="text-sm text-slate-500 leading-relaxed">{description}</p>
+            <h3 className={cn("text-lg font-bold mb-1 transition-colors", pending ? 'text-amber-900 group-hover:text-amber-700' : 'text-gray-900 group-hover:text-blue-600')}>{title}</h3>
+            <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
         </div>
     </button>
 );
@@ -146,33 +146,33 @@ const UploadStep: React.FC<{ onNext: () => void; onBack: () => void }> = ({ onNe
     return (
         <div className="max-w-4xl mx-auto space-y-10">
             <div className="text-center">
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">Upload Workflow</h1>
-                <p className="text-slate-500">Step 2 of 5: Import your CSV data</p>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Upload Workflow</h1>
+                <p className="text-gray-500">Step 2 of 5: Import your CSV data</p>
             </div>
 
             <WorkflowStepper step={2} />
 
-            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                <div className="bg-slate-50/50 border-b border-slate-100 p-1 flex justify-center">
-                    <div className="flex bg-slate-200 rounded-lg p-1 w-full max-w-sm my-4">
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+                <div className="bg-gray-50/50 border-b border-gray-100 p-1 flex justify-center">
+                    <div className="flex bg-gray-200 rounded-lg p-1 w-full max-w-sm my-4">
                         <button className="flex-1 px-4 py-2 bg-white text-blue-600 font-bold rounded shadow-sm text-sm">Upload CSV</button>
-                        <button className="flex-1 px-4 py-2 text-slate-500 font-medium text-sm">Copy & Paste</button>
+                        <button className="flex-1 px-4 py-2 text-gray-500 font-medium text-sm">Copy & Paste</button>
                     </div>
                 </div>
 
                 <div className="p-10 space-y-8">
                     <div className="grid grid-cols-2 gap-8">
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-slate-700">Column Separator</label>
-                            <select className="w-full h-11 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm px-3">
+                            <label className="text-sm font-semibold text-gray-700">Column Separator</label>
+                            <select className="w-full h-11 bg-gray-50 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm px-3">
                                 <option>Comma (,)</option>
                                 <option>Semicolon (;)</option>
                                 <option>Tab</option>
                             </select>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-slate-700">Target Account</label>
-                            <select className="w-full h-11 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm px-3">
+                            <label className="text-sm font-semibold text-gray-700">Target Account</label>
+                            <select className="w-full h-11 bg-gray-50 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm px-3">
                                 <option>Multi-account import</option>
                                 <option>Savings ...1234</option>
                                 <option>Checking ...5678</option>
@@ -181,18 +181,18 @@ const UploadStep: React.FC<{ onNext: () => void; onBack: () => void }> = ({ onNe
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-semibold text-slate-700">Upload File</label>
+                        <label className="text-sm font-semibold text-gray-700">Upload File</label>
                         <div className="border-2 border-dashed border-blue-200 bg-blue-50/30 rounded-2xl p-16 flex flex-col items-center justify-center text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-all group">
                             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-blue-600 shadow-sm mb-4 transition-transform group-hover:scale-110">
                                 <CloudUpload size={32} />
                             </div>
-                            <h3 className="text-lg font-bold text-slate-900 mb-1">Click to upload or drag and drop</h3>
-                            <p className="text-sm text-slate-500 mb-4">SVG, PNG, JPG or GIF (max. 800x400px)</p>
-                            <div className="px-3 py-1 bg-white border border-slate-200 rounded text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                            <h3 className="text-lg font-bold text-gray-900 mb-1">Click to upload or drag and drop</h3>
+                            <p className="text-sm text-gray-500 mb-4">SVG, PNG, JPG or GIF (max. 800x400px)</p>
+                            <div className="px-3 py-1 bg-white border border-gray-200 rounded text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                                 Supported formats: .csv, .xls, .xlsx
                             </div>
                         </div>
-                        <div className="flex justify-between items-center px-1 text-xs text-slate-400">
+                        <div className="flex justify-between items-center px-1 text-xs text-gray-400">
                             <button className="flex items-center gap-1 hover:text-blue-600">
                                 <FileText size={14} /> Download sample template
                             </button>
@@ -200,8 +200,8 @@ const UploadStep: React.FC<{ onNext: () => void; onBack: () => void }> = ({ onNe
                         </div>
                     </div>
 
-                    <div className="pt-6 border-t border-slate-100 flex items-center justify-end gap-4">
-                        <button onClick={onBack} className="px-6 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-600 transition-colors">Cancel</button>
+                    <div className="pt-6 border-t border-gray-100 flex items-center justify-end gap-4">
+                        <button onClick={onBack} className="px-6 py-2.5 text-sm font-semibold text-gray-400 hover:text-gray-600 transition-colors">Cancel</button>
                         <button
                             onClick={onNext}
                             className="px-10 py-2.5 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-500/25 hover:bg-blue-700 transition-all flex items-center gap-2 group"
@@ -248,17 +248,17 @@ const MapStep: React.FC<{ onNext: () => void; onBack: () => void }> = ({ onNext,
         <div className="max-w-[1400px] mx-auto space-y-8 relative">
             {isMapping && (
                 <div className="fixed inset-0 bg-white/60 backdrop-blur-[2px] z-50 flex flex-col items-center justify-center">
-                    <div className="w-64 h-2 bg-slate-100 rounded-full overflow-hidden mb-4">
+                    <div className="w-64 h-2 bg-gray-100 rounded-full overflow-hidden mb-4">
                         <div className="h-full bg-blue-600 animate-[shimmer_1.5s_infinite] w-1/2"></div>
                     </div>
-                    <p className="text-sm font-bold text-slate-600 animate-pulse">Gemini AI is scanning your data structure...</p>
+                    <p className="text-sm font-bold text-gray-600 animate-pulse">Gemini AI is scanning your data structure...</p>
                 </div>
             )}
 
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div className="space-y-1">
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Map CSV Columns</h1>
-                    <p className="text-slate-500">Match your file columns to WealthOS's data structure.</p>
+                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Map CSV Columns</h1>
+                    <p className="text-gray-500">Match your file columns to WealthOS's data structure.</p>
                 </div>
                 <div className="flex items-center gap-2 bg-green-50 border border-green-100 text-green-700 px-4 py-2 rounded-lg shadow-sm">
                     <Wand2 size={18} />
@@ -271,33 +271,33 @@ const MapStep: React.FC<{ onNext: () => void; onBack: () => void }> = ({ onNext,
             <div className="grid grid-cols-12 gap-8 items-start">
                 <div className="col-span-7 space-y-4">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <FileText className="text-slate-400" size={20} />
+                        <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            <FileText className="text-gray-400" size={20} />
                             CSV Preview
                         </h2>
-                        <div className="px-3 py-1 bg-slate-100 border border-slate-200 rounded text-[11px] font-mono text-slate-500">
+                        <div className="px-3 py-1 bg-gray-100 border border-gray-200 rounded text-[11px] font-mono text-gray-500">
                             fidelity_export_2023.csv
                         </div>
                     </div>
-                    <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
-                                <thead className="bg-slate-50 text-slate-400 font-bold uppercase text-[10px] tracking-widest border-b border-slate-100">
+                                <thead className="bg-gray-50 text-gray-400 font-bold uppercase text-[10px] tracking-widest border-b border-gray-100">
                                     <tr>
                                         {['Date', 'Action', 'Symbol', 'Description', 'Amount'].map(h => (
                                             <th key={h} className="px-4 py-3">{h}</th>
                                         ))}
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100 text-[13px] text-slate-600">
-                                    <tr className="hover:bg-slate-50/50">
+                                <tbody className="divide-y divide-gray-100 text-[13px] text-gray-600">
+                                    <tr className="hover:bg-gray-50/50">
                                         <td className="px-4 py-3 font-mono">2023-10-24</td>
                                         <td className="px-4 py-3">BUY</td>
                                         <td className="px-4 py-3 font-bold text-blue-600">AAPL</td>
                                         <td className="px-4 py-3 truncate max-w-[150px]">APPLE INC COM</td>
                                         <td className="px-4 py-3">-173.50</td>
                                     </tr>
-                                    <tr className="hover:bg-slate-50/50">
+                                    <tr className="hover:bg-gray-50/50">
                                         <td className="px-4 py-3 font-mono">2023-10-24</td>
                                         <td className="px-4 py-3">DIVIDEND</td>
                                         <td className="px-4 py-3 font-bold text-blue-600">VTI</td>
@@ -312,21 +312,21 @@ const MapStep: React.FC<{ onNext: () => void; onBack: () => void }> = ({ onNext,
 
                 <div className="col-span-5 space-y-4">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <Filter className="text-slate-400" size={20} />
+                        <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            <Filter className="text-gray-400" size={20} />
                             Configuration
                         </h2>
                         <button
                             onClick={handleMagicMap}
                             disabled={isMapping}
-                            className="flex items-center gap-2 px-4 py-1.5 bg-indigo-600 text-white text-[11px] font-bold uppercase tracking-widest rounded-full hover:bg-indigo-700 transition-all shadow-md hover:shadow-indigo-200 disabled:opacity-50"
+                            className="flex items-center gap-2 px-4 py-1.5 bg-blue-600 text-white text-[11px] font-bold uppercase tracking-widest rounded-full hover:bg-blue-700 transition-all shadow-md hover:shadow-blue-200 disabled:opacity-50"
                         >
                             <Wand2 size={14} />
                             Magic Map with AI
                         </button>
                     </div>
 
-                    <div className="bg-white border border-slate-200 rounded-2xl shadow-lg p-8 space-y-6">
+                    <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-8 space-y-6">
                         {Object.entries(mappings).map(([field, value]) => (
                             <MappingField
                                 key={field}
@@ -338,8 +338,8 @@ const MapStep: React.FC<{ onNext: () => void; onBack: () => void }> = ({ onNext,
                             />
                         ))}
 
-                        <div className="pt-6 border-t border-slate-100 flex items-center justify-between">
-                            <button onClick={onBack} className="px-6 py-2.5 text-sm font-bold text-slate-400 hover:text-slate-600">Back</button>
+                        <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
+                            <button onClick={onBack} className="px-6 py-2.5 text-sm font-bold text-gray-400 hover:text-gray-600">Back</button>
                             <button
                                 onClick={onNext}
                                 className="px-8 py-2.5 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition-all flex items-center gap-2 group"
@@ -398,19 +398,19 @@ const ReviewStep: React.FC<{ onNext: () => void; onBack: () => void }> = ({ onNe
         <div className="max-w-[1600px] mx-auto space-y-8 h-full flex flex-col relative">
             <div className="flex items-end justify-between">
                 <div className="space-y-1">
-                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-4">
+                    <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-4">
                         Review & Fix Errors
                         <span className={`px-3 py-0.5 rounded-full text-xs font-bold border transition-colors ${errorCount > 0 ? 'bg-red-100 text-red-700 border-red-200' : 'bg-emerald-100 text-emerald-700 border-emerald-200'}`}>
                             {errorCount > 0 ? `${errorCount} Errors Remaining` : 'All Errors Fixed!'}
                         </span>
                     </h1>
-                    <p className="text-slate-500">Please review the parsed data. AI has identified {errorCount} issues.</p>
+                    <p className="text-gray-500">Please review the parsed data. AI has identified {errorCount} issues.</p>
                 </div>
                 <div className="flex gap-3">
                     <button
                         onClick={handleMagicFix}
                         disabled={isFixing || errorCount === 0}
-                        className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg hover:shadow-indigo-200 disabled:opacity-50 disabled:shadow-none"
+                        className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition-all shadow-lg hover:shadow-blue-200 disabled:opacity-50 disabled:shadow-none"
                     >
                         {isFixing ? (
                             <Loader2 className="animate-spin" size={18} />
@@ -422,66 +422,66 @@ const ReviewStep: React.FC<{ onNext: () => void; onBack: () => void }> = ({ onNe
                 </div>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-2xl shadow-xl flex-1 flex flex-col overflow-hidden max-h-[600px]">
-                <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-white flex-shrink-0">
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-xl flex-1 flex flex-col overflow-hidden max-h-[600px]">
+                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white flex-shrink-0">
                     <div className="flex items-center gap-4">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                             <input
                                 type="text"
                                 placeholder="Filter transactions..."
-                                className="pl-10 pr-4 py-2 text-sm border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 w-72 h-10 border outline-none"
+                                className="pl-10 pr-4 py-2 text-sm border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 w-72 h-10 border outline-none"
                             />
                         </div>
-                        <div className="h-6 w-px bg-slate-200"></div>
-                        <button className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-lg transition-colors">
+                        <div className="h-6 w-px bg-gray-200"></div>
+                        <button className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-gray-500 hover:bg-gray-50 rounded-lg transition-colors">
                             <Filter size={16} /> All Status
                         </button>
                     </div>
-                    <div className="flex items-center gap-2 text-[13px] text-slate-400">
+                    <div className="flex items-center gap-2 text-[13px] text-gray-400">
                         <Info className="text-blue-500" size={16} />
-                        AI suggestions are marked with <span className="text-indigo-600 font-bold">Sparkles</span>
+                        AI suggestions are marked with <span className="text-blue-600 font-bold">Sparkles</span>
                     </div>
                 </div>
 
                 <div className="flex-1 overflow-auto">
                     <table className="w-full text-left border-collapse min-w-[1200px]">
-                        <thead className="sticky top-0 bg-slate-50 z-20 border-b border-slate-200 shadow-sm">
-                            <tr className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                <th className="py-4 px-6 w-12 border-r border-slate-200 text-center"><input type="checkbox" className="rounded border-slate-300" /></th>
-                                <th className="py-4 px-6 border-r border-slate-200">Date</th>
-                                <th className="py-4 px-6 border-r border-slate-200">Description</th>
-                                <th className="py-4 px-6 border-r border-slate-200">Category</th>
-                                <th className="py-4 px-6 border-r border-slate-200 text-right">Amount</th>
+                        <thead className="sticky top-0 bg-gray-50 z-20 border-b border-gray-200 shadow-sm">
+                            <tr className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                <th className="py-4 px-6 w-12 border-r border-gray-200 text-center"><input type="checkbox" className="rounded border-gray-300" /></th>
+                                <th className="py-4 px-6 border-r border-gray-200">Date</th>
+                                <th className="py-4 px-6 border-r border-gray-200">Description</th>
+                                <th className="py-4 px-6 border-r border-gray-200">Category</th>
+                                <th className="py-4 px-6 border-r border-gray-200 text-right">Amount</th>
                                 <th className="py-4 px-6">Status</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 text-sm">
+                        <tbody className="divide-y divide-gray-100 text-sm">
                             {data.map((row) => (
                                 <tr
                                     key={row.id}
-                                    className={`hover:bg-slate-50/50 transition-colors ${row.status === 'error' ? 'bg-red-50/40 border-l-4 border-l-red-500' : row.id.includes('fixed') ? 'bg-indigo-50/20 border-l-4 border-l-indigo-400' : ''}`}
+                                    className={`hover:bg-gray-50/50 transition-colors ${row.status === 'error' ? 'bg-red-50/40 border-l-4 border-l-red-500' : row.id.includes('fixed') ? 'bg-blue-50/20 border-l-4 border-l-blue-400' : ''}`}
                                 >
-                                    <td className="py-3 px-6 text-center border-r border-slate-100">
-                                        <input type="checkbox" className="rounded border-slate-300" />
+                                    <td className="py-3 px-6 text-center border-r border-gray-100">
+                                        <input type="checkbox" className="rounded border-gray-300" />
                                     </td>
-                                    <td className={`py-3 px-6 font-mono border-r border-slate-100 ${row.status === 'error' && row.errorMsg?.includes('date') ? 'text-red-600 font-bold' : row.id.includes('fixed') ? 'text-indigo-600 font-bold' : 'text-slate-500'}`}>
+                                    <td className={`py-3 px-6 font-mono border-r border-gray-100 ${row.status === 'error' && row.errorMsg?.includes('date') ? 'text-red-600 font-bold' : row.id.includes('fixed') ? 'text-blue-600 font-bold' : 'text-gray-500'}`}>
                                         {row.date}
-                                        {row.id.includes('fixed') && <Wand2 size={12} className="inline ml-1 text-indigo-400" />}
+                                        {row.id.includes('fixed') && <Wand2 size={12} className="inline ml-1 text-blue-400" />}
                                     </td>
-                                    <td className="py-3 px-6 font-bold text-slate-900 border-r border-slate-100">{row.description}</td>
-                                    <td className="py-3 px-6 border-r border-slate-100">
+                                    <td className="py-3 px-6 font-bold text-gray-900 border-r border-gray-100">{row.description}</td>
+                                    <td className="py-3 px-6 border-r border-gray-100">
                                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider ${row.status === 'error' && row.errorMsg?.includes('category')
                                                 ? 'bg-red-100 text-red-600 italic'
-                                                : row.id.includes('fixed') ? 'bg-indigo-100 text-indigo-600' : 'bg-blue-50 text-blue-600'
+                                                : row.id.includes('fixed') ? 'bg-blue-100 text-blue-600' : 'bg-blue-50 text-blue-600'
                                             }`}>
                                             {row.category}
                                             {row.id.includes('fixed') && <Wand2 size={12} className="ml-1" />}
                                         </span>
                                     </td>
-                                    <td className={`py-3 px-6 font-mono text-right border-r border-slate-100 ${row.status === 'error' && row.amount < 0 && row.category === 'Income'
+                                    <td className={`py-3 px-6 font-mono text-right border-r border-gray-100 ${row.status === 'error' && row.amount < 0 && row.category === 'Income'
                                             ? 'text-red-600 font-bold'
-                                            : row.amount > 0 ? 'text-emerald-600 font-bold' : 'text-slate-900'
+                                            : row.amount > 0 ? 'text-emerald-600 font-bold' : 'text-gray-900'
                                         }`}>
                                         {row.amount < 0 ? '-' : '+'}${Math.abs(row.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </td>
@@ -506,17 +506,17 @@ const ReviewStep: React.FC<{ onNext: () => void; onBack: () => void }> = ({ onNe
                     </table>
                 </div>
 
-                <div className="px-8 py-6 bg-slate-50 border-t border-slate-200 flex items-center justify-between flex-shrink-0">
+                <div className="px-8 py-6 bg-gray-50 border-t border-gray-200 flex items-center justify-between flex-shrink-0">
                     <div className="flex items-center gap-6">
                         <div className="flex items-center gap-2.5">
                             <span className={`w-2.5 h-2.5 rounded-full ${errorCount === 0 ? 'bg-emerald-500' : 'bg-red-500 animate-pulse'}`}></span>
-                            <span className="text-sm font-bold text-slate-600">{data.length - errorCount} rows ready</span>
+                            <span className="text-sm font-bold text-gray-600">{data.length - errorCount} rows ready</span>
                         </div>
                         {errorCount > 0 && <span className="text-sm font-bold text-red-500">{errorCount} need fixing</span>}
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <button onClick={onBack} className="px-6 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl">
+                        <button onClick={onBack} className="px-6 py-3 bg-white border border-gray-200 text-gray-600 font-bold rounded-xl">
                             Back
                         </button>
                         <button
@@ -540,11 +540,11 @@ const CompleteStep: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
             <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-6">
                 <CheckCircle size={40} />
             </div>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Import Successful!</h1>
-            <p className="text-slate-500 mb-8 max-w-md">Your transactions have been successfully imported and categorized. Your portfolio is now up to date.</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Import Successful!</h1>
+            <p className="text-gray-500 mb-8 max-w-md">Your transactions have been successfully imported and categorized. Your portfolio is now up to date.</p>
             <button
                 onClick={onFinish}
-                className="px-8 py-3 bg-slate-900 text-white font-bold rounded-xl shadow-lg hover:bg-slate-800 transition-all"
+                className="px-8 py-3 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:bg-gray-800 transition-all"
             >
                 Return to Dashboard
             </button>
@@ -556,16 +556,16 @@ const CompleteStep: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
 
 const WorkflowStepper: React.FC<{ step: number }> = ({ step }) => (
     <div className="flex items-center justify-between px-10 relative mb-12">
-        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-200 -translate-y-1/2 z-0"></div>
+        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -translate-y-1/2 z-0"></div>
         {[1, 2, 3, 4, 5].map((s) => (
             <div key={s} className="relative z-10 flex flex-col items-center gap-2">
                 <div className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all shadow-sm",
-                    s < step ? 'bg-blue-600 text-white' : s === step ? 'bg-blue-600 text-white ring-8 ring-blue-50' : 'bg-white text-slate-400 border-2 border-slate-100'
+                    s < step ? 'bg-blue-600 text-white' : s === step ? 'bg-blue-600 text-white ring-8 ring-blue-50' : 'bg-white text-gray-400 border-2 border-gray-100'
                 )}>
                     {s < step ? <Check size={18} /> : s}
                 </div>
-                <span className={cn("text-xs font-bold transition-colors", s <= step ? 'text-blue-600' : 'text-slate-400')}>
+                <span className={cn("text-xs font-bold transition-colors", s <= step ? 'text-blue-600' : 'text-gray-400')}>
                     {s === 1 && 'Source'}
                     {s === 2 && 'Upload'}
                     {s === 3 && 'Map'}
@@ -592,20 +592,20 @@ const MappingField: React.FC<{
     onChange: (v: string) => void;
     required?: boolean;
 }> = ({ label, icon: Icon, value, onChange, required }) => (
-    <div className="p-4 border border-slate-100 rounded-2xl space-y-2 hover:border-blue-500/30 transition-colors">
+    <div className="p-4 border border-gray-100 rounded-2xl space-y-2 hover:border-blue-500/30 transition-colors">
         <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-sm font-bold text-slate-800">
-                <Icon size={18} className="text-slate-400" />
+            <label className="flex items-center gap-2 text-sm font-bold text-gray-800">
+                <Icon size={18} className="text-gray-400" />
                 {label} {required && <span className="text-red-500">*</span>}
             </label>
             {value !== '-- Select Column --' && (
-                <span className="text-[9px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100 uppercase tracking-widest">Matched</span>
+                <span className="text-[9px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 uppercase tracking-widest">Matched</span>
             )}
         </div>
         <select
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full h-10 bg-slate-50 border-slate-200 rounded-lg text-sm font-medium text-slate-700 focus:ring-blue-500 outline-none px-2"
+            className="w-full h-10 bg-gray-50 border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:ring-blue-500 outline-none px-2"
         >
             <option>-- Select Column --</option>
             <option>Date (Column A)</option>
