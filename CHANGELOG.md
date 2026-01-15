@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **E2E Testing with Playwright** (Phase 13 of UX/UI redesign):
+  - Playwright test framework with 24 comprehensive tests
+  - Test suites: Authentication, Dashboard, Navigation, Reports, Settings
+  - Auto-start configuration for Flask backend and Vite dev server
+  - npm scripts: `test:e2e`, `test:e2e:headed`, `test:e2e:ui`
+
 - **API Integration Layer** (Phase 1 of revised UX/UI plan):
   - `src/api/client.ts`: Type-safe fetch wrapper with error handling, timeout support, and dev logging.
   - `src/api/endpoints.ts`: Centralized endpoint constants for all Flask backend routes.

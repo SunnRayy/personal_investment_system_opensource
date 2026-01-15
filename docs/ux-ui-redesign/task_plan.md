@@ -1,6 +1,6 @@
 # Feature: UX/UI Redesign
 
-> **Last Updated**: 2026-01-14
+> **Last Updated**: 2026-01-15
 > **Full Plan**: See [development-plan.md](./development-plan.md) for detailed implementation guide.
 
 ## Overview
@@ -24,6 +24,7 @@ Complete redesign of the Personal Investment System UI following `docs/design-fr
 | 10 | Reports Migration | ✅ Complete | Portfolio, CashFlow, Compass pages |
 | 11 | Remaining Pages | ✅ Complete | Wealth, Settings, Simulation, Performance, Logic Studio |
 | 12 | Final Polish | ✅ Complete | Dark mode, code splitting, template deprecation |
+| 13 | E2E Testing | ✅ Complete | Playwright tests for all pages (24 tests) |
 
 ---
 
@@ -124,6 +125,22 @@ Complete redesign of the Personal Investment System UI following `docs/design-fr
   - Kept error pages, integrations, onboarding active
 - [ ] WCAG 2.1 AA accessibility audit (deferred)
 
+### Phase 13: E2E Testing ✅ (2026-01-15)
+
+- [x] Install and configure Playwright
+  - `playwright.config.ts` with auto-start for Flask and Vite
+  - Chromium browser for testing
+- [x] Create comprehensive E2E test suites
+  - `e2e/auth.spec.ts` - Login, session, redirect (5 tests)
+  - `e2e/dashboard.spec.ts` - Layout, API data loading (4 tests)
+  - `e2e/navigation.spec.ts` - Sidebar navigation (6 tests)
+  - `e2e/reports.spec.ts` - All report pages (6 tests)
+  - `e2e/settings.spec.ts` - Preferences, dark mode (3 tests)
+- [x] Fix Vite proxy configuration
+  - Changed from proxying page routes to API-only paths
+  - Enables proper React Router handling for SPA navigation
+- [x] All 24 tests passing
+
 ---
 
 ## Progress Log
@@ -148,6 +165,7 @@ Complete redesign of the Personal Investment System UI following `docs/design-fr
 | 2026-01-14 | **Dark mode toggle** - PreferencesContext + Tailwind config | Code splitting |
 | 2026-01-14 | **Code splitting** - React.lazy(), chunk size 235KB | Template deprecation |
 | 2026-01-14 | **Template deprecation** - 21 templates moved to deprecated/ | **Phase 12 Complete** |
+| 2026-01-15 | **E2E Testing** - Playwright with 24 tests, all passing | **Phase 13 Complete** |
 
 ---
 
