@@ -101,6 +101,35 @@ export interface UnifiedAnalysisResponse {
   error?: string;
 }
 
+// Market Thermometer Indicator (from /api/market_thermometer)
+export interface MarketIndicator {
+  value: number;
+  zone: string;
+  level: number;  // 0-4 (0=extreme fear/undervalued, 4=extreme greed/overvalued)
+  status: 'success' | 'error';
+  error_message?: string;
+  data_age_warning?: string;
+}
+
+// Market Thermometer Response
+export interface MarketThermometerData {
+  shiller_pe: MarketIndicator;
+  fear_greed: MarketIndicator;
+  vix: MarketIndicator;
+  buffett_us: MarketIndicator;
+  buffett_china: MarketIndicator;
+  buffett_japan: MarketIndicator;
+  buffett_europe: MarketIndicator;
+  last_updated: string;
+}
+
+export interface MarketThermometerResponse {
+  status: 'success' | 'error';
+  data: MarketThermometerData | null;
+  generated_at: string;
+  error?: string;
+}
+
 // Wealth Dashboard Summary
 export interface WealthSummaryResponse {
   status: 'success' | 'error';

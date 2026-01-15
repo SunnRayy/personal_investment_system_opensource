@@ -281,9 +281,15 @@ const Wealth: React.FC = () => {
       </div>
 
       {/* KPI Cards */}
+      {summary?.period_label && summary.period_label !== 'YTD' && (
+        <div className="mb-2 flex items-center gap-2 text-sm text-amber-600">
+          <AlertCircle size={14} />
+          <span>Showing <strong>{summary.period_label}</strong> data (no current year data available)</span>
+        </div>
+      )}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KPICard
-          label="YTD Income"
+          label={`${summary?.period_label || 'YTD'} Income`}
           value={summary?.ytd_income || '$384,000'}
           yoy={summary?.ytd_income_yoy || '+12.5%'}
           icon={TrendingUp}
@@ -291,7 +297,7 @@ const Wealth: React.FC = () => {
           iconColor="text-emerald-600"
         />
         <KPICard
-          label="YTD Expenses"
+          label={`${summary?.period_label || 'YTD'} Expenses`}
           value={summary?.ytd_expense || '$218,500'}
           yoy={summary?.ytd_expense_yoy || '+8.2%'}
           icon={TrendingDown}
@@ -299,7 +305,7 @@ const Wealth: React.FC = () => {
           iconColor="text-red-600"
         />
         <KPICard
-          label="YTD Investments"
+          label={`${summary?.period_label || 'YTD'} Investments`}
           value={summary?.ytd_investment || '$92,000'}
           yoy={summary?.ytd_investment_yoy || '+15.3%'}
           icon={PiggyBank}
@@ -307,7 +313,7 @@ const Wealth: React.FC = () => {
           iconColor="text-blue-600"
         />
         <KPICard
-          label="YTD Net Cash Flow"
+          label={`${summary?.period_label || 'YTD'} Net Cash Flow`}
           value={summary?.ytd_net_cf || '$73,500'}
           yoy={summary?.ytd_net_cf_yoy || '+18.7%'}
           icon={Wallet}

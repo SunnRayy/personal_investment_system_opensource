@@ -25,6 +25,7 @@ Complete redesign of the Personal Investment System UI following `docs/design-fr
 | 11 | Remaining Pages | ✅ Complete | Wealth, Settings, Simulation, Performance, Logic Studio |
 | 12 | Final Polish | ✅ Complete | Dark mode, code splitting, template deprecation |
 | 13 | E2E Testing | ✅ Complete | Playwright tests for all pages (24 tests) |
+| 14 | Upstream Fixes | 🔄 Pending | Fixes from Legacy Real Data testing |
 
 ---
 
@@ -140,6 +141,34 @@ Complete redesign of the Personal Investment System UI following `docs/design-fr
   - Changed from proxying page routes to API-only paths
   - Enables proper React Router handling for SPA navigation
 - [x] All 24 tests passing
+
+### Phase 14: Upstream Fixes (From Legacy Testing) 🔄
+
+> **Context**: Issues identified during real-data testing in the Legacy Repo (Jan 15, 2026).
+
+- [x] **Infrastructure**
+  - [x] Change default backend port to **5001** (AirPlay conflict)
+  - [x] Update `vite.config.ts` proxy to 5001
+
+- [x] **Data Binding (Priority)**
+  - [x] Bind Action Compass to `market_thermometer` API (Fear & Greed, Buffett Ind.)
+  - [x] Implement "Smart Fallback" for Wealth Dashboard KPIs (empty current year → L12M)
+
+- [x] **Visual Polish**
+  - [x] Improve CashFlow Sankey styling (SVG flow connectors, gradients, hover effects)
+  - [x] Create `GlassTooltip.tsx` for glassmorphism chart tooltips
+  - [ ] Fix Dashboard Hero Chart hover labels
+  - [ ] Diversify global Allocation Chart colors
+  - [ ] Align Logic Studio Settings UI with mockups
+
+- [x] **Data Binding**
+  - [x] Remove demo arrays from Portfolio Report; bind `useUnifiedAnalysis` with fallback
+
+- [x] **Functionality**
+  - [x] Fix Data Workbench Upload (drag/drop, click, paste tab)
+  - [x] Create `TimePeriodSelector.tsx` component
+  - [x] Wire up TimePeriodSelector across pages (Portfolio, CashFlow, Compass)
+  - [x] Enable Export buttons with CSV download
 
 ---
 

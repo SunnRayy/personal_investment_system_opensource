@@ -404,13 +404,17 @@ class WealthService:
         Calculate YTD metrics for KPI cards: Income, Expense, Investment, Net Cash Flow.
         Each includes absolute value and YoY % comparison with previous year.
         Systematically sums specific authoritative columns to avoid double-counting.
+        
+        **Smart Fallback**: If current year has no data, falls back to L12M (Last 12 Months)
+        with a clear indicator so users know they're viewing historical data.
         """
         if df is None or df.empty:
             return {
                 'ytd_income': '--', 'ytd_income_yoy': '--',
                 'ytd_expense': '--', 'ytd_expense_yoy': '--',
                 'ytd_investment': '--', 'ytd_investment_yoy': '--',
-                'ytd_net_cf': '--', 'ytd_net_cf_yoy': '--'
+                'ytd_net_cf': '--', 'ytd_net_cf_yoy': '--',
+                'period_label': 'No Data'
             }
         
         now = pd.Timestamp.now()
@@ -430,10 +434,9 @@ class WealthService:
             'Income_Passive_Interest_CNY'
         ]
 
-        def get_sums(year, month):
-            start = pd.Timestamp(year, 1, 1)
-            end = pd.Timestamp(year, month, 1) + pd.DateOffset(months=1) - pd.Timedelta(days=1)
-            mask = (df.index >= start) & (df.index <= end)
+        def get_sums_for_range(start_date, end_date):
+            """Get income, expense, investment sums for a date range."""
+            mask = (df.index >= start_date) & (df.index <= end_date)
             if not mask.any():
                 return 0, 0, 0
             
@@ -448,10 +451,36 @@ class WealthService:
             
             return inc, exp, inv
 
-        ytd_inc, ytd_exp, ytd_inv = get_sums(current_year, current_month)
-        ytd_net = ytd_inc - ytd_exp - ytd_inv
+        def get_ytd_sums(year, month):
+            """Get YTD sums for a specific year up to specified month."""
+            start = pd.Timestamp(year, 1, 1)
+            end = pd.Timestamp(year, month, 1) + pd.DateOffset(months=1) - pd.Timedelta(days=1)
+            return get_sums_for_range(start, end)
+
+        # Try current year first
+        ytd_inc, ytd_exp, ytd_inv = get_ytd_sums(current_year, current_month)
+        use_l12m_fallback = (ytd_inc == 0 and ytd_exp == 0 and ytd_inv == 0)
         
-        prev_inc, prev_exp, prev_inv = get_sums(last_year, current_month)
+        period_label = 'YTD'  # Default label
+        
+        if use_l12m_fallback:
+            # Smart Fallback: Use Last 12 Months instead
+            logger.info("Smart Fallback: Current year empty, using L12M metrics")
+            end_date = df.index.max()
+            start_date = end_date - pd.DateOffset(months=12)
+            
+            ytd_inc, ytd_exp, ytd_inv = get_sums_for_range(start_date, end_date)
+            period_label = 'L12M'  # Indicate this is Last 12 Months data
+            
+            # Calculate comparison: previous 12 months before L12M
+            prev_end = start_date - pd.Timedelta(days=1)
+            prev_start = prev_end - pd.DateOffset(months=12)
+            prev_inc, prev_exp, prev_inv = get_sums_for_range(prev_start, prev_end)
+        else:
+            # Use standard YoY comparison
+            prev_inc, prev_exp, prev_inv = get_ytd_sums(last_year, current_month)
+        
+        ytd_net = ytd_inc - ytd_exp - ytd_inv
         prev_net = prev_inc - prev_exp - prev_inv
         
         # Calculate YoY %
@@ -472,7 +501,8 @@ class WealthService:
             'ytd_investment': self._fmt_currency(ytd_inv),
             'ytd_investment_yoy': fmt_yoy(yoy_pct(ytd_inv, prev_inv)),
             'ytd_net_cf': self._fmt_currency(ytd_net),
-            'ytd_net_cf_yoy': fmt_yoy(yoy_pct(ytd_net, prev_net))
+            'ytd_net_cf_yoy': fmt_yoy(yoy_pct(ytd_net, prev_net)),
+            'period_label': period_label  # 'YTD' or 'L12M' for frontend display
         }
 
     def _calculate_ytd_expense_breakdown(self, df: pd.DataFrame) -> Dict[str, Any]:

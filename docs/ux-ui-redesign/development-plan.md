@@ -412,6 +412,38 @@ Solution: This is expected. Will be fixed in Phase 5 with code splitting.
 
 ---
 
+## Legacy Data Validation Findings
+
+> **Note**: These issues were identified after testing the UX/UI Redesign in the **Legacy Repository** with real user data (2026-01-15). Priority items have been addressed.
+
+### 1. Visual & Design Issues (Deferred)
+
+- **Dashboard Hero Chart**: Month labels missing on hover.
+- **Allocation Breakdown**: Colors too monochromatic; Asset names localized in Chinese (ignore system language).
+- **Chart Tooltips**: Poor visual design; needs Glassmorphism update.
+- **Sankey Diagram**: Styling mismatch with Figma.
+- **Logic Studio**: Settings UI mismatch.
+
+### 2. Data Binding Logic ✅ RESOLVED
+
+- ~~**Wealth Dashboard**: KPI cards showed $0 due to empty current year (needs "Smart Fallback" logic).~~
+  - **Fix**: `_calculate_ytd_metrics` now falls back to L12M when current year is empty, with `period_label` indicator.
+- ~~**Action Compass**: Relied on `DEMO_` constants; needs `market_thermometer` API binding.~~
+  - **Fix**: Created `/api/market_thermometer` endpoint and `useMarketThermometer` hook.
+- **Portfolio Report**: Still uses demo arrays for chart data (lower priority, deferred).
+
+### 3. Functionality (Deferred)
+
+- **Data Workbench**: Upload/Paste buttons unresponsive.
+- **Interactive Controls**: Time period selection, search, and export buttons non-functional.
+
+### 4. Infrastructure ✅ RESOLVED
+
+- ~~**Port Conflict**: Default port 5000 conflicts with macOS AirPlay Receiver.~~
+  - **Status**: Already fixed in `main.py` (port 5001 default) and `vite.config.ts`.
+
+---
+
 ## Handoff Checklist
 
 For the next developer picking up this work:
@@ -425,6 +457,7 @@ For the next developer picking up this work:
 - [ ] Check `project-status.md` for any blockers
 
 **Current Status**: All 13 phases complete. The UX/UI redesign is feature-complete with:
+
 - React SPA with all pages migrated
 - Full API integration with Flask backend
 - Authentication and protected routes

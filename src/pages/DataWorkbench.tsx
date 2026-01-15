@@ -143,6 +143,43 @@ const WorkbenchCard: React.FC<{
 );
 
 const UploadStep: React.FC<{ onNext: () => void; onBack: () => void }> = ({ onNext, onBack }) => {
+    const [activeTab, setActiveTab] = useState<'upload' | 'paste'>('upload');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [pasteContent, setPasteContent] = useState('');
+    const [isDragOver, setIsDragOver] = useState(false);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    const handleFileSelect = (file: File) => {
+        const validExtensions = ['.csv', '.xls', '.xlsx'];
+        const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'));
+        if (validExtensions.includes(ext)) {
+            setSelectedFile(file);
+        } else {
+            alert('Please upload a CSV, XLS, or XLSX file');
+        }
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragOver(false);
+        const file = e.dataTransfer.files[0];
+        if (file) handleFileSelect(file);
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragOver(true);
+    };
+
+    const handleDragLeave = () => setIsDragOver(false);
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) handleFileSelect(file);
+    };
+
+    const canProceed = activeTab === 'upload' ? !!selectedFile : pasteContent.trim().length > 0;
+
     return (
         <div className="max-w-4xl mx-auto space-y-10">
             <div className="text-center">
@@ -155,8 +192,18 @@ const UploadStep: React.FC<{ onNext: () => void; onBack: () => void }> = ({ onNe
             <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
                 <div className="bg-gray-50/50 border-b border-gray-100 p-1 flex justify-center">
                     <div className="flex bg-gray-200 rounded-lg p-1 w-full max-w-sm my-4">
-                        <button className="flex-1 px-4 py-2 bg-white text-blue-600 font-bold rounded shadow-sm text-sm">Upload CSV</button>
-                        <button className="flex-1 px-4 py-2 text-gray-500 font-medium text-sm">Copy & Paste</button>
+                        <button
+                            onClick={() => setActiveTab('upload')}
+                            className={`flex-1 px-4 py-2 font-bold rounded text-sm transition-all ${activeTab === 'upload' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                        >
+                            Upload CSV
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('paste')}
+                            className={`flex-1 px-4 py-2 font-medium text-sm transition-all ${activeTab === 'paste' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                        >
+                            Copy & Paste
+                        </button>
                     </div>
                 </div>
 
@@ -180,31 +227,75 @@ const UploadStep: React.FC<{ onNext: () => void; onBack: () => void }> = ({ onNe
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-semibold text-gray-700">Upload File</label>
-                        <div className="border-2 border-dashed border-blue-200 bg-blue-50/30 rounded-2xl p-16 flex flex-col items-center justify-center text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-all group">
-                            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-blue-600 shadow-sm mb-4 transition-transform group-hover:scale-110">
-                                <CloudUpload size={32} />
+                    {activeTab === 'upload' ? (
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-gray-700">Upload File</label>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept=".csv,.xls,.xlsx"
+                                onChange={handleInputChange}
+                                className="hidden"
+                            />
+                            <div
+                                onClick={() => fileInputRef.current?.click()}
+                                onDrop={handleDrop}
+                                onDragOver={handleDragOver}
+                                onDragLeave={handleDragLeave}
+                                className={`border-2 border-dashed rounded-2xl p-16 flex flex-col items-center justify-center text-center cursor-pointer transition-all group ${isDragOver
+                                        ? 'border-blue-500 bg-blue-50'
+                                        : selectedFile
+                                            ? 'border-emerald-400 bg-emerald-50/30'
+                                            : 'border-blue-200 bg-blue-50/30 hover:border-blue-400 hover:bg-blue-50/50'
+                                    }`}
+                            >
+                                {selectedFile ? (
+                                    <>
+                                        <div className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-lg mb-4">
+                                            <CheckCircle size={32} />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-1">{selectedFile.name}</h3>
+                                        <p className="text-sm text-gray-500">{(selectedFile.size / 1024).toFixed(1)} KB • Click to change</p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-blue-600 shadow-sm mb-4 transition-transform group-hover:scale-110">
+                                            <CloudUpload size={32} />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-1">Click to upload or drag and drop</h3>
+                                        <p className="text-sm text-gray-500 mb-4">Drag your file here or click to browse</p>
+                                        <div className="px-3 py-1 bg-white border border-gray-200 rounded text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                            Supported formats: .csv, .xls, .xlsx
+                                        </div>
+                                    </>
+                                )}
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-1">Click to upload or drag and drop</h3>
-                            <p className="text-sm text-gray-500 mb-4">SVG, PNG, JPG or GIF (max. 800x400px)</p>
-                            <div className="px-3 py-1 bg-white border border-gray-200 rounded text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                Supported formats: .csv, .xls, .xlsx
+                            <div className="flex justify-between items-center px-1 text-xs text-gray-400">
+                                <button className="flex items-center gap-1 hover:text-blue-600">
+                                    <FileText size={14} /> Download sample template
+                                </button>
+                                <span>Max size: 50MB</span>
                             </div>
                         </div>
-                        <div className="flex justify-between items-center px-1 text-xs text-gray-400">
-                            <button className="flex items-center gap-1 hover:text-blue-600">
-                                <FileText size={14} /> Download sample template
-                            </button>
-                            <span>Max size: 50MB</span>
+                    ) : (
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-gray-700">Paste CSV Data</label>
+                            <textarea
+                                value={pasteContent}
+                                onChange={(e) => setPasteContent(e.target.value)}
+                                placeholder="Paste your CSV data here...&#10;&#10;Date,Symbol,Description,Amount&#10;2023-10-24,AAPL,Buy 10 shares,-1735.00"
+                                className="w-full h-64 bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                            />
+                            <p className="text-xs text-gray-400">Tip: Copy rows from Excel or Google Sheets and paste them directly</p>
                         </div>
-                    </div>
+                    )}
 
                     <div className="pt-6 border-t border-gray-100 flex items-center justify-end gap-4">
                         <button onClick={onBack} className="px-6 py-2.5 text-sm font-semibold text-gray-400 hover:text-gray-600 transition-colors">Cancel</button>
                         <button
                             onClick={onNext}
-                            className="px-10 py-2.5 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-500/25 hover:bg-blue-700 transition-all flex items-center gap-2 group"
+                            disabled={!canProceed}
+                            className="px-10 py-2.5 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-500/25 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 group"
                         >
                             Continue to Mapping
                             <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
@@ -472,16 +563,16 @@ const ReviewStep: React.FC<{ onNext: () => void; onBack: () => void }> = ({ onNe
                                     <td className="py-3 px-6 font-bold text-gray-900 border-r border-gray-100">{row.description}</td>
                                     <td className="py-3 px-6 border-r border-gray-100">
                                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider ${row.status === 'error' && row.errorMsg?.includes('category')
-                                                ? 'bg-red-100 text-red-600 italic'
-                                                : row.id.includes('fixed') ? 'bg-blue-100 text-blue-600' : 'bg-blue-50 text-blue-600'
+                                            ? 'bg-red-100 text-red-600 italic'
+                                            : row.id.includes('fixed') ? 'bg-blue-100 text-blue-600' : 'bg-blue-50 text-blue-600'
                                             }`}>
                                             {row.category}
                                             {row.id.includes('fixed') && <Wand2 size={12} className="ml-1" />}
                                         </span>
                                     </td>
                                     <td className={`py-3 px-6 font-mono text-right border-r border-gray-100 ${row.status === 'error' && row.amount < 0 && row.category === 'Income'
-                                            ? 'text-red-600 font-bold'
-                                            : row.amount > 0 ? 'text-emerald-600 font-bold' : 'text-gray-900'
+                                        ? 'text-red-600 font-bold'
+                                        : row.amount > 0 ? 'text-emerald-600 font-bold' : 'text-gray-900'
                                         }`}>
                                         {row.amount < 0 ? '-' : '+'}${Math.abs(row.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </td>

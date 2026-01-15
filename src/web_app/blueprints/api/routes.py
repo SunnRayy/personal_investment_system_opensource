@@ -263,6 +263,34 @@ def data_quality_api():
 	})
 
 
+@api_bp.route('/market_thermometer', methods=['GET'])
+@login_required
+def market_thermometer_api():
+	"""Fetch market sentiment indicators for the Action Compass.
+	
+	Returns Fear & Greed Index, VIX, Shiller PE, and Buffett Indicators
+	from cached or fresh data via MacroAnalyzer.
+	"""
+	try:
+		from src.investment_optimization.macro_analyzer import MacroAnalyzer
+		
+		analyzer = MacroAnalyzer()
+		data = analyzer.get_market_thermometer()
+		
+		return jsonify({
+			'status': 'success',
+			'data': data,
+			'generated_at': datetime.now().isoformat()
+		})
+	except Exception as e:
+		logger.error(f"Error fetching market thermometer: {e}")
+		return jsonify({
+			'status': 'error',
+			'error': str(e),
+			'data': None
+		}), 500
+
+
 @api_bp.route('/cache/refresh', methods=['POST'])
 @login_required
 def refresh_cache():

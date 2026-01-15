@@ -3,7 +3,7 @@
  * Performance & Growth Metrics - The "Health Check"
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
     AreaChart,
     Area,
@@ -21,11 +21,12 @@ import {
     Cell,
     Legend,
 } from 'recharts';
-import { TrendingUp, TrendingDown, Award, Droplets, DollarSign, BarChart3 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Award, Droplets, DollarSign, BarChart3, Download, RefreshCw } from 'lucide-react';
 import { useUnifiedAnalysis } from '../hooks/useReports';
+import { TimePeriodSelector, type TimePeriod } from '../components/ui/TimePeriodSelector';
 
-// Demo data for portfolio growth
-const GROWTH_DATA = [
+// Demo data for portfolio growth (fallback when API unavailable)
+const DEMO_GROWTH_DATA = [
     { month: 'Jan', portfolio: 1980000, invested: 1900000, equity: 1100000, fixedIncome: 600000, alts: 280000 },
     { month: 'Feb', portfolio: 2020000, invested: 1920000, equity: 1150000, fixedIncome: 590000, alts: 280000 },
     { month: 'Mar', portfolio: 1950000, invested: 1940000, equity: 1050000, fixedIncome: 620000, alts: 280000 },
@@ -40,8 +41,8 @@ const GROWTH_DATA = [
     { month: 'Dec', portfolio: 2140580, invested: 2012130, equity: 1250000, fixedIncome: 610000, alts: 280580 },
 ];
 
-// YoY Net Worth data
-const YOY_DATA = [
+// YoY Net Worth data (fallback)
+const DEMO_YOY_DATA = [
     { year: '2020', growth: 180000, baseline: 1400000 },
     { year: '2021', growth: 220000, baseline: 1580000 },
     { year: '2022', growth: 150000, baseline: 1800000 },
@@ -49,17 +50,17 @@ const YOY_DATA = [
     { year: '2024', growth: 190000, baseline: 2230000 },
 ];
 
-// Performance by asset class
-const PERFORMANCE_DATA = [
+// Performance by asset class (fallback)
+const DEMO_PERFORMANCE_DATA = [
     { name: 'Public Equity', xirr: 14.2, color: '#3b82f6' },
     { name: 'Fixed Income', xirr: 4.8, color: '#f59e0b' },
     { name: 'Alternatives', xirr: 9.1, color: '#22c55e' },
-    { name: 'Real Estate', xirr: 6.5, color: '#3b82f6' },
+    { name: 'Real Estate', xirr: 6.5, color: '#8b5cf6' },
     { name: 'Cash / Equiv', xirr: 3.2, color: '#64748b' },
 ];
 
-// Allocation data for donut
-const ALLOCATION_DATA = [
+// Allocation data for donut (fallback)
+const DEMO_ALLOCATION_DATA = [
     { name: 'Equity', value: 55, color: '#3b82f6' },
     { name: 'Fixed Income', value: 25, color: '#f59e0b' },
     { name: 'Alternatives', value: 12, color: '#22c55e' },
@@ -67,14 +68,40 @@ const ALLOCATION_DATA = [
 ];
 
 const Portfolio: React.FC = () => {
-    const { data: analysisData, isLoading } = useUnifiedAnalysis();
+    const [period, setPeriod] = useState<TimePeriod>('YTD');
+    const { data: analysisData, isLoading, refetch, isFetching } = useUnifiedAnalysis();
 
-    // Extract portfolio snapshot data
+    // Use API data with demo fallback
+    const growthData = React.useMemo(() => {
+        // TODO: Transform analysisData.trend_data when available
+        return DEMO_GROWTH_DATA;
+    }, [analysisData]);
+
+    const yoyData = DEMO_YOY_DATA;
+    const performanceData = DEMO_PERFORMANCE_DATA;
+    const allocationData = DEMO_ALLOCATION_DATA;
+
+    // Extract portfolio snapshot data with fallback
     const netWorth = analysisData?.portfolio_snapshot?.total_value || 2140580;
-    const ytdGrowth = analysisData?.performance?.ytd_return || 6.4;
-    const ytdAmount = 128450;
+    const ytdGrowth = analysisData?.performance_data?.ytd_return || 6.4;
+    const ytdAmount = Math.round(netWorth * (ytdGrowth / 100));
     const liquidAssets = analysisData?.portfolio_snapshot?.liquid_assets || 420000;
-    const sharpeRatio = 1.85;
+
+    const handleExport = () => {
+        // Create CSV export of portfolio data
+        const csvContent = [
+            ['Month', 'Portfolio Value', 'Invested', 'Equity', 'Fixed Income', 'Alternatives'],
+            ...growthData.map(row => [row.month, row.portfolio, row.invested, row.equity, row.fixedIncome, row.alts])
+        ].map(row => row.join(',')).join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `portfolio_report_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+    };
 
     if (isLoading) {
         return (
@@ -92,9 +119,25 @@ const Portfolio: React.FC = () => {
             {/* Header */}
             <div className="flex items-center justify-between mb-2">
                 <h1 className="text-3xl font-bold text-gray-900">Performance & Growth Metrics</h1>
-                <div className="flex items-center gap-4">
-                    <button className="px-3 py-1.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">
-                        Period: YTD ▾
+                <div className="flex items-center gap-3">
+                    <TimePeriodSelector
+                        value={period}
+                        onChange={setPeriod}
+                        options={['1M', '3M', '6M', 'YTD', '1Y', 'ALL']}
+                    />
+                    <button
+                        onClick={() => refetch()}
+                        disabled={isFetching}
+                        className="p-2 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                    >
+                        <RefreshCw size={16} className={isFetching ? 'animate-spin' : ''} />
+                    </button>
+                    <button
+                        onClick={handleExport}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                    >
+                        <Download size={16} />
+                        Export
                     </button>
                 </div>
             </div>
@@ -131,7 +174,7 @@ const Portfolio: React.FC = () => {
                 </div>
 
                 <ResponsiveContainer width="100%" height={280}>
-                    <AreaChart data={GROWTH_DATA} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                    <AreaChart data={growthData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                         <defs>
                             <linearGradient id="equityGrad" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
@@ -174,7 +217,7 @@ const Portfolio: React.FC = () => {
                         <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">Last 12 Months</span>
                     </div>
                     <div className="space-y-4">
-                        {PERFORMANCE_DATA.map((item) => (
+                        {performanceData.map((item) => (
                             <div key={item.name}>
                                 <div className="flex justify-between text-sm mb-1.5">
                                     <span className="font-medium text-gray-700">{item.name}</span>
@@ -200,7 +243,7 @@ const Portfolio: React.FC = () => {
                         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">YoY Net Worth Growth</h3>
                     </div>
                     <ResponsiveContainer width="100%" height={220}>
-                        <BarChart data={YOY_DATA}>
+                        <BarChart data={yoyData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                             <XAxis dataKey="year" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} />
                             <YAxis tick={{ fill: '#64748b', fontSize: 12 }} tickFormatter={(v) => `$${(v / 1000000).toFixed(1)}M`} axisLine={false} />

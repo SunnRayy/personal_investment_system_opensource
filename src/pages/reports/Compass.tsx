@@ -5,12 +5,13 @@
  * Uses demo data when API data is unavailable to ensure page always loads.
  */
 
-import React from 'react';
-import { Download, Play, AlertTriangle, TrendingUp, TrendingDown, Activity } from 'lucide-react';
-import { useUnifiedAnalysis, useCorrelation } from '../../hooks/useReports';
+import React, { useState } from 'react';
+import { Download, Play, AlertTriangle, TrendingUp, TrendingDown, Activity, RefreshCw } from 'lucide-react';
+import { useUnifiedAnalysis, useCorrelation, useMarketThermometer } from '../../hooks/useReports';
 import GroupedBarChart from '../../components/charts/GroupedBarChart';
 import DivergingBarChart from '../../components/charts/DivergingBarChart';
 import CorrelationMatrix from '../../components/charts/CorrelationMatrix';
+import { TimePeriodSelector, type TimePeriod } from '../../components/ui/TimePeriodSelector';
 
 // Demo data for when API is unavailable
 const DEMO_ALLOCATION = [
@@ -46,8 +47,10 @@ const DEMO_RECOMMENDATIONS = [
 ];
 
 const Compass: React.FC = () => {
-    const { data: analysisData, isLoading: analysisLoading, refetch } = useUnifiedAnalysis();
+    const [period, setPeriod] = useState<TimePeriod>('YTD');
+    const { data: analysisData, isLoading: analysisLoading, refetch, isFetching } = useUnifiedAnalysis();
     const { data: correlationData, isLoading: correlationLoading } = useCorrelation(true);
+    const { data: thermometerData } = useMarketThermometer();
 
     // Use demo data when API data is unavailable
     const allocationData = React.useMemo(() => {
@@ -80,15 +83,25 @@ const Compass: React.FC = () => {
         description: 'Market signals suggest reducing beta exposure in tech sectors while increasing quality duration in fixed income.'
     };
 
-    // Fear & Greed Index - demo value (would come from macro_analyzer API)
-    const fearGreedIndex = 42; // Neutral-Fear territory
+    // Fear & Greed Index - from macro_analyzer API with fallback
+    const fearGreedIndex = React.useMemo(() => {
+        if (thermometerData?.fear_greed?.status === 'success') {
+            return Math.round(thermometerData.fear_greed.value);
+        }
+        return 42; // Demo fallback
+    }, [thermometerData]);
     const fearGreedLabel = fearGreedIndex < 25 ? 'Extreme Fear' :
         fearGreedIndex < 45 ? 'Fear' :
             fearGreedIndex < 55 ? 'Neutral' :
                 fearGreedIndex < 75 ? 'Greed' : 'Extreme Greed';
 
-    // Buffett Indicator - demo value 
-    const buffettIndicator = 178; // Percentage (>100 = overvalued)
+    // Buffett Indicator (US market) - from macro_analyzer API with fallback
+    const buffettIndicator = React.useMemo(() => {
+        if (thermometerData?.buffett_us?.status === 'success') {
+            return Math.round(thermometerData.buffett_us.value);
+        }
+        return 178; // Demo fallback
+    }, [thermometerData]);
     const buffettLabel = buffettIndicator > 150 ? 'Overvalued' :
         buffettIndicator > 100 ? 'Fair Value' : 'Undervalued';
 
@@ -118,9 +131,31 @@ const Compass: React.FC = () => {
                     <h1 className="text-3xl font-bold text-gray-900">Action Compass Strategy</h1>
                     <p className="text-sm text-gray-500">Tactical rebalancing and regime analysis</p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex items-center gap-3">
+                    <TimePeriodSelector
+                        value={period}
+                        onChange={setPeriod}
+                        options={['1M', '3M', 'YTD', '1Y']}
+                    />
                     <button
                         onClick={() => refetch()}
+                        disabled={isFetching}
+                        className="p-2 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                    >
+                        <RefreshCw size={16} className={isFetching ? 'animate-spin' : ''} />
+                    </button>
+                    <button
+                        onClick={() => {
+                            const csvContent = [
+                                ['Category', 'Target %', 'Current %', 'Drift'],
+                                ...allocationData.map((row: any) => [row.name, row.target, row.current, row.current - row.target])
+                            ].map(row => row.join(',')).join('\n');
+                            const blob = new Blob([csvContent], { type: 'text/csv' });
+                            const link = document.createElement('a');
+                            link.href = URL.createObjectURL(blob);
+                            link.download = `compass_report_${new Date().toISOString().split('T')[0]}.csv`;
+                            link.click();
+                        }}
                         className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
                         <Download size={16} />
@@ -258,8 +293,8 @@ const Compass: React.FC = () => {
                                 <tr key={i} className="hover:bg-gray-50">
                                     <td className="py-3">
                                         <span className={`rounded-full px-2 py-1 text-xs font-semibold ${rec.priority === 'High' ? 'bg-red-100 text-red-700' :
-                                                rec.priority === 'Medium' ? 'bg-amber-100 text-amber-700' :
-                                                    'bg-gray-100 text-gray-600'
+                                            rec.priority === 'Medium' ? 'bg-amber-100 text-amber-700' :
+                                                'bg-gray-100 text-gray-600'
                                             }`}>
                                             {rec.priority}
                                         </span>

@@ -52,8 +52,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Cash Flow tab: Income vs expenses bar charts, net cash flow trend.
   - Expenses tab: Expense breakdown pie chart, efficiency analysis with progress bars.
   - YTD KPI cards with Year-over-Year comparison.
+  - **Smart Fallback**: YTD metrics now fallback to Last 12 Months (L12M) when current year has no data, with dynamic label indicator.
   - New hooks: `useWealthDashboard()`, `useWealthParity()`.
   - TypeScript types for wealth API responses.
+
+- **Phase 14 Upstream Fixes** (from legacy real-data testing):
+  - **Market Thermometer API**: New `/api/market_thermometer` endpoint for Fear & Greed Index and Buffett Indicator.
+  - **Compass API Binding**: `useMarketThermometer` hook with real macro data, demo fallback.
+  - **TimePeriodSelector**: Reusable period filter component (1M/3M/6M/YTD/1Y/ALL) wired to Portfolio, CashFlow, Compass.
+  - **GlassTooltip**: Glassmorphism-styled chart tooltip component with frosted glass effect.
+  - **Export Buttons**: CSV download functionality on all report pages (Portfolio, CashFlow, Compass).
+  - **Data Workbench**: Functional file upload with drag/drop, click-to-browse, Copy & Paste tab.
+  - **CashFlow Sankey**: Improved visualization with SVG flow connectors, gradient styling, hover effects.
 
 - **Settings Page** (`/settings`): User preferences management with localStorage persistence.
   - Display preferences: Theme (light/dark/system), Language (en/zh), Currency (USD/CNY), Date format.

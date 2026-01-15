@@ -3,8 +3,8 @@
  * Capital flow visualization and forecasting
  */
 
-import React from 'react';
-import { Download, Calendar, TrendingUp, TrendingDown, DollarSign, PiggyBank } from 'lucide-react';
+import React, { useState } from 'react';
+import { Download, Calendar, TrendingUp, TrendingDown, DollarSign, PiggyBank, RefreshCw } from 'lucide-react';
 import {
     AreaChart,
     Area,
@@ -23,11 +23,13 @@ import {
     Cell,
 } from 'recharts';
 import { useCashFlow } from '../../hooks/useReports';
+import { TimePeriodSelector, type TimePeriod } from '../../components/ui/TimePeriodSelector';
 
 const COLORS = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
 const CashFlow: React.FC = () => {
-    const { data: cashFlowData, isLoading, error, refetch } = useCashFlow();
+    const [period, setPeriod] = useState<TimePeriod>('1Y');
+    const { data: cashFlowData, isLoading, error, refetch, isFetching } = useCashFlow();
 
     // Demo data for visualization
     const monthlyData = React.useMemo(() => {
@@ -108,78 +110,134 @@ const CashFlow: React.FC = () => {
                     <h1 className="text-3xl font-bold text-gray-900">Cash Flow Analysis</h1>
                     <p className="text-sm text-gray-500">Visualizing capital movement and forecasting liquidity</p>
                 </div>
-                <div className="flex gap-3">
-                    <button className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                        <Calendar size={16} />
-                        Last 12 Months
+                <div className="flex items-center gap-3">
+                    <TimePeriodSelector
+                        value={period}
+                        onChange={setPeriod}
+                        options={['3M', '6M', '1Y', 'ALL']}
+                    />
+                    <button
+                        onClick={() => refetch()}
+                        disabled={isFetching}
+                        className="p-2 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                    >
+                        <RefreshCw size={16} className={isFetching ? 'animate-spin' : ''} />
                     </button>
-                    <button className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+                    <button
+                        onClick={() => {
+                            const csvContent = [
+                                ['Month', 'Income', 'Expense', 'Net'],
+                                ...monthlyData.map(row => [row.month, row.income, row.expense, row.net])
+                            ].map(row => row.join(',')).join('\n');
+                            const blob = new Blob([csvContent], { type: 'text/csv' });
+                            const link = document.createElement('a');
+                            link.href = URL.createObjectURL(blob);
+                            link.download = `cashflow_${new Date().toISOString().split('T')[0]}.csv`;
+                            link.click();
+                        }}
+                        className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                    >
                         <Download size={16} />
-                        Export Report
+                        Export
                     </button>
                 </div>
             </div>
 
-            {/* Row 1: Sankey-style Flow Diagram (simplified as stacked visual) */}
+            {/* Row 1: Sankey-style Flow Diagram (improved styling) */}
             <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <div className="mb-4 flex items-center justify-between">
                     <div>
                         <h3 className="font-semibold text-gray-900">Capital Flow Diagram</h3>
-                        <p className="text-sm text-gray-500">Inflow breakdown (Salary, RSU, Dividends) → Outflow allocation</p>
+                        <p className="text-sm text-gray-500">Inflow breakdown → Outflow allocation</p>
                     </div>
                     <div className="flex gap-4 text-sm">
                         <span className="flex items-center gap-2">
-                            <span className="h-3 w-3 rounded-full bg-emerald-500"></span>
+                            <span className="h-3 w-3 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600"></span>
                             Income
                         </span>
                         <span className="flex items-center gap-2">
-                            <span className="h-3 w-3 rounded-full bg-red-500"></span>
+                            <span className="h-3 w-3 rounded-full bg-gradient-to-br from-red-400 to-red-600"></span>
                             Expenses
                         </span>
                         <span className="flex items-center gap-2">
-                            <span className="h-3 w-3 rounded-full bg-blue-500"></span>
+                            <span className="h-3 w-3 rounded-full bg-gradient-to-br from-blue-400 to-blue-600"></span>
                             Savings/Inv
                         </span>
                     </div>
                 </div>
 
-                {/* Simplified Sankey visualization */}
-                <div className="flex items-center justify-center gap-4 py-8">
+                {/* Improved Sankey visualization */}
+                <div className="flex items-center justify-center gap-8 py-8">
                     {/* Income sources */}
-                    <div className="flex flex-col gap-2">
-                        {incomeBreakdown.map((item, i) => (
-                            <div
-                                key={item.name}
-                                className="flex items-center gap-2 rounded-lg bg-emerald-100 px-4 py-3"
-                                style={{ height: `${30 + (item.value / 5000)}px` }}
-                            >
-                                <span className="text-sm font-medium text-emerald-700">{item.name}</span>
-                                <span className="text-xs text-emerald-600">¥{(item.value / 1000).toFixed(0)}k</span>
-                            </div>
-                        ))}
+                    <div className="flex flex-col gap-3 min-w-[160px]">
+                        {incomeBreakdown.map((item, i) => {
+                            const height = Math.max(40, (item.value / 4000) + 30);
+                            return (
+                                <div
+                                    key={item.name}
+                                    className="group relative flex items-center gap-3 rounded-xl bg-gradient-to-r from-emerald-50 to-emerald-100 border border-emerald-200/60 px-4 transition-all hover:shadow-md hover:scale-[1.02]"
+                                    style={{ height: `${height}px` }}
+                                >
+                                    <div className="w-1 h-3/4 rounded-full bg-gradient-to-b from-emerald-400 to-emerald-600" />
+                                    <div className="flex-1">
+                                        <span className="text-sm font-semibold text-emerald-800">{item.name}</span>
+                                        <p className="text-xs text-emerald-600 font-mono">¥{(item.value / 1000).toFixed(0)}k</p>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
 
-                    {/* Flow arrows */}
-                    <div className="flex flex-col items-center justify-center">
-                        <div className="h-32 w-24 rounded-lg bg-gradient-to-r from-emerald-200 via-gray-100 to-red-200"></div>
-                        <p className="mt-2 text-xs text-gray-500">Total Flow</p>
+                    {/* Flow connectors */}
+                    <div className="flex flex-col items-center justify-center relative w-32">
+                        <svg className="w-full h-40" viewBox="0 0 100 120">
+                            <defs>
+                                <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
+                                    <stop offset="50%" stopColor="#94a3b8" stopOpacity="0.2" />
+                                    <stop offset="100%" stopColor="#ef4444" stopOpacity="0.4" />
+                                </linearGradient>
+                            </defs>
+                            {/* Flow paths */}
+                            <path d="M 0 20 Q 50 20, 100 30" fill="none" stroke="url(#flowGrad)" strokeWidth="8" strokeLinecap="round" opacity="0.6" />
+                            <path d="M 0 60 Q 50 60, 100 60" fill="none" stroke="url(#flowGrad)" strokeWidth="12" strokeLinecap="round" opacity="0.8" />
+                            <path d="M 0 100 Q 50 100, 100 90" fill="none" stroke="url(#flowGrad)" strokeWidth="6" strokeLinecap="round" opacity="0.5" />
+                        </svg>
+                        <div className="absolute bottom-0 text-center">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Total Flow</span>
+                            <p className="text-xs font-mono text-gray-600">¥389k</p>
+                        </div>
                     </div>
 
                     {/* Outflow */}
-                    <div className="flex flex-col gap-2">
-                        {expenseBreakdown.map((item, i) => (
-                            <div
-                                key={item.name}
-                                className={`flex items-center gap-2 rounded-lg px-4 py-3 ${item.name === 'Investments' ? 'bg-blue-100' : 'bg-red-100'
-                                    }`}
-                                style={{ height: `${30 + (item.value / 5000)}px` }}
-                            >
-                                <span className={`text-sm font-medium ${item.name === 'Investments' ? 'text-blue-700' : 'text-red-700'
-                                    }`}>{item.name}</span>
-                                <span className={`text-xs ${item.name === 'Investments' ? 'text-blue-600' : 'text-red-600'
-                                    }`}>¥{(item.value / 1000).toFixed(0)}k</span>
-                            </div>
-                        ))}
+                    <div className="flex flex-col gap-3 min-w-[160px]">
+                        {expenseBreakdown.map((item, i) => {
+                            const height = Math.max(40, (item.value / 4000) + 30);
+                            const isInvestment = item.name === 'Investments';
+                            return (
+                                <div
+                                    key={item.name}
+                                    className={`group relative flex items-center gap-3 rounded-xl border px-4 transition-all hover:shadow-md hover:scale-[1.02] ${isInvestment
+                                        ? 'bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200/60'
+                                        : 'bg-gradient-to-r from-red-50 to-red-100 border-red-200/60'
+                                        }`}
+                                    style={{ height: `${height}px` }}
+                                >
+                                    <div className={`w-1 h-3/4 rounded-full ${isInvestment
+                                        ? 'bg-gradient-to-b from-blue-400 to-blue-600'
+                                        : 'bg-gradient-to-b from-red-400 to-red-600'
+                                        }`} />
+                                    <div className="flex-1">
+                                        <span className={`text-sm font-semibold ${isInvestment ? 'text-blue-800' : 'text-red-800'}`}>
+                                            {item.name}
+                                        </span>
+                                        <p className={`text-xs font-mono ${isInvestment ? 'text-blue-600' : 'text-red-600'}`}>
+                                            ¥{(item.value / 1000).toFixed(0)}k
+                                        </p>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>

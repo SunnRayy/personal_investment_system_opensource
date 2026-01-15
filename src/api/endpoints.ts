@@ -14,6 +14,7 @@ export const ENDPOINTS = {
   UNIFIED_ANALYSIS: '/api/unified_analysis',
   ASSETS_LIST: '/api/assets/list',
   DATA_QUALITY: '/api/data_quality',
+  MARKET_THERMOMETER: '/api/market_thermometer',
 
   // Cache Management
   CACHE_REFRESH: '/api/cache/refresh',

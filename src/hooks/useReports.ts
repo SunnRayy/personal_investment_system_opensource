@@ -14,6 +14,7 @@ import type {
   CorrelationResponse,
   SimulationResponse,
   SimulationParams,
+  MarketThermometerResponse,
 } from '../api/types';
 
 // Query keys for cache management
@@ -22,6 +23,7 @@ export const REPORTS_QUERY_KEYS = {
   wealthSummary: ['reports', 'wealth', 'summary'] as const,
   cashFlow: ['reports', 'wealth', 'cashflow'] as const,
   correlation: ['reports', 'correlation'] as const,
+  marketThermometer: ['reports', 'market-thermometer'] as const,
   simulation: (params: SimulationParams) => ['reports', 'simulation', params] as const,
 };
 
@@ -50,6 +52,30 @@ export function useUnifiedAnalysis() {
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 30 * 60 * 1000,   // 30 minutes
     retry: 2,
+    refetchOnWindowFocus: false,
+  });
+}
+
+/**
+ * Fetch market thermometer data (Fear & Greed, Buffett, VIX, Shiller PE)
+ *
+ * Used by Action Compass for sentiment indicators.
+ */
+export function useMarketThermometer() {
+  return useQuery({
+    queryKey: REPORTS_QUERY_KEYS.marketThermometer,
+    queryFn: async () => {
+      const result = await api.get<MarketThermometerResponse>(ENDPOINTS.MARKET_THERMOMETER);
+
+      if (!result.success) {
+        throw new Error(result.error.message);
+      }
+
+      return result.data.data;
+    },
+    staleTime: 15 * 60 * 1000, // 15 minutes (external data, less frequent updates)
+    gcTime: 60 * 60 * 1000,    // 1 hour
+    retry: 1,
     refetchOnWindowFocus: false,
   });
 }
