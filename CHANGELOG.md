@@ -65,6 +65,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Data Workbench**: Functional file upload with drag/drop, click-to-browse, Copy & Paste tab.
   - **CashFlow Sankey**: Improved visualization with SVG flow connectors, gradient styling, hover effects.
 
+- **Phase 15 Data Integration** (remove hardcoded demo data):
+  - **LifetimePerformance.tsx**: Removed `GAINS_BREAKDOWN`, `SUBCLASS_DATA`, `ASSET_DATA` constants; integrated `useLifetimePerformance()` API hook; added functional pagination, filter toggle, and CSV export.
+  - **Portfolio.tsx**: Removed 4 `DEMO_*` constants; added `usePortfolioOverview()` hook for trend data; simplified hero chart to single area chart.
+  - **CashFlow.tsx**: Removed hardcoded `forecastData`, `incomeBreakdown`, `expenseBreakdown`; added conditional rendering for null states.
+  - **Compass.tsx**: Removed all `DEMO_*` fallback constants; implemented null-safe rendering with graceful error states.
+  - **New Service**: `src/web_app/services/lifetime_performance_service.py` for gains/performance calculations.
+
 - **Settings Page** (`/settings`): User preferences management with localStorage persistence.
   - Display preferences: Theme (light/dark/system), Language (en/zh), Currency (USD/CNY), Date format.
   - Analysis parameters section (read-only view of config/settings.yaml values).
